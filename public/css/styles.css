@@ -1,0 +1,12 @@
+tr.treeview {
+    display:none;
+    transition: 0.5 all;
+}
+
+tr.treeview.active{
+    display: table-row;
+}
+  
+tr.treeview table{
+    width: 100%;
+}
