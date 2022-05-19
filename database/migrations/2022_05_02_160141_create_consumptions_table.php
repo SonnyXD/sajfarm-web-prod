@@ -15,7 +15,11 @@ return new class extends Migration
     {
         Schema::create('consumptions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('checklist_id')->constrained();
+            $table->foreignId('inventory_id')->default('2')->constrained();
+            $table->foreignId('medic_id')->default(0)->nullable()->constrained();
+            $table->foreignId('ambulance_id')->nullable()->constrained();
+            $table->integer('patient_number')->nullable();
+            $table->string('tour');
             $table->date('document_date');
         });
     }

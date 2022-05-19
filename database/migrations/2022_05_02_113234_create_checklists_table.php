@@ -15,8 +15,10 @@ return new class extends Migration
     {
         Schema::create('checklists', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('inventory_id')->default('2')->constrained();
+            $table->foreignId('inventory_id')->constrained();
             $table->foreignId('medic_id')->default(0)->nullable()->constrained();
+            $table->foreignId('assistent_id')->default(0)->nullable()->constrained();
+            $table->foreignId('ambulancier_id')->default(0)->nullable()->constrained();
             $table->foreignId('ambulance_id')->nullable()->constrained();
             $table->date('checklist_date');
             $table->integer('patient_number')->nullable();

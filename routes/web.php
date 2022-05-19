@@ -10,6 +10,8 @@ use App\Models\Ambulance;
 use App\Models\Item;
 use App\Models\Unit;
 use App\Models\Invoice;
+use App\Models\InvoiceItem;
+use App\Models\ItemStock;
 
 use \App\Http\Controllers\AmbulanceController;
 use \App\Http\Controllers\AmbulanceTypeController;
@@ -56,10 +58,12 @@ use \App\Http\Controllers\AuthController;
 // });
 
 Route::get('login', [AuthController::class, 'index'])->name('login');
-Route::get('register', [AuthController::class, 'registration'])->name('register');
+//Route::get('register', [AuthController::class, 'registration'])->name('register');
 Route::post('register', [AuthController::class, 'postRegistration'])->name('register.post');
 Route::post('/', [AuthController::class, 'postLogin'])->name('login.post'); 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/register', [AuthController::class, 'index'])->name('login');
 
 Route::get('/', array('uses' => 'App\Http\Controllers\RoutesController@home'));
 
@@ -233,15 +237,13 @@ Route::get('/gestiune/{inventory_slug}/{category}', array('uses' => 'App\Http\Co
 //     return view('gestiune');
 // })->name('subgestiune');
 
-// Route::get('/operatiuni/{operatiune}', function ($dest) {
-//     $path = __DIR__ . "/../resources/operatiuni/{$dest}.php";
+Route::get('/testenv', function () {
+    
+    dd(ItemStock::with('invoice_item')->where('inventory_id', 1)->where('item_id', 1)->get());
 
-//     if(!file_exists($path)) {
-//         return redirect(404);
-//     }
+});
 
-//     return view('operation');
-// });
+Route::get('/inventory-products', array('uses' => 'App\Http\Controllers\LogicForms@inventory_products'));
 
 Route::get('/operatiuni/intrare-factura', array('uses' => 'App\Http\Controllers\RoutesController@invoice'));
 
@@ -275,7 +277,7 @@ Route::get('/documente/balanta', array('uses' => 'App\Http\Controllers\RoutesCon
 
 Route::get('/documente/baza-de-date', array('uses' => 'App\Http\Controllers\RoutesController@baza_date'));
 
-Route::get('/fun', [App\Http\Controllers\GeneratePDFController::class, 'invoice']);
+//Route::get('/fun', [App\Http\Controllers\GeneratePDFController::class, 'invoice']);
 
 Route::post('intrare-factura', 'App\Http\Controllers\InvoiceController@store')->name('invoices.store');
 
@@ -294,6 +296,8 @@ Route::post('bon-consum-medici', 'App\Http\Controllers\ConsumptionController@sto
 Route::post('aviz-intrare', 'App\Http\Controllers\AvizEntryController@store')->name('avizentries.store');
 
 Route::post('retur', 'App\Http\Controllers\ReturningController@store')->name('returnings.store');
+
+Route::post('inserare-proprietati', 'App\Http\Controllers\ProviderController@store')->name('provider.store');
 
 //Route::post('intrare-factura', 'App\Http\Controllers\InvoiceItemController@store')->name('invoiceitems.store');
 

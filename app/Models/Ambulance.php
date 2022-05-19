@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\AmbulanceType;
 use \App\Models\Substation;
+use \App\Models\Checklist;
 
 class Ambulance extends Model
 {
@@ -21,5 +22,9 @@ class Ambulance extends Model
 
     public function substation() {
         return $this->hasOne( Substation::class );
+    }
+
+    public function checklist() {
+        return $this->hasMany( Checklist::class );
     }
 }

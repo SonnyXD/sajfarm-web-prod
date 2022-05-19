@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\Item;
 use \App\Models\ItemStock;
+use \App\Models\Checklist;
 
 class ChecklistItem extends Model
 {
@@ -21,5 +22,13 @@ class ChecklistItem extends Model
 
     public function item_stock() {
         return $this->hasMany( ItemStock::class );
+    }
+
+    public function checklist() {
+        return $this->hasMany( Checklist::class );
+    }
+
+    public function checklist_item() {
+        return $this->belongsTo( ChecklistItem::class);
     }
 }

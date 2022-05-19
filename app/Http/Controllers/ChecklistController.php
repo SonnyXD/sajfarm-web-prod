@@ -41,22 +41,41 @@ class ChecklistController extends Controller
             'ambulance-select' => 'nullable',
             'document-date' => 'required',
             'patient-number' => 'nullable',
-            'tura' => 'required'
+            'tura' => 'required',
+            'assistent-select' => 'nullable',
+            'ambulancier-select' => 'nullable'
         ));
     
         $checklist = new \App\Models\Checklist();
-        $checklist->inventory_id = $request->input('substation-select') ?? 2;
+        $checklist->inventory_id = $request->input('substation-select');
         $checklist->medic_id = $request->input('medic-select');
         $checklist->ambulance_id = $request->input('ambulance-select');
         $checklist->checklist_date = $request->input('document-date');
         $checklist->patient_number = $request->input('patient-number');
+        $checklist->assistent_id = $request->input('assistent-select') ?? null;
+        $checklist->ambulancier_id = $request->input('ambulancier-select') ?? null;
         $checklist->tour = $request->input('tura');
         $checklist->save();
 
-       
+
+        $products = $request->input('product');
+        
+        foreach($products as $product)
+        {
+            $item = \App\Models\ItemStock::with('item')->find($product['productId']);
+            $item->quantity -= $product['productQty'];
+            $item->save();
+
+            $checklist_product = new \App\Models\ChecklistItem();
+            $checklist_product->checklist_id = $checklist->id;
+            $checklist_product->item_stock_id = $product['productId'];
+            $checklist_product->item_id = $item->item->id;
+            $checklist_product->quantity = $product['productQty'];
+            $checklist_product->save();
+        }
     
         return redirect('/operatiuni/checklist-statii')
-            ->with('success', 'Created Successfully');
+            ->with('success', 'Checklist generat cu succes!');
     }
 
     /**

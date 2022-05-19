@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('invoice_id')->constrained();
             $table->foreignId('item_id')->constrained();
-            $table->string('cim_code');
+            $table->string('cim_code')->nullable();
             $table->string('product_code');
             $table->integer('quantity');
             $table->date('exp_date');

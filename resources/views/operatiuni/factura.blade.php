@@ -1,7 +1,11 @@
 <x-layout>
+    <script language="javascript">
+      //inline js reminder (or create .js files for every blade page)
+    </script>
     <x-container>
     <x-form id="intrare-factura" method="POST" action="{{ route('invoices.store') }}">
-      <p style="color:green; font-weight: bold;">{{Session::get('success');}}</p>
+      <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
+      <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
         <div class="form-group">
         <label for="furnizor-select">Furnizor</label>
         <select class="form-control" id="furnizor-select" name="furnizor-select">
@@ -82,10 +86,11 @@
                   </div>
                   </div>
                   <div class="form-group">
-                    <x-button>Adauga in Farmacie si genereaza NIR-ul</x-button>
+                    <x-button disabled="disabled">Adauga in Farmacie si genereaza NIR-ul</x-button>
                 </div>
                 <div id="test" style="display:none"></div>
     </x-form>
+   
     </x-container>
     <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
@@ -196,8 +201,12 @@
                   <x-input type="number" class="form-control" id="product-value" name="product-value" disabled="disabled"/>
                 </div>
 
-                
+                <div class="modal-footer">
+                    <x-button type="button" class="btn btn-success" id="add-product">Adauga</x-button>
+                    <x-modal-trigger type="button" class="btn btn-light" data-bs-dismiss="modal">Inchide</x-modal-trigger>
+                </div>
 
               </x-form>
           </x-modal>
 </x-layout>
+<script src="/js/invoice.js"></script>

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use \App\Models\Item;
 use \App\Models\Inventory;
 use \App\Models\Invoice;
+use \App\Models\InvoiceItem;
 
 class ItemStock extends Model
 {
@@ -17,14 +18,18 @@ class ItemStock extends Model
     public $timestamps = false;
 
     public function item() {
-        return $this->hasMany( Item::class );
+        return $this->belongsTo( Item::class );
+    }
+
+    public function invoice_item() {
+        return $this->belongsTo( InvoiceItem::class );
     }
 
     public function inventory() {
-        return $this->hasMany( Inventory::class );
+        return $this->belongsTo( Inventory::class );
     }
 
     public function invoice() {
-        return $this->hasOne( Invoice::class );
+        return $this->belongsTo( Invoice::class );
     }
 }

@@ -10,10 +10,7 @@
                         <div class="modal-body">
                           {{$slot}}
                         </div>
-                        <div class="modal-footer">
-                          <x-button type="button" class="btn btn-success" id="add-product">Adauga</x-button>
-                          <x-modal-trigger type="button" class="btn btn-light" data-bs-dismiss="modal">Inchide</x-modal-trigger>
-                        </div>
+                        
                       </div>
                     </div>
                   </div>

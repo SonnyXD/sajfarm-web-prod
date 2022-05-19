@@ -16,6 +16,11 @@ use \App\Models\Transfer;
 use \App\Models\AvizEntry;
 use \App\Models\Returning;
 use \App\Models\AmbulanceType;
+use \App\Models\ItemStock;
+use \App\Models\Assistent;
+use \App\Models\Ambulancier;
+use \App\Models\Consumption;
+use DB;
 
 class RoutesController extends Controller
 {
@@ -34,21 +39,58 @@ class RoutesController extends Controller
         // $inventory_slug = Inventory::select('slug')->get();
         // $category = Category::select('slug')->get();
 
-        $inv_slug = Inventory::where('slug', $inventory_slug)->first();
+        $inventory = Inventory::where('slug', $inventory_slug)->first();
+
         $current_category = Category::where('slug', $category)->first();
 
         $all_categories = Category::select('name')->get();
         //$all_items = Item::select('name')->get();
+        
+
+        // $item_detailed = ItemStock::all();
+
+        abort_unless($inventory, 404);
+        abort_unless($current_category, 404);
+
+
+        //dd($inventory->id . ' - ' . $current_category->id );
+
+        // $items = ItemStock::leftJoin('items', 'items.id', '=', 'item_stocks.item_id')
+        // ->where('item_stocks.inventory_id', '=', $inventory->id)
+        // ->where('items.category_id', $current_category->id)->get();
+        // 
+        // $items = ItemStock::with(['item.item' => function($q) use ($current_category) {
+        //     $q->select('name', 'id', 'category_id');
+        //     $q->where('category_id', '=', $current_category->id)
+        // }])->where('inventory_id', $inventory->id)->get();
+        // $quries = DB::getQueryLog();
+        // dd($items);
+        // $items = DB::table('item_stocks')
+        // ->join('invoice_items', 'invoice_items.id', '=', 'item_stocks.item_id')
+        // ->join('items', 'items.id', '=', 'invoice_items.item_id')
+        // ->where('item_stocks.inventory_id', $inventory->id)
+        // ->where('items.category_id', $current_category->id)->get();
+
         $all_items = Item::where('category_id', $current_category->id)->with('category')->get();
 
+        $item_stock = Item::leftJoin('invoice_items', 'invoice_items.item_id', '=', 'items.id')
+        ->leftJoin('measure_units as munit', 'munit.id', '=', 'invoice_items.measure_unit_id')
+        ->leftJoin('item_stocks', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
+        ->select('munit.name as m_name', 'invoice_items.*', 'items.*', 'item_stocks.*')
+        ->where('item_stocks.inventory_id', '=', $inventory->id)->get();
 
+        $grouped = array();
+
+        foreach($item_stock as $item)
+        {
+            $grouped[$item->name][] = $item;
+        }
 
         //dd($all_items);
 
-        abort_unless($inv_slug, 404);
-        abort_unless($current_category, 404);
+        
 
-        return view('gestiune.gestiune-view', ['inventory_slug' => $inventory_slug, 'category' => $category, 'categories' => $all_categories, 'items' => $all_items , 'current_category' => $current_category]);
+        return view('gestiune.gestiune-view', ['inventory_slug' => $inventory, 'category' => $category, 'categories' => $all_categories, 'current_category' => $current_category, 'all_items' => $all_items, 'items' => $grouped]);
     }
 
     public function invoice() 
@@ -65,8 +107,11 @@ class RoutesController extends Controller
     {
         $inventories = Inventory::all();
         $ambulances = Ambulance::all();
+        $item_stocks = ItemStock::all();
+        $assistents = Assistent::all();
+        $ambulanciers = Ambulancier::all();
 
-        return view('operatiuni.checklist-statii', ['inventories' => $inventories, 'ambulances' => $ambulances]);
+        return view('operatiuni.checklist-statii', ['inventories' => $inventories, 'ambulances' => $ambulances, 'item_stocks' => $item_stocks, 'assistents' => $assistents, 'ambulanciers' => $ambulanciers]);
     }
 
     public function medic_checklist() 
@@ -74,8 +119,10 @@ class RoutesController extends Controller
         $inventories = Inventory::all();
         $ambulances = Ambulance::all();
         $medics = Medic::all();
+        $assistents = Assistent::all();
+        $ambulanciers = Ambulancier::all();
 
-        return view('operatiuni.checklist-medici', ['inventories' => $inventories, 'ambulances' => $ambulances, 'medics' => $medics]);
+        return view('operatiuni.checklist-medici', ['inventories' => $inventories, 'ambulances' => $ambulances, 'medics' => $medics, 'assistents' => $assistents, 'ambulanciers' => $ambulanciers]);
     }
 
     public function bon_transfer()
@@ -90,15 +137,18 @@ class RoutesController extends Controller
     {
         $ambulances = Ambulance::all();
         $inventories = Inventory::all();
+        $consumptions = Consumption::all();
 
-        return view('operatiuni.consum-ambulante', ['ambulances' => $ambulances, 'inventories' => $inventories]);
+        return view('operatiuni.consum-ambulante', ['ambulances' => $ambulances, 'inventories' => $inventories, 'consumptions' => $consumptions]);
     }
 
     public function bon_consum_medici()
     {
         $medics = Medic::all();
+        $inventories = Inventory::all();
+        $consumptions = Consumption::all();
 
-        return view('operatiuni.consum-medici', ['medics' => $medics]);
+        return view('operatiuni.consum-medici', ['medics' => $medics, 'inventories' => $inventories, 'consumptions' => $consumptions]);
     }
 
     public function aviz_intrare()
@@ -145,7 +195,9 @@ class RoutesController extends Controller
 
     public function expirare()
     {
-        return view('documente.expirare');
+        $inventories = Inventory::all();
+
+        return view('documente.expirare', ['inventories' => $inventories]);
     }
 
     public function fisa_produs()

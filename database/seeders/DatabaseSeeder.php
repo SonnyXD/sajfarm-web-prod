@@ -33,8 +33,8 @@ class DatabaseSeeder extends Seeder
         User::factory(1)->create();
         Institution::factory(1)->create();
         MinimumQuantity::factory(3)->create();
-        Assistent::factory(2)->create();
-        Ambulancier::factory(2)->create();
+        //Assistent::factory(2)->create();
+        //Ambulancier::factory(2)->create();
         InvoiceItem::factory(5)->create();
         AvizEntry::factory(3)->create();
         AvizEntryItem::factory(3)->create();

@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\Medic;
 use \App\Models\Inventory;
+use \App\Models\Assistent;
+use \App\Models\Ambulancier;
 use \App\Models\Ambulance;
+use \App\Models\ChecklistItem;
 
 class Checklist extends Model
 {
@@ -26,14 +29,26 @@ class Checklist extends Model
     public $timestamps = false;
 
     public function medic() {
-        return $this->hasOne( Medic::class );
+        return $this->belongsTo( Medic::class );
     }
 
     public function inventory() {
-        return $this->hasOne( Inventory::class );
+        return $this->belongsTo( Inventory::class );
     }
 
     public function ambulance() {
-        return $this->hasOne( Ambulance::class );
+        return $this->belongsTo( Ambulance::class );
+    }
+
+    public function checklistitems() {
+        return $this->hasMany( ChecklistItem::class);
+    }
+
+    public function assistent() {
+        return $this->belongsTo( Assistent::class );
+    }
+
+    public function ambulancier() {
+        return $this->belongsTo( Ambulancier::class );
     }
 }

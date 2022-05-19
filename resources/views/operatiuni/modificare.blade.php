@@ -1,6 +1,8 @@
 <x-layout>
     <x-container>
         <x-form id="modificare-cant-min">
+          <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
+          <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
         <div class="form-group">
                     <label>Medicament/Material Sanitar:</label>
                     <select class="meds-single-select w-100" id="select-meds" name="select-meds">

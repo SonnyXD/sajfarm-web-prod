@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\Storage;
 //use \Mpdf\Mpdf as PDF; 
 use Codedge\Fpdf\Fpdf\Fpdf;
 use PDF;
+use Auth;
 
 use \App\Models\Invoice;
 use \App\Models\Institution;
+use \App\Models\Provider;
 
 class GeneratePDFController extends Controller
 {
@@ -77,18 +79,65 @@ class GeneratePDFController extends Controller
     {
         $invoices = Invoice::all();
         $invoice_id = $invoices->last()->id;
+        $user = Auth::user();
+
+        $date = $request->input('document-date');
+        $provider_id = $request->input('furnizor-select');
+        $provider = Provider::where('id', $provider_id)->get();
+        $invoice_number = $request->input('document-number');
+        $due_date = $request->input('due-date');
 
         $institution = Institution::all();
 
         $filename = 'nir'.$invoice_id.'.pdf';
 
-        $html = '<h2 style="font-weight:bold; text-align: center;">NOTA DE INTRARE RECEPTIE</h2>
+        $html = '<html>
+                <head>
+                <style>
+                td, th {border: 2px solid black;}
+                </style>
+                </head>
+                ';
+
+        $html .= ' <span style="font-weight: bold; float: left;">'. $institution[0]->name .'</span>
                 <br>
-                <h5 style="font-weight: bold; text-align: left;">'. $institution[0]->name .'</h5>
-                <h5 style="font-weight: bold; text-align: left;">CUI: '. $institution[0]->cui .'</h5>
-                <h5 style="font-weight: bold; text-align: left;">Adresa: '. $institution[0]->address .'</h5>
-        
+                <span style="float: left;">Utilizator: '. $user->name .'</span>
+                <h2 style="font-weight:bold; text-align: center;">NOTA DE INTRARE RECEPTIE</h2>
+                <br>
+                <span style="font-weight: bold; float: right;">Numar document: '. $invoice_id . ' / ' . $date .'</span>
+                <br>
+                <span style="font-weight: bold; float: right;">Furnizor: '. $provider .'</span>
+                <br>
+                <span style="font-weight: bold; float: right;">Gestiune: DEPOZIT FARMACIE</span>
+                <br>
+                <span style="font-weight: bold; float: right;">Document intrare: Factura fiscala - '. $invoice_number .'</span>
+                <br>
+                <span style="font-weight: bold; float: right;">Data scadenta: '. $due_date .'</span>
+                <br>
+                <br>
+                <br>
         ';
+
+        $html .= '
+        <table>
+        <tr>
+          <th style="font-weight: bold; text-align: center;">Cod CIM</th>
+          <th style="font-weight: bold; text-align: center;">Cod Produs</th>
+          <th style="font-weight: bold; text-align: center;">Lot</th>
+          <th style="font-weight: bold; text-align: center;">Data Exp.</th>
+          <th style="font-weight: bold; text-align: center;">UM</th>
+          <th style="font-weight: bold; text-align: center;">Cantitate</th>
+          <th style="font-weight: bold; text-align: center;">Pret Unitar</th>
+          <th style="font-weight: bold; text-align: center;">Pret cu TVA</th>
+          <th style="font-weight: bold; text-align: center;">Valoare (RON)</th>
+        </tr>
+        ';
+
+        $html .= '';
+
+        $html .= '</table>';
+
+        $html .= '</html>';
         
         PDF::SetTitle('NIR');
         PDF::AddPage('L', 'A4');

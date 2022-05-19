@@ -1,11 +1,13 @@
 <x-layout>
     <x-container>
-    <x-form id="aviz-intrare" method="POST" action="{{ route('avizentries.store') }}">
+    <x-form id="intrare-factura" method="POST" action="{{ route('avizentries.store') }}">
+      <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
+      <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
     <div class="form-group">
                 <label>Tip:</label>
                 <select class="form-control" id="type" name="type">
-                    <option value="donatie">Donatie</option>
-                    <option value="sponsorizare">Sponsorizare</option>
+                    <option value="Donatii">Donatie</option>
+                    <option value="Sponsorizari">Sponsorizare</option>
                 </select>
             </div>
         <div class="form-group">
@@ -73,20 +75,23 @@
                   <div class="form-group row">
                     <div class="col">
                     <label>Medicamente/Materiale Sanitare</label>
-                    <select class="meds-single-select w-100" name="meds">
-                      <option value="1">Algocalmin</option>
-                      <option value="2">Nurofen</option>
-                      <option value="3">Fentanyl</option>
+                    <select class="meds-single-select w-100" name="meds" id="meds">
+                    @if( $items->count() )
+                        @foreach ($items as $item)
+                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                        @endforeach
+                    @endif
                     </select>
                   </div>
                   <div class="col">
                   <label>Adauga Pozitie</label><br>
-                  <x-modal-trigger type="button" data-bs-toggle="modal" data-bs-target="#meds-modal">Adauga Pozitie</x-modal-trigger>
+                  <x-modal-trigger type="button" data-bs-toggle="modal" data-bs-target="#meds-modal" id="add-in-preview">Adauga Pozitie</x-modal-trigger>
                   </div>
                   </div>
                   <div class="form-group">
-                    <x-button>Adauga si genereaza NIR-ul</x-button>
+                    <x-button disabled="disabled">Adauga si genereaza NIR-ul</x-button>
                 </div>
+                <div id="test" style="display:none"></div>
     </x-form>
     </x-container>
     <div class="col-lg-12 grid-margin stretch-card">
@@ -198,6 +203,11 @@
                   <label for="recipient-name" class="col-form-label">Valoare:</label>
                   <x-input type="number" class="form-control" id="product-value" name="product-value" disabled="disabled"/>
                 </div>
+                <div class="modal-footer">
+                    <x-button type="button" class="btn btn-success" id="add-product">Adauga</x-button>
+                    <x-modal-trigger type="button" class="btn btn-light" data-bs-dismiss="modal">Inchide</x-modal-trigger>
+                </div>
               </x-form>
           </x-modal>
 </x-layout>
+<script src="/js/aviz.js"></script>

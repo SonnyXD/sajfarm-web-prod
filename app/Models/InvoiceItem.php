@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\Item;
 use \App\Models\Invoice;
+use \App\Models\MeasureUnit;
+use \App\Models\ItemStock;
 
 class InvoiceItem extends Model
 {
@@ -36,5 +38,13 @@ class InvoiceItem extends Model
 
     public function invoice() {
         return $this->belongsTo( Invoice::class );
+    }
+
+    public function measure_unit() {
+        return $this->belongsTo( MeasureUnit::class );
+    }
+
+    public function itemstock() {
+        return $this->hasMany( ItemStock::class );
     }
 }

@@ -26,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        
         view()->composer('components.sidebar', function($view){
             $view->with('categories', Category::first()->slug);
         });

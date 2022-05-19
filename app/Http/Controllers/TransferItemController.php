@@ -69,7 +69,7 @@ class TransferItemController extends Controller
      */
     public function update(Request $request, TransferItem $transferItem)
     {
-        //
+        
     }
 
     /**

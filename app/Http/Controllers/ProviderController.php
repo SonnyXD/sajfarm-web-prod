@@ -35,7 +35,25 @@ class ProviderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, array(
+            'provider-name' => 'required',
+            'provider-office' => 'required',
+            'provider-address' => 'required',
+            'provider-regc' => 'required',
+            'provider-cui' => 'required'
+        ));
+
+        $provider = new \App\Models\Provider();
+        $provider->name = $request->input('provider-name');
+        $provider->office = $request->input('provider-office');
+        $provider->address = $request->input('provider-address');
+        $provider->regc = $request->input('provider-regc');
+        $provider->cui = $request->input('provider-cui');
+
+        $provider->save();
+
+        return redirect('/operatiuni/inserare-proprietati')
+            ->with('success', 'Furnizor adaugat cu succes!');
     }
 
     /**

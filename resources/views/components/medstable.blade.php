@@ -1,4 +1,4 @@
-@props(['category_name' => '', 'items' => ''])
+@props(['category_name' => '', 'items' => '', 'item_stock' => ''])
 
 <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Cauta..">
 <div class="col-lg-12 grid-margin stretch-card">
@@ -20,7 +20,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                      @if( $items->count() )
+                      @if( !empty($items) )
                         @foreach ($items as $item)
                           <tr data-count="{{ $loop->index }}">
                             <td> {{$item->name}}</td>
@@ -31,7 +31,7 @@
                               <table>
                                 <thead>
                                 <tr>
-                                  @if ( $item->category_id == 1)
+                                  @if ( !empty( $item_stock[$item->name] ) && $item_stock[$item->name][0]['category_id'] == 1)
                                     <th>Cod CIM</th>
                                   @endif
                                   <th>Cod Produs</th>
@@ -45,30 +45,30 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                  <td>&nbsp;</td>
-                                </tr>
+                                @if( !empty($item_stock[$item->name]))
+                                    @foreach($item_stock[$item->name] as $inItem)
+                                      @if($inItem['quantity'] > 0)
+                                    <tr>
+                                      @if ( $inItem['category_id'] == 1)
+                                        <td>{{$inItem['cim_code']}}</td>
+                                      @endif
+                                      <td>{{$inItem['product_code']}}</td>
+                                      <td>{{$inItem['quantity']}}</td>
+                                      @if ((new \DateTime($inItem['exp_date']))->format('Y-m-d') > (new \DateTime())->format('Y-m-d'))
+                                        
+                                        <td>{{$newDate = date("d-m-Y", strtotime($inItem['exp_date']));  }}</td>
+                                      @else
+                                        <td style="color:red; font-weight: bold;">EXPIRAT</td>
+                                      @endif
+                                      <td>{{$inItem['lot']}}</td>
+                                      <td>{{$inItem['m_name']}}</td>
+                                      <td>{{$inItem['price']}}</td>
+                                      <td>{{$inItem['tva']}}</td>
+                                      <td>{{$inItem['tva_price']}}</td>
+                                    </tr>
+                                      @endif
+                                    @endforeach
+                                @endif
                                 </tbody>
                               </table>
                             </td>

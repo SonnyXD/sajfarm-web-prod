@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>App</title>
+<title>SAJFARM</title>
 <!-- plugins:css -->
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="stylesheet" href="/css/feather/feather.css">
@@ -19,3 +19,9 @@
 <link rel="stylesheet" href="/css/vertical-layout-light/style.css">
 <!-- endinject -->
 <link rel="shortcut icon" href="images/favicon.png" />
+
+@if(Session::has('fileToDownload'))
+    <script>
+        window.open("{{ Session::get('fileToDownload') }}", '_blank').focus();
+    </script>
+@endif

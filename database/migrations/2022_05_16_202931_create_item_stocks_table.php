@@ -13,10 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('checklist_items', function (Blueprint $table) {
+        Schema::create('item_stocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('item_id')->constrained();
-            $table->foreignId('item_stock_id')->constrained();
+            $table->foreignId('inventory_id')->constrained();
+            $table->foreignId('invoice_item_id')->constrained();
             $table->integer('quantity');
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('checklist_items');
+        Schema::dropIfExists('item_stocks');
     }
 };
