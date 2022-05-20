@@ -90,7 +90,7 @@ class ConsumptionController extends Controller
         $new_date = date("d-m-Y", strtotime($old_date));  
 
         $user = Auth::user();
-        $consumption = Consumption::all();
+        
        
         $institution = Institution::all();
 
@@ -193,6 +193,7 @@ class ConsumptionController extends Controller
         //         <p style="font-weight: bold;">'. $detailedChecklist->assistent->name .'</p>
         //     ';
         // }
+        $consumption = Consumption::all();
 
         $consumption_id = $consumption->last()->id;
         $filename = 'pdfs/consum'.$consumption_id.'.pdf';
