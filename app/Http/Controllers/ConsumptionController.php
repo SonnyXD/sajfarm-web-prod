@@ -196,6 +196,7 @@ class ConsumptionController extends Controller
         $consumption = Consumption::all();
 
         $consumption_id = $consumption->last()->id;
+        dd($consumption_id);
         $filename = 'pdfs/consum'.$consumption_id.'.pdf';
 
         $html .= '<br>';
