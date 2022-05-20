@@ -94,6 +94,10 @@ class ConsumptionController extends Controller
         $consumption_id = $consumption->last()->id;
         $institution = Institution::all();
 
+        if($consumption_id === null) {
+            $consumption_id = 1;
+        }
+
         $filename = 'pdfs/consum'.$consumption_id.'.pdf';
 
         $html = '<html>
@@ -132,7 +136,7 @@ class ConsumptionController extends Controller
         </tr>
         ';
         //dd($checklists);
-        $i = 0;
+        $total_value = 0;
         foreach($checklists as $checklist)
         {
             if( $checklist->checklistitems->isEmpty() ) {
@@ -171,6 +175,8 @@ class ConsumptionController extends Controller
                 <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
                 <td style="font-weight: bold; text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
             </tr>';
+
+            $total_value += $detailedItem->invoice_item->price * $item->quantity;
             }
             
             //delete checklist here and checklist items
@@ -194,7 +200,7 @@ class ConsumptionController extends Controller
 
         $html .= '<br>';
 
-        $html .= '';
+        $html .= 'Total valoare: '. $total_value .'';
 
         $html .= '</table>';
 
