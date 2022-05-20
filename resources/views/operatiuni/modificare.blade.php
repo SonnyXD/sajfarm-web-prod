@@ -1,6 +1,6 @@
 <x-layout>
-    <x-container>
-        <x-form id="modificare-cant-min">
+    <x-container :title="$title">
+        <x-form id="modificare-cant-min" method="POST" action="{{ route('modify.store') }}">
           <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
           <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
         <div class="form-group">
@@ -22,8 +22,9 @@
                         <x-input type="number" id="stoc-min-stoc3" placeholder="Stoc Minim Stoc 3" name="stoc-min-stoc3"/>
                     </div>
                     <div class="form-group">
-                        <x-button>Modifica</x-button>
+                        <x-button disabled="disabled">Modifica</x-button>
                 </div>
         </x-form>
     </x-container>
 </x-layout>
+<script src="/js/modify.js"></script>

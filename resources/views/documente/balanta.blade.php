@@ -1,5 +1,5 @@
 <x-layout>
-    <x-container>
+    <x-container :title="$title">
         <x-form id="balanta">
         <div class="form-group">
                     <label>Gestiune:</label>

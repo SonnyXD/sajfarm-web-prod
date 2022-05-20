@@ -1,5 +1,5 @@
 <x-layout>
-    <x-container>
+    <x-container :title="$title">
     <x-form id="checklist" method="POST" action="{{ route('consumptionsamb.store') }}">
     <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
     <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
@@ -64,10 +64,6 @@
                       </div>
                     </div>
                     </div>
-
-                    
-                    </div>
-                    
                   <div class="form-group">
                       <x-button disabled="disabled">Genereaza Bonul de Consum</x-button>
                 </div>

@@ -2,6 +2,8 @@ function facturaModal() {
     $('#cim-checkbox').click(function(){
       if($(this).prop("checked") == true) {
         $("#cim-input").css( "display", "block" );
+        $('#cim-code').show();
+        $('#cim-label').show();
       } else {
         $("#cim-input").css( "display", "none" );
       }
@@ -146,6 +148,8 @@ console.log( {valid, rowCount});
 
     $('#medstable tbody').append(output);
     testInputs();
+    $('#cim-code').hide();
+    $('#cim-label').hide();
     $('#meds-modal').modal('toggle');
     $('#meds-modal form')[0].reset();
 

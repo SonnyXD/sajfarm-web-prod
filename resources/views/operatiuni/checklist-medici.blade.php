@@ -1,5 +1,5 @@
 <x-layout>
-    <x-container>
+    <x-container :title="$title">
         <x-form id="checklist" method="POST" action="{{ route('checklists.store') }}">
         <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
         <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>

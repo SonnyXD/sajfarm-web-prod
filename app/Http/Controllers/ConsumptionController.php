@@ -94,7 +94,14 @@ class ConsumptionController extends Controller
        
         $institution = Institution::all();
 
-       
+        $consumption = Consumption::all();
+
+        $consumption_id = $consumption->last()->id ?? null;
+
+        if($consumption_id === null) {
+            $consumption_id = 1;
+        }
+        $filename = 'pdfs/consum'.$consumption_id.'.pdf';
 
         $html = '<html>
                 <head>
@@ -147,7 +154,6 @@ class ConsumptionController extends Controller
             $consumption->tour = $checklist->tour;
             $consumption->document_date = $request->input('document-date');
             $consumption->save();
-            $i++;
 
             foreach($checklist->checklistitems as $item)
             {
@@ -193,11 +199,6 @@ class ConsumptionController extends Controller
         //         <p style="font-weight: bold;">'. $detailedChecklist->assistent->name .'</p>
         //     ';
         // }
-        $consumption = Consumption::all();
-
-        $consumption_id = $consumption->last()->id;
-        dd($consumption_id);
-        $filename = 'pdfs/consum'.$consumption_id.'.pdf';
 
         $html .= '<br>';
 

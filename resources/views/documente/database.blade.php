@@ -1,5 +1,5 @@
 <x-layout>
-    <x-container>
+    <x-container :title="$title">
         <x-form id="database">
         <div class="form-group">
         <label for="select-id">Alege</label>

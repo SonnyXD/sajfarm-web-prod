@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\Inventory;
 use App\Models\ItemStock;
 use App\Models\Institution; 
+use App\Models\Ambulance; 
 use Illuminate\Http\Request;
 use Session;
 use PDF;
@@ -44,12 +45,16 @@ class ReturningController extends Controller
     {
         $this->validate($request, array(
             'from-location' => 'required',
-            'document-date' => 'required'
+            'document-date' => 'required',
+            'ambulance-select' => 'nullable'
         ));
     
         $returning = new \App\Models\Returning();
         $returning->inventory_id = $request->input('from-location');
         $returning->document_date = $request->input('document-date');
+        $returning->ambulance_id = $request->input('ambulance-select') ?? null;
+
+        $ambulance_id = $request->input('ambulance-select');
    
         $returning->save();
 
@@ -58,6 +63,15 @@ class ReturningController extends Controller
         $old_date = $request->input('document-date');
         $new_date = date("d-m-Y", strtotime($old_date));  
         $from_location = Inventory::where('id', $request->input('from-location'))->get();
+
+        $span_amb = '';
+
+        if($ambulance_id === null) {
+            $span_amb = '<span style="font-weight: bold; float: right;">Gestiune de iesire: '. $from_location->first()->name .'</span>';
+        } else {
+            $amb_name = Ambulance::where('id', $ambulance_id)->get()->first()->license_plate;
+            $span_amb = '<span style="font-weight: bold; float: right;">Gestiune de iesire: '. $from_location->first()->name .' - '. $amb_name .'</span>';
+        }
 
         $user = Auth::user();
         $returning = Returning::all();
@@ -81,7 +95,7 @@ class ReturningController extends Controller
         <br>
         <span style="font-weight: bold; float: right;">Numar document: '. $returning_id . ' / ' . $new_date .'</span>
         <br>
-        <span style="font-weight: bold; float: right;">Gestiune de iesire: '. $from_location->first()->name .'</span>
+        '. $span_amb .'
         <br>
         <br>
         <br>
@@ -91,12 +105,19 @@ class ReturningController extends Controller
         $html .= '
         <table>
         <tr>
-          <th style="font-weight: bold; text-align: center;">Nume</th>
-          <th style="font-weight: bold; text-align: center;">UM</th>
-          <th style="font-weight: bold; text-align: center;">Cantitate</th>
-          <th style="font-weight: bold; text-align: center;">Motiv</th>
+        <th style="font-weight: bold; text-align: center;">Cod Produs</th>
+        <th style="font-weight: bold; text-align: center;">Nume</th>
+        <th style="font-weight: bold; text-align: center;">UM</th>
+        <th style="font-weight: bold; text-align: center;">Cantitate</th>
+        <th style="font-weight: bold; text-align: center;">Pret</th>
+        <th style="font-weight: bold; text-align: center;">Valoare</th>
+        <th style="font-weight: bold; text-align: center;">Lot</th>
+        <th style="font-weight: bold; text-align: center;">Data expirare</th>
+        <th style="font-weight: bold; text-align: center;">Motiv</th>
         </tr>
         ';
+
+        $total_value = 0;
 
         foreach($products as $product) {
             $item = ItemStock::with('invoice_item')->where('id', $product['productId'])->get()->first();
@@ -104,16 +125,23 @@ class ReturningController extends Controller
             $item->save();
 
             $html.= '<tr>
+            <td style="font-weight: bold; text-align: center;">'. $item->invoice_item->product_code .'</td>
             <td style="font-weight: bold; text-align: center;">'. $product['productName'] .'</td>
             <td style="font-weight: bold; text-align: center;">'. $product['productUmText'] .'</td>
             <td style="font-weight: bold; text-align: center;">'. $product['productQty'] .'</td>
+            <td style="font-weight: bold; text-align: center;">'. $item->invoice_item->price .'</td>
+            <td style="font-weight: bold; text-align: center;">'. $item->invoice_item->price * $product['productQty'] .'</td>
+            <td style="font-weight: bold; text-align: center;">'. $item->invoice_item->lot .'</td>
+            <td style="font-weight: bold; text-align: center;">'. $item->invoice_item->exp_date .'</td>
             <td style="font-weight: bold; text-align: center;">'. $product['productReason'] .'</td>
         </tr>';
+
+        $total_value += $item->invoice_item->price * $product['productQty'];
         }
 
         $html .= '<br>';
 
-        $html .= '';
+        $html .= 'Total valoare: '. $total_value .'';
 
         $html .= '</table>';
 

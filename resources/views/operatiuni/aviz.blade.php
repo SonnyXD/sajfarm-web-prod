@@ -1,5 +1,5 @@
 <x-layout>
-    <x-container>
+    <x-container :title="$title">
     <x-form id="intrare-factura" method="POST" action="{{ route('avizentries.store') }}">
       <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
       <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
@@ -159,7 +159,7 @@
                 </div>
         
                 <div class="form-group" style="display:none;" id="cim-input">
-                  <label for="recipient-name" class="col-form-label">Cod CIM:</label>
+                  <label for="recipient-name" class="col-form-label" id="cim-label">Cod CIM:</label>
                   <x-input class="form-control" id="cim-code" name="cim-code"/>
                 </div>
                 <div class="form-group">

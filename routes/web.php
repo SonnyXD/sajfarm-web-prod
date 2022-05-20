@@ -299,6 +299,8 @@ Route::post('retur', 'App\Http\Controllers\ReturningController@store')->name('re
 
 Route::post('inserare-proprietati', 'App\Http\Controllers\ProviderController@store')->name('provider.store');
 
+Route::post('modificare-cant-min', 'App\Http\Controllers\MinimumQuantityController@store')->name('modify.store');
+
 //Route::post('intrare-factura', 'App\Http\Controllers\InvoiceItemController@store')->name('invoiceitems.store');
 
 // Route::get('/operatiuni/intrare-factura', function () {

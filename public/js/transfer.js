@@ -23,7 +23,6 @@ function getInventoryItems() {
     
     let selectedSubstation = $('#from-location').val();
     if (selectedSubstation == undefined) {
-      console.log('inside if');
       selectedSubstation = $('#from-location option:first()').val();
     }
     
@@ -48,7 +47,7 @@ function getInventoryItems() {
 function transferModal() {
     $('#add-in-preview').click(function () {
       let selected_med = $("#meds option:selected").text();
-      let med_name = selected_med.split("/");
+      let med_name = selected_med.split("[/]");
       $('#product-name').val(med_name[0]);
       $('#um').val(med_name[1]);
   
@@ -81,6 +80,8 @@ else
   $('#print').attr('disabled', false);
 
 }
+
+
   
    $('#add-product-transfer').on('click', function() {
 
@@ -105,7 +106,7 @@ else
   
     let productName = $('#meds').find(':selected').text();
   
-    let med_name = productName.split("/");
+    let med_name = productName.split("[/]");
   
     let productUmText = $('#um').find(':selected').text();
   
@@ -147,7 +148,26 @@ else
   });
   }
 
+  function selects() {
+
+    $('#from-location').on('change', function() {
+      let fromValue = $('#from-location').val();
+      let options = $('#to-location option').show();
+      if( $(this).val() !== '' ){
+          options.siblings('option[value="' + fromValue + '"]').hide()
+      }
+  });
+  $('#to-location').on('change', function() {
+      let toValue = $('#to-location').val();
+      let options = $('#from-location option').show();
+      if( $(this).val() !== '' ){
+          options.siblings('option[value="' + toValue + '"]').hide()
+      }
+  });
+  }
+
 jQuery(document).ready(() => {
     getInventoryItems();
     transferModal();
+    selects();
 });

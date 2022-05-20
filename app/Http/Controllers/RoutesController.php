@@ -20,6 +20,7 @@ use \App\Models\ItemStock;
 use \App\Models\Assistent;
 use \App\Models\Ambulancier;
 use \App\Models\Consumption;
+use \App\Models\MinimumQuantity;
 use DB;
 
 class RoutesController extends Controller
@@ -40,6 +41,10 @@ class RoutesController extends Controller
         // $category = Category::select('slug')->get();
 
         $inventory = Inventory::where('slug', $inventory_slug)->first();
+
+        $inventory_name = $inventory->name;
+
+        $inventory_id = $inventory->id;
 
         $current_category = Category::where('slug', $category)->first();
 
@@ -88,9 +93,15 @@ class RoutesController extends Controller
 
         //dd($all_items);
 
+        $minimum_quantities_farm = MinimumQuantity::where('inventory_id', '=', 1)->get();
+        $minimum_quantities_stoc3 = MinimumQuantity::where('inventory_id', '=', 2)->get();
+
+        //$item_sum = ItemStock::where()->sum('quantity'); //join cu inventory_id si item_id -> dupa astea te iei ca sa faci suma
+
+        //dd($item_sum);
         
 
-        return view('gestiune.gestiune-view', ['inventory_slug' => $inventory, 'category' => $category, 'categories' => $all_categories, 'current_category' => $current_category, 'all_items' => $all_items, 'items' => $grouped]);
+        return view('gestiune.gestiune-view', ['inventory_slug' => $inventory, 'category' => $category, 'categories' => $all_categories, 'current_category' => $current_category, 'all_items' => $all_items, 'items' => $grouped, 'inventory_name' => $inventory_name, 'inventory_id' => $inventory_id, 'minimum_quantities_farm' => $minimum_quantities_farm, 'minimum_quantities_stoc3' => $minimum_quantities_stoc3]);
     }
 
     public function invoice() 
@@ -100,7 +111,9 @@ class RoutesController extends Controller
         $units = MeasureUnit::all();
         $invoices = Invoice::all();
 
-        return view('operatiuni.factura', ['providers' => $providers, 'items' => $items, 'units' => $units, 'invoices' => $invoices]);
+        $title = 'Intrare Factura';
+
+        return view('operatiuni.factura', ['providers' => $providers, 'items' => $items, 'units' => $units, 'invoices' => $invoices, 'title' => $title]);
     }
 
     public function station_checklist() 
@@ -111,7 +124,9 @@ class RoutesController extends Controller
         $assistents = Assistent::all();
         $ambulanciers = Ambulancier::all();
 
-        return view('operatiuni.checklist-statii', ['inventories' => $inventories, 'ambulances' => $ambulances, 'item_stocks' => $item_stocks, 'assistents' => $assistents, 'ambulanciers' => $ambulanciers]);
+        $title = 'Checklist Statii';
+
+        return view('operatiuni.checklist-statii', ['inventories' => $inventories, 'ambulances' => $ambulances, 'item_stocks' => $item_stocks, 'assistents' => $assistents, 'ambulanciers' => $ambulanciers, 'title' => $title]);
     }
 
     public function medic_checklist() 
@@ -122,7 +137,9 @@ class RoutesController extends Controller
         $assistents = Assistent::all();
         $ambulanciers = Ambulancier::all();
 
-        return view('operatiuni.checklist-medici', ['inventories' => $inventories, 'ambulances' => $ambulances, 'medics' => $medics, 'assistents' => $assistents, 'ambulanciers' => $ambulanciers]);
+        $title = 'Checklist Medici';
+
+        return view('operatiuni.checklist-medici', ['inventories' => $inventories, 'ambulances' => $ambulances, 'medics' => $medics, 'assistents' => $assistents, 'ambulanciers' => $ambulanciers, 'title' => $title]);
     }
 
     public function bon_transfer()
@@ -130,7 +147,9 @@ class RoutesController extends Controller
         $inventories = Inventory::all();
         $transfers = Transfer::all();
 
-        return view('operatiuni.transfer', ['inventories' => $inventories, 'transfers' => $transfers]);
+        $title = 'Bon de Transfer';
+
+        return view('operatiuni.transfer', ['inventories' => $inventories, 'transfers' => $transfers, 'title' => $title]);
     }
 
     public function bon_consum_ambulante()
@@ -139,7 +158,9 @@ class RoutesController extends Controller
         $inventories = Inventory::all();
         $consumptions = Consumption::all();
 
-        return view('operatiuni.consum-ambulante', ['ambulances' => $ambulances, 'inventories' => $inventories, 'consumptions' => $consumptions]);
+        $title = 'Bon de Consum Ambulante';
+
+        return view('operatiuni.consum-ambulante', ['ambulances' => $ambulances, 'inventories' => $inventories, 'consumptions' => $consumptions, 'title' => $title]);
     }
 
     public function bon_consum_medici()
@@ -148,7 +169,9 @@ class RoutesController extends Controller
         $inventories = Inventory::all();
         $consumptions = Consumption::all();
 
-        return view('operatiuni.consum-medici', ['medics' => $medics, 'inventories' => $inventories, 'consumptions' => $consumptions]);
+        $title = 'Bon de Consum Medici';
+
+        return view('operatiuni.consum-medici', ['medics' => $medics, 'inventories' => $inventories, 'consumptions' => $consumptions, 'title' => $title]);
     }
 
     public function aviz_intrare()
@@ -159,29 +182,38 @@ class RoutesController extends Controller
         $invoices = Invoice::all();
         $aviz = AvizEntry::all();
 
-        return view('operatiuni.aviz', ['providers' => $providers, 'items' => $items, 'units' => $units, 'invoices' => $invoices, 'aviz' => $aviz]);
+        $title = 'Aviz Intrare';
+
+        return view('operatiuni.aviz', ['providers' => $providers, 'items' => $items, 'units' => $units, 'invoices' => $invoices, 'aviz' => $aviz, 'title' => $title]);
     }
 
     public function retur()
     {
         $inventories = Inventory::all();
         $returnings = Returning::all();
+        $ambulances = Ambulance::all();
 
-        return view('operatiuni.retur', ['inventories' => $inventories, 'returnings' => $returnings]);
+        $title = 'Retur';
+
+        return view('operatiuni.retur', ['inventories' => $inventories, 'returnings' => $returnings, 'title' => $title, 'ambulances' => $ambulances]);
     }
 
     public function min_cant()
     {
         $items = Item::all();
 
-        return view('operatiuni.modificare', ['items' => $items]);
+        $title = 'Modificare Cantitati Minime';
+
+        return view('operatiuni.modificare', ['items' => $items, 'title' => $title]);
     }
 
     public function rapoarte()
     {
         $inventories = Inventory::all();
 
-        return view('documente.raport', ['inventories' => $inventories]);
+        $title = 'Rapoarte';
+
+        return view('documente.raport', ['inventories' => $inventories, 'title' => $title]);
     }
 
     public function proprietati()
@@ -190,40 +222,52 @@ class RoutesController extends Controller
         $amb_types = AmbulanceType::all();
         $inventories = Inventory::all();
 
-        return view('operatiuni.proprietati', ['categories' => $categories, 'ambulanceTypes' => $amb_types, 'inventories' => $inventories]);
+        $title = 'Inserare Proprietati';
+
+        return view('operatiuni.proprietati', ['categories' => $categories, 'ambulanceTypes' => $amb_types, 'inventories' => $inventories, 'title' => $title]);
     }
 
     public function expirare()
     {
         $inventories = Inventory::all();
 
-        return view('documente.expirare', ['inventories' => $inventories]);
+        $title = 'Expira In 6 Luni';
+
+        return view('documente.expirare', ['inventories' => $inventories, 'title' => $title]);
     }
 
     public function fisa_produs()
     {
         $items = Item::all();
 
-        return view('documente.fisaprodus', ['items' => $items]);
+        $title = 'Fisa Produs';
+
+        return view('documente.fisaprodus', ['items' => $items, 'title' => $title]);
     }
 
     public function inventar()
     {
         $inventories = Inventory::all();
 
-        return view('documente.inventar', ['inventories' => $inventories]);
+        $title = 'Inventar';
+
+        return view('documente.inventar', ['inventories' => $inventories, 'title' => $title]);
     }
 
     public function balanta()
     {
         $inventories = Inventory::all();
 
-        return view('documente.balanta', ['inventories' => $inventories]);
+        $title = 'Balanta';
+
+        return view('documente.balanta', ['inventories' => $inventories, 'title' => $title]);
     }
 
     public function baza_date()
     {
-        return view('documente.database');
+        $title = 'Baza de Date';
+
+        return view('documente.database', ['title' => $title]);
     }
 
 }

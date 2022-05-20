@@ -15,8 +15,9 @@ return new class extends Migration
     {
         Schema::create('returnings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('inventory_id');
+            $table->foreignId('inventory_id')->constrained();
             $table->date('document_date');
+            $table->foreignId('ambulance_id')->constrained();
         });
     }
 

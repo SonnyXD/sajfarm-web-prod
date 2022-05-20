@@ -1,5 +1,5 @@
 <x-layout>
-    <x-container>
+    <x-container :title="$title">
         <x-form id="raport">
         <div class="form-group row">
                 <div class="col">

@@ -1,7 +1,7 @@
 function checklistMedicModal() {
     $('#add-in-preview').click(function () {
       let selected_med = $("#meds option:selected").text();
-      let med_name = selected_med.split("/");
+      let med_name = selected_med.split("[/]");
       $('#product-name').val(med_name[0]);
       $('#um').val(med_name[1]);
   
@@ -56,7 +56,7 @@ else
   
     let productName = $('#meds').find(':selected').text();
   
-    let med_name = productName.split("/");
+    let med_name = productName.split("[/]");
   
     let productUmText = $('#um').find(':selected').text();
   

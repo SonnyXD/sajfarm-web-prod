@@ -1,11 +1,11 @@
-@props(['category_name' => '', 'items' => '', 'item_stock' => ''])
+@props(['category_name' => '', 'items' => '', 'item_stock' => '', 'inventory_name' => '', 'inventory_id' => '', 'minimum_quantities_farm' => '', 'minimum_quantities_stoc3' => ''])
 
 <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Cauta..">
 <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
                   <h4 class="card-title" id="section-title">
-                  {{ $category_name }}
+                  {{$inventory_name}} - {{ $category_name }}
                   </h4>
                   <div class="table-responsive">
                     <table class="table table-striped" id="medstable">
@@ -14,24 +14,38 @@
                           <th>
                             Nume
                           </th>
-                          <th>
-                            Cantitate Totala
-                          </th>
+                          @if ($inventory_id == 1 || $inventory_id == 2) 
+                            <th>Cantitate Totala</th>
+                          @endif
                         </tr>
                       </thead>
                       <tbody>
                       @if( !empty($items) )
+                        @php
+                          $i = 0;
+                        @endphp
                         @foreach ($items as $item)
                           <tr data-count="{{ $loop->index }}">
                             <td> {{$item->name}}</td>
-                            <td> 150 / 0 </td>
+                            @if ($inventory_id == 1) 
+                                <td>150 / {{$minimum_quantities_farm[$i]->quantity ?? 0}}</td>
+                                @php
+                                  $i++;
+                                @endphp
+                            @endif
+                            @if ($inventory_id == 2) 
+                                <td>150 / {{$minimum_quantities_stoc3[$i]->quantity ?? 0}}</td>
+                                @php
+                                  $i++;
+                                @endphp
+                            @endif
                           </tr>
-                          <tr class="treeview tr-{{ $loop->index }}"> <!-- Cod CIM	Cod Produs	Nume	Cantitate	Termen Valabilitate	Lot	UM	Pret Unitar	TVA	Pret TVA -->
+                          <tr class="treeview tr-{{ $loop->index }}"> 
                             <td colspan="100%">
                               <table>
                                 <thead>
                                 <tr>
-                                  @if ( !empty( $item_stock[$item->name] ) && $item_stock[$item->name][0]['category_id'] == 1)
+                                  @if ($item->category_id == 1) 
                                     <th>Cod CIM</th>
                                   @endif
                                   <th>Cod Produs</th>

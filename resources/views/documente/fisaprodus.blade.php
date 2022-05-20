@@ -1,5 +1,5 @@
 <x-layout>
-    <x-container>
+    <x-container :title="$title">
         <x-form id="fisa-produs">
         <div class="form-group">
                     <label>Medicament/Material Sanitar:</label>

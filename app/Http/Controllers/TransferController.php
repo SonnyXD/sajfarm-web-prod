@@ -93,21 +93,49 @@ class TransferController extends Controller
         $html .= '
         <table>
         <tr>
-          <th style="font-weight: bold; text-align: center;">Nume</th>
-          <th style="font-weight: bold; text-align: center;">UM</th>
-          <th style="font-weight: bold; text-align: center;">Cantitate</th>
+        <th style="font-weight: bold; text-align: center;">Cod Produs</th>
+        <th style="font-weight: bold; text-align: center;">Nume</th>
+        <th style="font-weight: bold; text-align: center;">UM</th>
+        <th style="font-weight: bold; text-align: center;">Cantitate</th>
+        <th style="font-weight: bold; text-align: center;">Pret</th>
+        <th style="font-weight: bold; text-align: center;">Valoare</th>
+        <th style="font-weight: bold; text-align: center;">Lot</th>
+        <th style="font-weight: bold; text-align: center;">Data expirare</th>
         </tr>
         ';
+
+        // $products = collect($request->input('product'));
+        // $ids = $products->pluck('item_stock_id');
+        // $detailedItems = \App\Models\ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit')
+        //     ->whereIn('id', $ids)
+        //     ->get();
+        // foreach ($products as $product) {
+        //     //dd($product);
+        //     $stockInfo = $detailedItems->find('id', $product['productId']);
+        //     dd($stockInfo);
+        // }
+
+        $total_value = 0;
 
         
         //dd($request->input('product'));
         foreach($request->input('product') as $productPost) {
-            
+            //dd($productPost['productId']);
+            //$detailedItem = \App\Models\ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit')->find($productPost->item_stock_id);
+            $detailedItem = \App\Models\ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit')->find($productPost['productId']);
+            //dd($itemStock);
             $html.= '<tr>
+                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
                 <td style="font-weight: bold; text-align: center;">'. $productPost['productName'] .'</td>
                 <td style="font-weight: bold; text-align: center;">'. $productPost['productUmText'] .'</td>
                 <td style="font-weight: bold; text-align: center;">'. $productPost['productQty'] .'</td>
+                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->price .'</td>
+                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->price * $productPost['productQty'] .'</td>
+                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
+                <td style="font-weight: bold; text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
             </tr>';
+
+            $total_value += $detailedItem->invoice_item->price * $productPost['productQty'];
 
         $item = ItemStock::with('invoice_item')->where('id', $productPost['productId'])->get()->first();
         $item->quantity -= $productPost['productQty'];
@@ -156,7 +184,7 @@ class TransferController extends Controller
         }
         $html .= '<br>';
 
-        $html .= '';
+        $html .= 'Total valoare: '. $total_value .'';
 
         $html .= '</table>';
 

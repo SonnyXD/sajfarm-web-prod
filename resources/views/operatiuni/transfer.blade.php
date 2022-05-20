@@ -1,5 +1,5 @@
 <x-layout>
-    <x-container>
+    <x-container :title="$title">
         <x-form id="bon-transfer" method="POST" action="{{ route('transfers.store') }}">
         <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
         <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
@@ -20,7 +20,7 @@
                 <select class="form-control" id="to-location" name="to-location">
                     @if( $inventories->count() )
                       @foreach ($inventories as $inventory)
-                        @if($inventory->name != 'Statie centrala')
+                        @if($inventory->name != 'Farmacie')
                           <option value="{{ $inventory->id }}">{{ $inventory->name }}</option>
                         @endif
                       @endforeach

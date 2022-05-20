@@ -1,17 +1,32 @@
 <x-layout>
-    <x-container>
+    <x-container :title="$title">
         <x-form id="return-items" method="POST" action="{{ route('returnings.store') }}">
           <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
           <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
-        <div class="form-group">
+        <div class="form-group row">
+                <div class="col">
                 <label>Din:</label>
-                <select class="form-control" id="from-location" name="from-location">
+                <select class="meds-single-select w-100" id="from-location" name="from-location">
                     @if( $inventories->count() )
                       @foreach ($inventories as $inventory)
                           <option value="{{ $inventory->id }}">{{ $inventory->name }}</option>
                       @endforeach
                     @endif
                 </select>
+            </div>
+            <div class="col">
+                    <label>Ambulanta:</label>
+                    <div class="the-basics">
+                    <select class="meds-single-select w-100" id="ambulance-select" name="ambulance-select">
+                      <option value="">Fara ambulanta</option>
+                    @if( $ambulances->count() )
+                      @foreach ($ambulances as $ambulance)
+                          <option value="{{ $ambulance->id }}">{{ $ambulance->license_plate }}</option>
+                      @endforeach
+                    @endif
+                    </select>
+                    </div>
+                  </div>
             </div>
             <div class="form-group row">
                     <div class="col">

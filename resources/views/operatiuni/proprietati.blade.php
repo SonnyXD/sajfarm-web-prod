@@ -1,5 +1,5 @@
 <x-layout>
-    <x-container>
+    <x-container :title="$title">
         <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
         <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
     <div class="form-group">
