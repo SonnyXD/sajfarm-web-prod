@@ -91,14 +91,10 @@ class ConsumptionController extends Controller
 
         $user = Auth::user();
         $consumption = Consumption::all();
-        $consumption_id = $consumption->last()->id;
+       
         $institution = Institution::all();
 
-        if($consumption_id === null) {
-            $consumption_id = 1;
-        }
-
-        $filename = 'pdfs/consum'.$consumption_id.'.pdf';
+       
 
         $html = '<html>
                 <head>
@@ -197,6 +193,9 @@ class ConsumptionController extends Controller
         //         <p style="font-weight: bold;">'. $detailedChecklist->assistent->name .'</p>
         //     ';
         // }
+
+        $consumption_id = $consumption->last()->id;
+        $filename = 'pdfs/consum'.$consumption_id.'.pdf';
 
         $html .= '<br>';
 
