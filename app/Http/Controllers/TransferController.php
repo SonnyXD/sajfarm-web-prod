@@ -118,7 +118,7 @@ class TransferController extends Controller
         $total_value = 0;
 
         
-        //dd($request->input('product'));
+        
         foreach($request->input('product') as $productPost) {
             //dd($productPost['productId']);
             //$detailedItem = \App\Models\ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit')->find($productPost->item_stock_id);
@@ -184,9 +184,14 @@ class TransferController extends Controller
         }
         $html .= '<br>';
 
+        $html .= '</table><br><br>';
+
         $html .= 'Total valoare: '. $total_value .'';
 
-        $html .= '</table>';
+        $html .= '<br><br>';
+
+        $html .= 'GESTIONAR<br>
+        '. $user->name .'';
 
         $html .= '</html>';
 

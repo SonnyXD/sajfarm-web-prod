@@ -157,10 +157,7 @@ class InvoiceController extends Controller
 
         foreach($request->input('product') as $productPost) {
             $invoice_item = new \App\Models\InvoiceItem();
-            
-            //dd($productPost);
-            //$invoice_item->invoice_id = $productPost['lot']; // lot or productCode
-            //$invoice_item->invoice_id = $request->input('nir-number'); // lot or productCode
+        
             $invoice_item->invoice_id = Invoice::all()->last()->id;
             $invoice_item->item_id = $productPost['productId'];
             $invoice_item->cim_code = $productPost['productCim'];
@@ -199,70 +196,32 @@ class InvoiceController extends Controller
             
         }
 
-        $html .= '<br>
-                    Total valoare: '. $total_value .'';
-
-        // $invoices = Invoice::all();
-        // $invoice_id = $invoices->last()->id;
-        // $user = Auth::user();
-
-        // $old_date = $request->input('document-date');
-        // $new_date = date("d-m-Y", strtotime($old_date));  
-        // $provider_id = $request->input('furnizor-select');
-        // $provider = Provider::where('id', $provider_id)->get();
-        // $invoice_number = $request->input('document-number');
-        // $old_due_date = $request->input('due-date');
-        // $new_due_date = date("d-m-Y", strtotime($old_due_date));  
-
-        // $institution = Institution::all();
-
-        // $filename = 'pdfs/nir'.$invoice_id.'.pdf';
-
-        // $html = '<html>
-        //         <head>
-        //         <style>
-        //         td, th {border: 2px solid black;}
-        //         </style>
-        //         </head>
-        //         ';
-
-        // $html .= ' <span style="font-weight: bold; float: left;">'. $institution[0]->name .'</span>
-        //         <br>
-        //         <span style="float: left;">Utilizator: '. $user->name .'</span>
-        //         <h2 style="font-weight:bold; text-align: center;">NOTA DE INTRARE RECEPTIE</h2>
-        //         <br>
-        //         <span style="font-weight: bold; float: right;">Numar document: '. $invoice_id . ' / ' . $new_date .'</span>
-        //         <br>
-        //         <span style="font-weight: bold; float: right;">Furnizor: '. $provider->first()->name .'</span>
-        //         <br>
-        //         <span style="font-weight: bold; float: right;">Gestiune: DEPOZIT FARMACIE</span>
-        //         <br>
-        //         <span style="font-weight: bold; float: right;">Document intrare: Factura fiscala - '. $invoice_number .'</span>
-        //         <br>
-        //         <span style="font-weight: bold; float: right;">Data scadenta: '. $new_due_date .'</span>
-        //         <br>
-        //         <br>
-        //         <br>
-        // ';
-
-        // $html .= '
-        // <table>
-        // <tr>
-        //   <th style="font-weight: bold; text-align: center;">Cod CIM</th>
-        //   <th style="font-weight: bold; text-align: center;">Cod Produs</th>
-        //   <th style="font-weight: bold; text-align: center;">Lot</th>
-        //   <th style="font-weight: bold; text-align: center;">Data Exp.</th>
-        //   <th style="font-weight: bold; text-align: center;">UM</th>
-        //   <th style="font-weight: bold; text-align: center;">Cantitate</th>
-        //   <th style="font-weight: bold; text-align: center;">Pret Unitar</th>
-        //   <th style="font-weight: bold; text-align: center;">Pret cu TVA</th>
-        //   <th style="font-weight: bold; text-align: center;">Valoare (RON)</th>
-        // </tr>
-        // ';
-        
-        $html .= '';
-
         $html .= '</table>';
+
+        $html .= '<br><br>
+                    Total valoare: '. $total_value .'<br><br><br>';     
+
+        $html .= '<table class="footer-table">
+        <tr>
+        <td colspan="2" style="text-align: center;">Comisia de receptie</td>
+        </tr>
+        <tr>
+        <td style="text-align: center;">Nume si prenume</td>
+        <td style="text-align: center;">Semnatura</td>
+        </tr>
+        <tr>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
+        </tr>
+        <tr>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
+        </tr>
+        <tr>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
+        </tr>
+    </table>';
 
         $html .= '</html>';
 

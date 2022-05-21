@@ -65,14 +65,18 @@ class ConsumptionController extends Controller
 
         //dd($med_id);
 
+        $span = "";
+
         if( !empty( $amb_id ) ) {
             $checklists = \App\Models\Checklist::with('checklistitems', 'inventory', 'medic', 'ambulance', 'assistent', 'ambulancier')
             ->whereBetween('checklist_date', [$from, $to])->where('ambulance_id', '=', $amb_id)->get();
             $from_name = Ambulance::where('id', $request->input('ambulance-select'))->get()->first()->license_plate;
+            $span = '<span style="font-weight: bold; float: right;">Din: '. $from_name .'</span>';
         } else {
             $checklists = \App\Models\Checklist::with('checklistitems', 'inventory', 'medic', 'ambulance', 'assistent', 'ambulancier')
             ->whereBetween('checklist_date', [$from, $to])->where('medic_id', '=', $med_id)->get();
             $from_name = Medic::where('id', $request->input('medic-select'))->get()->first()->name;
+            $span = '<span style="font-weight: bold; float: right;">Medic: '. $from_name .'</span>';
         }
         if($checklists->isEmpty())
         {
@@ -118,7 +122,7 @@ class ConsumptionController extends Controller
         <br>
         <span style="font-weight: bold; float: right;">Numar document: '. $consumption_id . ' / ' . $new_date .'</span>
         <br>
-        <span style="font-weight: bold; float: right;">Din: '. $from_name .'</span>
+        '. $span .'
         <br>
         <br>
         <br>
@@ -191,20 +195,49 @@ class ConsumptionController extends Controller
             // man. tu stergi din checklist si adaugi in consum. o sa le ai pe toate in consum.
         }
 
-        // foreach($checklists as $checklist)
-        // {
-        //     $detailedChecklist = \App\Models\Checklist::with('assistent')->find($checklist->assistent_id);
-        //     dd($detailedChecklist);
-        //     $html .= '<br>
-        //         <p style="font-weight: bold;">'. $detailedChecklist->assistent->name .'</p>
-        //     ';
-        // }
-
-        $html .= '<br>';
+        $html .= '</table><br><br>';
 
         $html .= 'Total valoare: '. $total_value .'';
 
-        $html .= '</table>';
+        $html .= '<br><br>Asistenti:';
+
+        foreach($checklists as $checklist)
+        {
+            //$detailedChecklist = \App\Models\Checklist::with('assistent')->find($checklist->assistent_id);
+
+            $detailedChecklist = \App\Models\Checklist::with('assistent', 'ambulancier')->find($checklist->id);
+            $assistent = $detailedChecklist->assistent->name ?? '';
+            //dd($detailedChecklist);
+            
+            if($assistent != '') {
+                $html .= '
+                <p style="font-weight: bold;">'. $assistent .'</p>
+                <br>
+            ';
+            }
+            
+        }
+
+        $html .= '<br><br>Ambulantieri:';
+
+        foreach($checklists as $checklist)
+        {
+            //$detailedChecklist = \App\Models\Checklist::with('assistent')->find($checklist->assistent_id);
+
+            $detailedChecklist = \App\Models\Checklist::with('assistent', 'ambulancier')->find($checklist->id);
+            $ambulancier = $detailedChecklist->ambulancier->name ?? '';
+            //dd($detailedChecklist);
+
+            if($ambulancier != '') {
+                $html .= '
+                <p style="font-weight: bold;">'. $ambulancier .'</p>
+                <br>
+            ';
+            }
+            
+        }
+
+        $html .= '<br>';
 
         $html .= '</html>';
 

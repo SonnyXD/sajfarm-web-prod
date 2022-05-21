@@ -137,8 +137,37 @@ class GeneratePDFController extends Controller
 
         $html .= '</table>';
 
-        $html .= '</html>';
-        
+        $html .= '<table class="footer-table">
+        <tr>
+          <td colspan="2" style="text-align: center;">Comisia de receptie</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">Nume si prenume</td>
+          <td style="text-align: center;">Semnatura</td>
+        </tr>
+        <tr>
+          <td colspan="1"></td>
+          <td colspan="1"></td>
+        </tr>
+        <tr>
+          <td colspan="1"></td>
+          <td colspan="1"></td>
+        </tr>
+        <tr>
+          <td colspan="1"></td>
+          <td colspan="1"></td>
+        </tr>
+      </table>';
+
+      $html .= '<style>
+        .footer-table {
+          position: absolute;
+          bottom: 0px;
+        }
+      </style>';
+
+      $html .= '</html>';
+
         PDF::SetTitle('NIR');
         PDF::AddPage('L', 'A4');
         PDF::writeHTML($html, true, false, true, false, '');

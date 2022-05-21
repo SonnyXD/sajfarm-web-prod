@@ -26,7 +26,7 @@ class LogicForms extends Controller
                     $item->item->name,
                     $item->invoice_item->measure_unit->name,
                     $item->quantity,
-                    $item->invoice_item->lot
+                    date("d-m-Y", strtotime($item->invoice_item->exp_date))
                 );
             }
         }
