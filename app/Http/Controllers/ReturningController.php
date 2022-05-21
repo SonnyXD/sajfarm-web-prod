@@ -78,7 +78,7 @@ class ReturningController extends Controller
         $returning_id = $returning->last()->id;
         $institution = Institution::all();
 
-        $filename = 'pdfs/transfer'.$returning_id.'.pdf';
+        $filename = 'pdfs/retur'.$returning_id.'.pdf';
 
         $html = '<html>
                 <head>
