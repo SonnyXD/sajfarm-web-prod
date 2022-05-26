@@ -76,10 +76,10 @@
                             Nume
                           </th>
                           <th>
-                            Cantitate
+                            UM
                           </th>
                           <th>
-                            UM
+                           Cantitate
                           </th>
                           <th>
                             Motiv
@@ -98,6 +98,8 @@
             <x-modal>
               <x-form id="factura-modal">
               <div style="display: none;" class="alert alert-danger" role="alert" id="modal-alert">Cantitate invalida!</div>
+              <div style="display: none;" class="alert alert-danger" role="alert" id="modal-alert-404">Alege un produs!</div>
+              <div style="display: none;" class="alert alert-danger" role="alert" id="modal-alert-fields">Completeaza campurile!</div>
               <div class="form-group">
                   <label for="recipient-name" class="col-form-label">Nume Produs:</label>
                   <x-input class="form-control" id="product-name" name="product-name" disabled="disabled"/>

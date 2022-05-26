@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('item_id')->constrained();
             $table->foreignId('item_stock_id')->constrained();
             $table->integer('quantity');
+            $table->integer('used');
         });
     }
 

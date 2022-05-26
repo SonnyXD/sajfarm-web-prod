@@ -20,6 +20,8 @@ function facturaModal() {
       let tva_price = ((tva_proc/100) * price) + (+price);
       let quantity = $("#product-quantity").val();
       let value = (+quantity) * (+tva_price);
+      value = value.toFixed(4);
+      tva_price = tva_price.toFixed(4);
       $("#product-tva-price").val(tva_price);
       $("#product-value").val(value);
   });
@@ -70,6 +72,36 @@ console.log( {valid, rowCount});
   // });
 
   $('#add-product').on('click', function() {
+
+    if(!$('#product-code').val()) {
+      $('#modal-alert').css('display','block');
+      return;
+    }
+
+    if(!$('#product-quantity').val()) {
+      $('#modal-alert').css('display','block');
+      return;
+    }
+
+    if(!$('#product-availability').val()) {
+      $('#modal-alert').css('display','block');
+      return;
+    }
+
+    if(!$('#product-lot').val()) {
+      $('#modal-alert').css('display','block');
+      return;
+    }
+
+    if(!$('#product-price').val()) {
+      $('#modal-alert').css('display','block');
+      return;
+    }
+
+    if(!$('#product-tva').val()) {
+      $('#modal-alert').css('display','block');
+      return;
+    }
 
     let i = $('#medstable').find('tbody tr').length;
 

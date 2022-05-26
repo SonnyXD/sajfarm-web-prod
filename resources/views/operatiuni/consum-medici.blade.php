@@ -68,5 +68,34 @@
                 </div>
         </x-form>
     </x-container>
+
+    <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title" id="section-title">Checklisturi</h4>
+                  <div class="table-responsive">
+                    <table class="table table-striped" id="med-checklists">
+                      <thead>
+                        <tr class="header">
+                          <th>
+                            Medic
+                          </th>
+                          <th>
+                            Ambulanta 
+                          </th>
+                          <th>
+                            Data
+                          </th>
+                          <th>
+                            Tura
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                  
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
 </x-layout>
 <script src="/js/medic-consume.js"></script>

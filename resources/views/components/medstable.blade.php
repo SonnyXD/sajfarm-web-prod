@@ -7,6 +7,7 @@
                   <h4 class="card-title" id="section-title">
                   {{$inventory_name}} - {{ $category_name }}
                   </h4>
+                  <p></p>
                   <div class="table-responsive">
                     <table class="table table-striped" id="medstable">
                       <thead>
@@ -27,14 +28,30 @@
                         @foreach ($items as $item)
                           <tr data-count="{{ $loop->index }}">
                             <td> {{$item->name}}</td>
-                            @if ($inventory_id == 1) 
-                                <td>150 / {{$minimum_quantities_farm[$i]->quantity ?? 0}}</td>
+                            @if ($inventory_id == 1)
+                              @php
+                                $item_sum = \App\Models\ItemStock::with('inventory', 'item')->where('inventory_id', '=', 1)->where('item_id', '=', $item->id)->sum('quantity');
+                                $min_cant = $minimum_quantities_farm[$i]->quantity ?? 0;
+                              @endphp 
+                                @if($item_sum < $min_cant || $item_sum == 0)
+                                  <td style="color: red; font-weight: bold;">{{$item_sum}} / {{$min_cant}}</td>
+                                @else
+                                  <td>{{$item_sum}} / {{$min_cant}}</td>
+                                @endif
                                 @php
                                   $i++;
                                 @endphp
                             @endif
-                            @if ($inventory_id == 2) 
-                                <td>150 / {{$minimum_quantities_stoc3[$i]->quantity ?? 0}}</td>
+                            @if ($inventory_id == 2)
+                              @php
+                                $item_sum = \App\Models\ItemStock::with('inventory', 'item')->where('inventory_id', '=', 2)->where('item_id', '=', $item->id)->sum('quantity');
+                                $min_cant = $minimum_quantities_stoc3[$i]->quantity ?? 0;
+                              @endphp 
+                                @if($item_sum < $min_cant || $item_sum == 0)
+                                  <td style="color: red; font-weight: bold;">{{$item_sum}} / {{$min_cant}}</td>
+                                @else
+                                  <td>{{$item_sum}} / {{$min_cant}}</td>
+                                @endif
                                 @php
                                   $i++;
                                 @endphp
@@ -56,6 +73,7 @@
                                   <th>Pret Unitar</th>
                                   <th>TVA</th>
                                   <th>Pret TVA</th>
+                                  <th>Valoare</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -79,6 +97,7 @@
                                       <td>{{$inItem['price']}}</td>
                                       <td>{{$inItem['tva']}}</td>
                                       <td>{{$inItem['tva_price']}}</td>
+                                      <td>{{number_format($inItem['tva_price'] * $inItem['quantity'],4)}}</td>
                                     </tr>
                                       @endif
                                     @endforeach
@@ -89,46 +108,6 @@
                           </tr>
                         @endforeach
                       @endif
-                        <!-- <tr>
-                          <td> Algocalmin pentru copii</td>
-                          <td> 150 </td>
-                        </tr>
-                        <tr>
-                          <td> Nurofen </td>
-                          <td> 500 </td>
-                        </tr>
-                        <tr>
-                          <td> Algocalmin pentru copii</td>
-                          <td> 150 </td>
-                        </tr>
-                        <tr>
-                          <td> Nurofen </td>
-                          <td> 500 </td>
-                        </tr>
-                        <tr>
-                          <td> Algocalmin pentru copii</td>
-                          <td> 150 </td>
-                        </tr>
-                        <tr>
-                          <td> Nurofen </td>
-                          <td> 500 </td>
-                        </tr>
-                        <tr>
-                          <td> Algocalmin pentru copii</td>
-                          <td> 150 </td>
-                        </tr>
-                        <tr>
-                          <td> Nurofen </td>
-                          <td> 500 </td>
-                        </tr>
-                        <tr>
-                          <td> Algocalmin pentru copii</td>
-                          <td> 150 </td>
-                        </tr>
-                        <tr>
-                          <td> Nurofen </td>
-                          <td> 500 </td>
-                        </tr> -->
                       </tbody>
                     </table>
                   </div>

@@ -149,6 +149,7 @@
 
           <x-modal>
               <x-form id="factura-modal">
+              <div style="display: none;" class="alert alert-danger" role="alert" id="modal-alert">Completeaza toate campurile!</div>
               <div class="form-group">
                   <label for="recipient-name" class="col-form-label">Nume Produs:</label>
                   <x-input class="form-control" id="product-name" name="product-name" disabled="disabled"/>

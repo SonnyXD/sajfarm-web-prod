@@ -96,6 +96,16 @@ else
         return;
     }
 
+    if(!$('#product-quantity').val()) {
+      $('#modal-alert').css('display','block');
+      return;
+    }
+
+    if(!$('#product-name').val()) {
+      $('#modal-alert-404').css('display','block');
+      return;
+    }
+
     $('#modal-alert').css('display','none');
 
     $('#modal-alert').css('display','none');

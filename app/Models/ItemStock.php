@@ -8,6 +8,7 @@ use \App\Models\Item;
 use \App\Models\Inventory;
 use \App\Models\Invoice;
 use \App\Models\InvoiceItem;
+use \App\Models\ChecklistItem;
 
 class ItemStock extends Model
 {
@@ -31,5 +32,9 @@ class ItemStock extends Model
 
     public function invoice() {
         return $this->belongsTo( Invoice::class );
+    }
+
+    public function checklist_item() {
+        return $this->belongsTo( ChecklistItem::class );
     }
 }

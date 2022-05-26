@@ -24,6 +24,55 @@ else
 testInputs();
 }
 
+function getChecklists() {
+  $('#ambulance-select').on('change', function() {
+    let ambulanceId = $(this).val();
+    
+    $.ajax({
+        type: "GET",
+        data: {
+            ambulance: ambulanceId
+        },
+        url: "/ambulance-checklist",
+        success: function(response) {
+            $('#amb-checklists tr:not(:first)').empty();
+            $('#amb-checklists').append(response);
+        }
+    });
+
+});
+
+$('#ambulance-select').on('change.select2', function() {
+  let ambulanceId = $(this).val();
+  loadAmbulance(ambulanceId);
+
+});
+
+let selectedAmb = $('#ambulance-select').val();
+if (selectedAmb == undefined) {
+  selectedAmb = $('#ambulance-select option:first()').val();
+}
+
+//console.log(selectedSubstation);
+loadAmbulance(selectedAmb);
+
+function loadAmbulance(selectedAmb) {
+  $.ajax({
+    type: "GET",
+    data: {
+        ambulance: selectedAmb
+    },
+    url: "/ambulance-checklist",
+    success: function(response) {
+      $('#amb-checklists tr:not(:first)').empty();
+      $('#amb-checklists').append(response);
+    }
+});
+}
+
+}
+
 jQuery(document).ready(() => {
     conditions();
+    getChecklists();
 });

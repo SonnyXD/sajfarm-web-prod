@@ -23,6 +23,7 @@ return new class extends Migration
             $table->date('checklist_date');
             $table->integer('patient_number')->nullable();
             $table->string('tour');
+            $table->integer('used');
         });
     }
 

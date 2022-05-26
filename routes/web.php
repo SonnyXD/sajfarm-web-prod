@@ -245,6 +245,10 @@ Route::get('/testenv', function () {
 
 Route::get('/inventory-products', array('uses' => 'App\Http\Controllers\LogicForms@inventory_products'));
 
+Route::get('/ambulance-checklist', array('uses' => 'App\Http\Controllers\LogicForms@ambulance_checklists'));
+
+Route::get('/medic-checklist', array('uses' => 'App\Http\Controllers\LogicForms@medic_checklists'));
+
 Route::get('/operatiuni/intrare-factura', array('uses' => 'App\Http\Controllers\RoutesController@invoice'));
 
 Route::get('/operatiuni/checklist-statii', array('uses' => 'App\Http\Controllers\RoutesController@station_checklist'));
@@ -279,7 +283,7 @@ Route::get('/documente/baza-de-date', array('uses' => 'App\Http\Controllers\Rout
 
 //Route::get('/fun', [App\Http\Controllers\GeneratePDFController::class, 'invoice']);
 
-Route::post('intrare-factura', 'App\Http\Controllers\InvoiceController@store')->name('invoices.store');
+Route::get('intrare-factura', 'App\Http\Controllers\InvoiceController@store')->name('invoices.store');
 
 //Route::post('intrare-factura', 'App\Http\Controllers\GeneratePDFController@invoice')->name('invoicepdf.store');
 

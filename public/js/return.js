@@ -86,13 +86,36 @@ $('#print').attr('disabled', false);
 
     if (parseInt($('#product-quantity').val()) > parseInt($('#product-quantity').attr('max'))) {
         $('#modal-alert').css('display','block');
+        $('#modal-alert-404').css('display','none');
+        $('#modal-alert-fields').css('display','none');
         console.log('enter here');
         return;
     }
     
     if (parseInt($('#product-quantity').val()) < parseInt($('#product-quantity').attr('min'))) {
         $('#modal-alert').css('display','block');
+        $('#modal-alert-404').css('display','none');
+        $('#modal-alert-fields').css('display','none');
         return;
+    }
+
+    if(!$('#product-quantity').val()) {
+      $('#modal-alert').css('display','block');
+      return;
+    }
+
+    if(!$('#product-name').val()) {
+      $('#modal-alert-404').css('display','block');
+      $('#modal-alert').css('display','none');
+      $('#modal-alert-fields').css('display','none');
+      return;
+    }
+
+    if(!$('#reason').val()) {
+      $('#modal-alert-fields').css('display','block');
+      $('#modal-alert-404').css('display','none');
+      $('#modal-alert').css('display','none');
+      return;
     }
 
     $('#modal-alert').css('display','none');
@@ -143,6 +166,9 @@ $('#print').attr('disabled', false);
 
     $('#medstable tbody').append(output);
     testInputs();
+    $('#modal-alert').css('display','none');
+    $('#modal-alert-404').css('display','none');
+    $('#modal-alert-fields').css('display','none');
     $('#meds-modal').modal('toggle');
     $('#meds-modal form')[0].reset();
 

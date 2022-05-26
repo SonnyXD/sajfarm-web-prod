@@ -191,7 +191,11 @@ class TransferController extends Controller
         $html .= '<br><br>';
 
         $html .= 'GESTIONAR<br>
-        '. $user->name .'';
+        '. $institution[0]->pharmacy_manager .'<br><br>';
+
+        $html .= '<span style="float: left;">Farm. Sef<br>'.$institution[0]->pharmacy_manager.'</span><br><br>
+                  <span style="float: right;">As. Farm. <br>'.$institution[0]->assistent.'<br><br></span>
+                  <span style="text-align: right;">Primitor:</span>';
 
         $html .= '</html>';
 

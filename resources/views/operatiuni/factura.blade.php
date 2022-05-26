@@ -5,7 +5,7 @@
       //inline js reminder (or create .js files for every blade page)
     </script>
     <x-container :title="$title">
-    <x-form id="intrare-factura" method="POST" action="{{ route('invoices.store') }}">
+    <x-form id="intrare-factura" method="GET" action="{{ route('invoices.store') }}">
       <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
       <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
         <div class="form-group">
@@ -144,10 +144,11 @@
                   </div>
                 </div>
               </div>
-            </div>
+            
 
             <x-modal>
               <x-form id="factura-modal">
+              <div style="display: none;" class="alert alert-danger" role="alert" id="modal-alert">Completeaza toate campurile!</div>
               <div class="form-group">
                   <label for="recipient-name" class="col-form-label">Nume Produs:</label>
                   <x-input class="form-control" id="product-name" name="product-name" disabled="disabled"/>

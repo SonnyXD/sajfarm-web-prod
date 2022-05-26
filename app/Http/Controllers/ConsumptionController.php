@@ -69,14 +69,56 @@ class ConsumptionController extends Controller
 
         if( !empty( $amb_id ) ) {
             $checklists = \App\Models\Checklist::with('checklistitems', 'inventory', 'medic', 'ambulance', 'assistent', 'ambulancier')
-            ->whereBetween('checklist_date', [$from, $to])->where('ambulance_id', '=', $amb_id)->get();
+            ->whereBetween('checklist_date', [$from, $to])->where('ambulance_id', '=', $amb_id)->where('used', '=', 0)->get();
             $from_name = Ambulance::where('id', $request->input('ambulance-select'))->get()->first()->license_plate;
-            $span = '<span style="font-weight: bold; float: right;">Din: '. $from_name .'</span>';
+            $checklist_sub = \App\Models\Checklist::with('inventory')->where('ambulance_id', '=', $amb_id)->get()->first()->inventory->name;
+            if($checklist_sub == "Stoc 3") {
+                $checklist_sub = "Statie centrala";
+            }
+            $span = '<span style="font-weight: bold; float: right;">Substatie: '. $checklist_sub .'</span><br>
+            <span style="font-weight: bold; float: right;">Ambulanta: '. $from_name .'</span>';
         } else {
             $checklists = \App\Models\Checklist::with('checklistitems', 'inventory', 'medic', 'ambulance', 'assistent', 'ambulancier')
-            ->whereBetween('checklist_date', [$from, $to])->where('medic_id', '=', $med_id)->get();
+            ->whereBetween('checklist_date', [$from, $to])->where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
             $from_name = Medic::where('id', $request->input('medic-select'))->get()->first()->name;
-            $span = '<span style="font-weight: bold; float: right;">Medic: '. $from_name .'</span>';
+            $checklist_amb = \App\Models\Checklist::with('ambulance')->where('medic_id', '=', $med_id)->get();
+            $checklist_patients = \App\Models\Checklist::where('medic_id', '=', $med_id)->get();
+            $span = '<span style="font-weight: bold; float: right;">Medic: '. $from_name .'</span><br>';
+
+            $span .= '<span style="font-weight: bold; float: right;">Ambulante: ';
+
+            $counter = 0;
+
+            foreach($checklist_amb as $ambulance) {
+                if( $counter == count( $checklist_amb ) - 1) {
+                    $span .= $ambulance->ambulance->license_plate;
+                } else {
+                    $span .= $ambulance->ambulance->license_plate.' / ';
+                }
+                
+                $counter++;
+                
+            }
+
+            $span .= '</span><br>';
+
+            $span .= '<span style="font-weight: bold; float: right;">Nr. fise pacienti: ';
+
+            $counter = 0;
+
+            foreach($checklist_patients as $patient) {
+                if( $counter == count( $checklist_patients ) - 1) {
+                    $span .= $patient->patient_number;
+                } else {
+                    $span .= $patient->patient_number.' / ';
+                }
+                
+                $counter++;
+                
+            }
+
+            $span .= '</span><br>';
+
         }
         if($checklists->isEmpty())
         {
@@ -120,6 +162,8 @@ class ConsumptionController extends Controller
         <span style="float: left;">Utilizator: '. $user->name .'</span>
         <h2 style="font-weight:bold; text-align: center;">BON DE CONSUM</h2>
         <br>
+        <span style="font-weight:bold; float: right;">Perioada: '. date("d-m-Y", strtotime($from)) .' - '. date("d-m-Y", strtotime($to)) .'</span>
+        <br>
         <span style="font-weight: bold; float: right;">Numar document: '. $consumption_id . ' / ' . $new_date .'</span>
         <br>
         '. $span .'
@@ -144,20 +188,41 @@ class ConsumptionController extends Controller
         ';
         //dd($checklists);
         $total_value = 0;
+        $i = 1;
         foreach($checklists as $checklist)
         {
+
+            // if($checklist->used == 1) {
+            //     // return redirect('/operatiuni/bon-consum-ambulante')
+            //     //     ->with('error', 'Generare bon de consum esuat! Cauze posibile: nu exista checklist pentru ambulanta/medicul respectiv');
+            //     continue;
+            // }
+            
             if( $checklist->checklistitems->isEmpty() ) {
                 continue;
             }
 
-            $consumption = new \App\Models\Consumption();
-            $consumption->inventory_id = $checklist->inventory->id;
-            $consumption->medic_id = $checklist->medic->id ?? null;
-            $consumption->ambulance_id = $checklist->ambulance->id;
-            $consumption->patient_number = $checklist->patient_number;
-            $consumption->tour = $checklist->tour;
-            $consumption->document_date = $request->input('document-date');
-            $consumption->save();
+            if($i == 1) {
+                $consumption = new \App\Models\Consumption();
+                $consumption->inventory_id = $checklist->inventory->id;
+                $consumption->medic_id = $checklist->medic->id ?? null;
+                $consumption->ambulance_id = $checklist->ambulance->id;
+                $consumption->patient_number = $checklist->patient_number;
+                $consumption->tour = $checklist->tour;
+                $consumption->document_date = $request->input('document-date');
+                $consumption->save();
+            }
+
+            $i++;
+
+            // $consumption = new \App\Models\Consumption();
+            // $consumption->inventory_id = $checklist->inventory->id;
+            // $consumption->medic_id = $checklist->medic->id ?? null;
+            // $consumption->ambulance_id = $checklist->ambulance->id;
+            // $consumption->patient_number = $checklist->patient_number;
+            // $consumption->tour = $checklist->tour;
+            // $consumption->document_date = $request->input('document-date');
+            // $consumption->save();
 
             foreach($checklist->checklistitems as $item)
             {
@@ -167,9 +232,12 @@ class ConsumptionController extends Controller
                 $consumItem->consumption_id = $consumption->id;
                 $consumItem->item_id = $item->item_id;
                 $consumItem->item_stock_id = $item->item_stock_id;
-                $consumItem->quantity = $item->quantity;;
+                $consumItem->quantity = $item->quantity;
                 $consumItem->save();
                 //generez document
+
+                $item->used = 1;
+                $item->save();
 
                 $html.= '<tr>
                 <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
@@ -199,11 +267,15 @@ class ConsumptionController extends Controller
 
         $html .= 'Total valoare: '. $total_value .'';
 
-        $html .= '<br><br>Asistenti:';
+        $html .= '<br><br>Asistenti:<br>';
 
         foreach($checklists as $checklist)
         {
             //$detailedChecklist = \App\Models\Checklist::with('assistent')->find($checklist->assistent_id);
+
+            if($checklist->used == 1) {
+                continue;
+            }
 
             $detailedChecklist = \App\Models\Checklist::with('assistent', 'ambulancier')->find($checklist->id);
             $assistent = $detailedChecklist->assistent->name ?? '';
@@ -211,17 +283,21 @@ class ConsumptionController extends Controller
             
             if($assistent != '') {
                 $html .= '
-                <p style="font-weight: bold;">'. $assistent .'</p>
+                <span style="font-weight: bold;">'. $assistent .'</span>
                 <br>
             ';
             }
             
         }
 
-        $html .= '<br><br>Ambulantieri:';
+        $html .= '<br><br>Ambulantieri:<br>';
 
         foreach($checklists as $checklist)
         {
+
+            if($checklist->used == 1) {
+                continue;
+            }
             //$detailedChecklist = \App\Models\Checklist::with('assistent')->find($checklist->assistent_id);
 
             $detailedChecklist = \App\Models\Checklist::with('assistent', 'ambulancier')->find($checklist->id);
@@ -230,12 +306,18 @@ class ConsumptionController extends Controller
 
             if($ambulancier != '') {
                 $html .= '
-                <p style="font-weight: bold;">'. $ambulancier .'</p>
+                <span style="font-weight: bold;">'. $ambulancier .'</span>
                 <br>
             ';
             }
+
+            $checklist->used = 1;
+            $checklist->save();
             
         }
+
+        $html .= '<p style="text-align: right;">Intocmit Farm. Sef<br>
+        '. $institution[0]->pharmacy_manager .'</p>';
 
         $html .= '<br>';
 
