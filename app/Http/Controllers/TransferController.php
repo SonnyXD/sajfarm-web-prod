@@ -178,6 +178,7 @@ class TransferController extends Controller
         $transfer_item = new \App\Models\TransferItem();
 
         $transfer_item->item_stock_id = $productPost['productId'];
+        $transfer_item->transfer_id = $transfer->id;
         $transfer_item->item_id = $item->item_id;
         $transfer_item->quantity = $productPost['productQty'];
 
