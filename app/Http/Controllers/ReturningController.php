@@ -137,6 +137,16 @@ class ReturningController extends Controller
         </tr>';
 
         $total_value += $item->invoice_item->price * $product['productQty'];
+
+        $returning_item = new \App\Models\ReturningItem();
+
+        $returning_item->item_stock_id = $product['productId'];
+        $returning_item->returning_id = $returning_id;
+        $returning_item->item_id = $item->item_id;
+        $returning_item->quantity = $product['productQty'];
+        $returning_item->reason = $product['productReason'];
+
+        $returning_item->save();
         }
 
         $html .= '<br>';
