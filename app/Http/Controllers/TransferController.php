@@ -181,6 +181,8 @@ class TransferController extends Controller
         $transfer_item->item_id = $item->item_id;
         $transfer_item->quantity = $productPost['productQty'];
 
+        $transfer_item->save();
+
         }
         $html .= '<br>';
 
