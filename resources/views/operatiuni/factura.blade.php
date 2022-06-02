@@ -55,19 +55,19 @@
                     <div class="col">
                       <label>Procent Discount</label>
                       <div id="the-basics">
-                      <x-input type="number" id="discount-procent" name="discount-procent"/>
+                      <x-input type="number" id="discount-procent" name="discount-procent" step="any"/>
                       </div>
                     </div>
                     <div class="col">
                       <label>Valoare Discount</label>
                       <div id="bloodhound">
-                      <x-input type="number" id="discount-value" name="discount-value"/>
+                      <x-input type="number" id="discount-value" name="discount-value" step="any"/>
                       </div>
                     </div>
                     <div class="col">
                       <label>Valoare Totala</label>
                       <div id="bloodhound">
-                      <x-input type="number" id="total-value" name="total-value"/>
+                      <x-input type="number" id="total-value" name="total-value" step="any"/>
                       </div>
                     </div>
                   </div>
