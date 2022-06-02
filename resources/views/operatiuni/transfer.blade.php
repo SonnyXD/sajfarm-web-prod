@@ -3,6 +3,8 @@
         <x-form id="bon-transfer" method="POST" action="{{ route('transfers.store') }}">
         <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
         <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
+        <input type="hidden" id="from-location-id" name="from-location-id" value=""/>
+        <input type="hidden" id="to-location-id" name="to-location-id" value=""/>
             <div class="form-group">
                 <label>Din:</label>
                 <select class="form-control" id="from-location" name="from-location">
@@ -88,6 +90,9 @@
                           </th>
                           <th>
                             Cantitate
+                          </th>
+                          <th>
+                            
                           </th>
                         </tr>
                       </thead>

@@ -1,5 +1,6 @@
 function treeviewDisplay() {
-    jQuery('#medstable tbody tr:not(.treeview)').click(function() {
+    jQuery('#medstable > tbody > tr:not(.treeview)').click(function() {
+      //console.log('test');
         const treeview = jQuery('#medstable tbody tr.treeview.tr-' + jQuery(this).data('count'));
   
         if( treeview.hasClass('active') ) {
@@ -7,6 +8,7 @@ function treeviewDisplay() {
         } else {
           jQuery('#medstable tbody tr.treeview').removeClass('active');
           treeview.addClass('active');
+          treeview[0].style.display = "";
         }
         
     });
@@ -14,11 +16,12 @@ function treeviewDisplay() {
 
   function myFunction() {
     // Declare variables
+    
     var input, filter, table, tr, td, i, txtValue;
     input = document.getElementById("myInput");
     filter = input.value.toUpperCase();
     table = document.getElementById("medstable");
-    tr = table.getElementsByTagName("tr");
+    tr = $(table).find('> tbody > tr');
   
     // Loop through all table rows, and hide those who don't match the search query
     for (i = 0; i < tr.length; i++) {

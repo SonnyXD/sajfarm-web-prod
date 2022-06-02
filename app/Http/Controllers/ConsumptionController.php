@@ -71,7 +71,9 @@ class ConsumptionController extends Controller
             $checklists = \App\Models\Checklist::with('checklistitems', 'inventory', 'medic', 'ambulance', 'assistent', 'ambulancier')
             ->whereBetween('checklist_date', [$from, $to])->where('ambulance_id', '=', $amb_id)->where('used', '=', 0)->get();
             $from_name = Ambulance::where('id', $request->input('ambulance-select'))->get()->first()->license_plate;
-            $checklist_sub = \App\Models\Checklist::with('inventory')->where('ambulance_id', '=', $amb_id)->get()->first()->inventory->name;
+
+            $checklist_sub = \App\Models\Checklist::with('inventory')->where('ambulance_id', '=', $amb_id)->first()?->inventory->name;
+
             if($checklist_sub == "Stoc 3") {
                 $checklist_sub = "Statie centrala";
             }
@@ -81,43 +83,44 @@ class ConsumptionController extends Controller
             $checklists = \App\Models\Checklist::with('checklistitems', 'inventory', 'medic', 'ambulance', 'assistent', 'ambulancier')
             ->whereBetween('checklist_date', [$from, $to])->where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
             $from_name = Medic::where('id', $request->input('medic-select'))->get()->first()->name;
-            $checklist_amb = \App\Models\Checklist::with('ambulance')->where('medic_id', '=', $med_id)->get();
-            $checklist_patients = \App\Models\Checklist::where('medic_id', '=', $med_id)->get();
+            $checklist_amb = \App\Models\Checklist::with('ambulance')->where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
+            $checklist_patients = \App\Models\Checklist::where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
             $span = '<span style="font-weight: bold; float: right;">Medic: '. $from_name .'</span><br>';
 
-            $span .= '<span style="font-weight: bold; float: right;">Ambulante: ';
+            //$span .= '<span style="font-weight: bold; float: right;">Ambulante: ';
 
-            $counter = 0;
+            //$counter = 0;
+            //dd($checklist_amb);
 
-            foreach($checklist_amb as $ambulance) {
-                if( $counter == count( $checklist_amb ) - 1) {
-                    $span .= $ambulance->ambulance->license_plate;
-                } else {
-                    $span .= $ambulance->ambulance->license_plate.' / ';
-                }
+            // foreach($checklist_amb as $ambulance) {
+            //     if( ($counter == count( $checklist_amb ) - 1)) {
+            //         $span .= $ambulance->ambulance->license_plate;
+            //     } else {
+            //         $span .= $ambulance->ambulance->license_plate.' / ';
+            //     }
                 
-                $counter++;
+            //     $counter++;
                 
-            }
+            // }
 
-            $span .= '</span><br>';
+            //$span .= '</span><br>';
 
-            $span .= '<span style="font-weight: bold; float: right;">Nr. fise pacienti: ';
+            // $span .= '<span style="font-weight: bold; float: right;">Nr. fise pacienti: ';
 
-            $counter = 0;
+            // $counter = 0;
 
-            foreach($checklist_patients as $patient) {
-                if( $counter == count( $checklist_patients ) - 1) {
-                    $span .= $patient->patient_number;
-                } else {
-                    $span .= $patient->patient_number.' / ';
-                }
+            // foreach($checklist_patients as $patient) {
+            //     if( $counter == count( $checklist_patients ) - 1) {
+            //         $span .= $patient->patient_number;
+            //     } else {
+            //         $span .= $patient->patient_number.' / ';
+            //     }
                 
-                $counter++;
+            //     $counter++;
                 
-            }
+            // }
 
-            $span .= '</span><br>';
+            //$span .= '</span><br>';
 
         }
         if($checklists->isEmpty())
@@ -142,12 +145,15 @@ class ConsumptionController extends Controller
 
         $consumption = Consumption::all();
 
-        $consumption_id = $consumption->last()->id ?? null;
+        $consumption_id = $consumption->last()?->id;
 
         if($consumption_id === null) {
             $consumption_id = 1;
+        } else {
+            $consumption_id++;
         }
-        $filename = 'pdfs/consum'.$consumption_id.'.pdf';
+
+        $filename = 'pdfs/consum'.$consumption_id .'.pdf';
 
         $html = '<html>
                 <head>
@@ -169,23 +175,41 @@ class ConsumptionController extends Controller
         '. $span .'
         <br>
         <br>
-        <br>
-        <br>
 ';
 
-        $html .= '
-        <table>
-        <tr>
-          <th style="font-weight: bold; text-align: center;">Cod Produs</th>
-          <th style="font-weight: bold; text-align: center;">Nume</th>
-          <th style="font-weight: bold; text-align: center;">UM</th>
-          <th style="font-weight: bold; text-align: center;">Cantitate</th>
-          <th style="font-weight: bold; text-align: center;">Pret</th>
-          <th style="font-weight: bold; text-align: center;">Valoare</th>
-          <th style="font-weight: bold; text-align: center;">Lot</th>
-          <th style="font-weight: bold; text-align: center;">Data expirare</th>
-        </tr>
-        ';
+        if(empty($amb_id)) {
+            $html .= '
+            <table>
+            <tr>
+            <th style="font-weight: bold; text-align: center;">Cod Produs</th>
+            <th style="font-weight: bold; text-align: center;">Nume</th>
+            <th style="font-weight: bold; text-align: center;">UM</th>
+            <th style="font-weight: bold; text-align: center;">Cantitate</th>
+            <th style="font-weight: bold; text-align: center;">Pret</th>
+            <th style="font-weight: bold; text-align: center;">Valoare</th>
+            <th style="font-weight: bold; text-align: center;">Lot</th>
+            <th style="font-weight: bold; text-align: center;">Data expirare</th>
+            <th style="font-weight: bold; text-align: center;">Ambulanta</th>
+            <th style="font-weight: bold; text-align: center;">Nr fisa pacient</th>
+            </tr>
+            ';
+        } else {
+            $html .= '
+            <table>
+            <tr>
+            <th style="font-weight: bold; text-align: center;">Cod Produs</th>
+            <th style="font-weight: bold; text-align: center;">Nume</th>
+            <th style="font-weight: bold; text-align: center;">UM</th>
+            <th style="font-weight: bold; text-align: center;">Cantitate</th>
+            <th style="font-weight: bold; text-align: center;">Pret</th>
+            <th style="font-weight: bold; text-align: center;">Valoare</th>
+            <th style="font-weight: bold; text-align: center;">Lot</th>
+            <th style="font-weight: bold; text-align: center;">Data expirare</th>
+            </tr>
+            ';
+        }
+
+        
         //dd($checklists);
         $total_value = 0;
         $i = 1;
@@ -239,16 +263,34 @@ class ConsumptionController extends Controller
                 $item->used = 1;
                 $item->save();
 
-                $html.= '<tr>
-                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $detailedItem->item->name .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->measure_unit->name .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $item->quantity .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->price .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->price * $item->quantity .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
-                <td style="font-weight: bold; text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
-            </tr>';
+                if(empty( $amb_id )) {
+                    $html.= '<tr>
+                    <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
+                    <td style="text-align: center;">'. $detailedItem->item->name .'</td>
+                    <td style="text-align: center;">'. $detailedItem->invoice_item->measure_unit->name .'</td>
+                    <td style="text-align: center;">'. $item->quantity .'</td>
+                    <td style="text-align: center;">'. $detailedItem->invoice_item->price .'</td>
+                    <td style="text-align: center;">'. $detailedItem->invoice_item->price * $item->quantity .'</td>
+                    <td style="text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
+                    <td style="text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
+                    <td style="text-align: center;">'. $checklist->ambulance->license_plate .'</td>
+                    <td style="text-align: center;">'. $checklist->patient_number .'</td>
+                </tr>';
+                } else {
+                    $html.= '<tr>
+                    <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
+                    <td style="text-align: center;">'. $detailedItem->item->name .'</td>
+                    <td style="text-align: center;">'. $detailedItem->invoice_item->measure_unit->name .'</td>
+                    <td style="text-align: center;">'. $item->quantity .'</td>
+                    <td style="text-align: center;">'. $detailedItem->invoice_item->price .'</td>
+                    <td style="text-align: center;">'. $detailedItem->invoice_item->price * $item->quantity .'</td>
+                    <td style="text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
+                    <td style="text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
+                </tr>';
+                }
+
+
+                
 
             $total_value += $detailedItem->invoice_item->price * $item->quantity;
             }
@@ -269,6 +311,8 @@ class ConsumptionController extends Controller
 
         $html .= '<br><br>Asistenti:<br>';
 
+        $assistents = array();
+
         foreach($checklists as $checklist)
         {
             //$detailedChecklist = \App\Models\Checklist::with('assistent')->find($checklist->assistent_id);
@@ -282,15 +326,20 @@ class ConsumptionController extends Controller
             //dd($detailedChecklist);
             
             if($assistent != '') {
-                $html .= '
-                <span style="font-weight: bold;">'. $assistent .'</span>
-                <br>
-            ';
+                if (in_array($assistent, $assistents) == false) {
+                    array_push($assistents, $assistent);
+                    $html .= '
+                    <span style="font-weight: bold;">'. $assistent .'</span>
+                    <br>';
+                }
+                
             }
             
         }
 
         $html .= '<br><br>Ambulantieri:<br>';
+
+        $ambulanciers = array();
 
         foreach($checklists as $checklist)
         {
@@ -305,10 +354,13 @@ class ConsumptionController extends Controller
             //dd($detailedChecklist);
 
             if($ambulancier != '') {
-                $html .= '
-                <span style="font-weight: bold;">'. $ambulancier .'</span>
-                <br>
-            ';
+                if (in_array($ambulancier, $ambulanciers) == false) {
+                    array_push($ambulanciers, $ambulancier);
+                    $html .= '
+                    <span style="font-weight: bold;">'. $ambulancier .'</span>
+                    <br>';
+                }
+                
             }
 
             $checklist->used = 1;
@@ -318,6 +370,8 @@ class ConsumptionController extends Controller
 
         $html .= '<p style="text-align: right;">Intocmit Farm. Sef<br>
         '. $institution[0]->pharmacy_manager .'</p>';
+
+        //dd($assistents);
 
         $html .= '<br>';
 

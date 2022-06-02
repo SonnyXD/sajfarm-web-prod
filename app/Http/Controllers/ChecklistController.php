@@ -37,7 +37,7 @@ class ChecklistController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, array(
-            'substation-select' => 'nullable',
+            'from-location-id' => 'nullable',
             'medic-select' => 'nullable',
             'ambulance-select' => 'nullable',
             'document-date' => 'required',
@@ -48,7 +48,7 @@ class ChecklistController extends Controller
         ));
     
         $checklist = new \App\Models\Checklist();
-        $checklist->inventory_id = $request->input('substation-select');
+        $checklist->inventory_id = $request->input('from-location-id');
         $checklist->medic_id = $request->input('medic-select');
         $checklist->ambulance_id = $request->input('ambulance-select');
         $checklist->checklist_date = $request->input('document-date');
@@ -82,11 +82,20 @@ class ChecklistController extends Controller
                 $newItem->quantity = $product['productQty'];
                 $newItem->used = 0;
                 $newItem->save();
-            } else {
+            } else if($new_item->used == 1){
                 // dam doar debug daca exista deja sa vedem. ok
+             
+                $newItem = new \App\Models\ChecklistItem();
+                $newItem->checklist_id = $checklist->id;
+                $newItem->item_id = $item->item->id;
+                $newItem->item_stock_id = $product['productId'];
+                $newItem->quantity = $product['productQty'];
+                $newItem->used = 0;
+                $newItem->save();
+                //nice. si mai e o chestie.
+            } else {
                 $new_item->quantity += $product['productQty']; // gresit aici. gata
                 $new_item->save();
-                //nice. si mai e o chestie.
             }
 
             // $checklist_product = new \App\Models\ChecklistItem();
@@ -97,9 +106,16 @@ class ChecklistController extends Controller
             // $checklist_product->used = 0;
             // $checklist_product->save();
         }
-    
+
+        if($checklist->medic_id) {
+            return redirect('/operatiuni/checklist-medici')
+                ->with('success', 'Checklist generat cu succes!');
+        }
+
         return redirect('/operatiuni/checklist-statii')
             ->with('success', 'Checklist generat cu succes!');
+    
+        
     }
 
     /**

@@ -101,7 +101,12 @@ function addProductToNir() {
       return;
     }
 
-    let i = $('#medstable').find('tbody tr').length;
+    let i = $("#intrare-factura").data('lineCounter');
+    if (i == undefined) {
+      i = 0;
+    }
+
+    //let i = $('#medstable').find('tbody tr').length;
 
     let productId = $('#meds').find(':selected').val();
 
@@ -129,54 +134,80 @@ function addProductToNir() {
 
     let productValue = $('#product-value').val();
 
-    let container = $('#test');
+    let containerForm = $('<div></div>', {style: "display:none"});
 
-    let newInput = '<input name="product['+i+'][productId]" value="' + productId + '" />';
-    let newInput2 = '<input name="product['+i+'][productCim]" value="' + productCim + '" />';
-    let newInput3 = '<input name="product['+i+'][productCode]" value="' + productCode + '" />';
-    let newInput4 = '<input name="product['+i+'][productQty]" value="' + productQuantity + '" />';
-    let newInput5 = '<input name="product['+i+'][productExp]" value="' + productExp + '" />';
-    let newInput6 = '<input name="product['+i+'][productLot]" value="' + productLot + '" />';
-    let newInput7 = '<input name="product['+i+'][productUm]" value="' + productUM + '" />';
-    let newInput8 = '<input name="product['+i+'][productPrice]" value="' + productPrice + '" />';
-    let newInput9 = '<input name="product['+i+'][productTva]" value="' + productTva + '" />';
-    let newInput10 = '<input name="product['+i+'][productTvaPrice]" value="' + productTvaPrice + '" />';
-    let newInput11 = '<input name="product['+i+'][productValue]" value="' + productValue + '" />';
-    let newInput12 = '<input name="product['+i+'][productUmText]" value="' + productUmText + '" />';
-    let newInput13 = '<input name="product['+i+'][productName]" value="' + productName + '" />';
+    let newInput = '<input form="intrare-factura" name="product['+i+'][productId]" value="' + productId + '" />';
+    let newInput2 = '<input form="intrare-factura" name="product['+i+'][productCim]" value="' + productCim + '" />';
+    let newInput3 = '<input form="intrare-factura" name="product['+i+'][productCode]" value="' + productCode + '" />';
+    let newInput4 = '<input form="intrare-factura" name="product['+i+'][productQty]" value="' + productQuantity + '" />';
+    let newInput5 = '<input form="intrare-factura" name="product['+i+'][productExp]" value="' + productExp + '" />';
+    let newInput6 = '<input form="intrare-factura" name="product['+i+'][productLot]" value="' + productLot + '" />';
+    let newInput7 = '<input form="intrare-factura" name="product['+i+'][productUm]" value="' + productUM + '" />';
+    let newInput8 = '<input form="intrare-factura" name="product['+i+'][productPrice]" value="' + productPrice + '" />';
+    let newInput9 = '<input form="intrare-factura" name="product['+i+'][productTva]" value="' + productTva + '" />';
+    let newInput10 = '<input form="intrare-factura" name="product['+i+'][productTvaPrice]" value="' + productTvaPrice + '" />';
+    let newInput11 = '<input form="intrare-factura" name="product['+i+'][productValue]" value="' + productValue + '" />';
+    let newInput12 = '<input form="intrare-factura" name="product['+i+'][productUmText]" value="' + productUmText + '" />';
+    let newInput13 = '<input form="intrare-factura" name="product['+i+'][productName]" value="' + productName + '" />';
 
     // <input name="test[abc][1]" value="test" />
     /*
     $_POST['test']['abc']['1'] = "test"
     */
 
-    container.append(newInput);
-    container.append(newInput2);
-    container.append(newInput3);
-    container.append(newInput4);
-    container.append(newInput5);
-    container.append(newInput6);
-    container.append(newInput7);
-    container.append(newInput8);
-    container.append(newInput9);
-    container.append(newInput10);
-    container.append(newInput11);
-    container.append(newInput12);
-    container.append(newInput13);
+    containerForm.append(newInput);
+    containerForm.append(newInput2);
+    containerForm.append(newInput3);
+    containerForm.append(newInput4);
+    containerForm.append(newInput5);
+    containerForm.append(newInput6);
+    containerForm.append(newInput7);
+    containerForm.append(newInput8);
+    containerForm.append(newInput9);
+    containerForm.append(newInput10);
+    containerForm.append(newInput11);
+    containerForm.append(newInput12);
+    containerForm.append(newInput13);
 
-    let output = '<tr>';
+    // let output = '<tr>';
+    // $('#meds-modal input:not([type=hidden], [type=checkbox]), #meds-modal select').each(function() {
+    //   if(!$(this).is("select"))
+    //     output += '<td>' + $(this).val() + '</td>';
+    //   else if($(this).is("select")) 
+    //     output += '<td>' + $('#um option:selected').text() + '</td>';
+    //   else if( !$(this).val() )
+    //     output += '<td>' + '' + '</td>';
+    // });
+
+    let tr = $('<tr></<tr>');
     $('#meds-modal input:not([type=hidden], [type=checkbox]), #meds-modal select').each(function() {
-      if(!$(this).is("select"))
-        output += '<td>' + $(this).val() + '</td>';
-      else if($(this).is("select")) 
-        output += '<td>' + $('#um option:selected').text() + '</td>';
-      else if( !$(this).val() )
-        output += '<td>' + '' + '</td>';
+      if(!$(this).is("select")) {
+        tr.append($('<td>' + $(this).val() + '</td>'));
+      } else if ($(this).is('select')) {
+        tr.append('<td>'+$('#um option:selected').text()+'</td>');
+      } else if (!(this).val()) {
+        tr.append('<td></td>');
+      }
+    
     });
 
-    output += '</tr>';
+    let actionTd = $('<td></td>');
+    actionTd.append('<button type="button" class="btn btn-danger" id="delete-row">Sterge</button>');
+    actionTd.append(containerForm);
 
-    $('#medstable tbody').append(output);
+    tr.append(actionTd);
+
+    // output += '<td><button type="button" class="btn btn-danger" id="delete-row">Sterge</button></td>';
+
+    // output += '</tr>';
+
+
+    i++;
+    $("#intrare-factura").data('lineCounter', i);
+
+
+
+    $('#medstable tbody').append(tr);
     testInputs();
     $('#cim-code').hide();
     $('#cim-label').hide();
@@ -201,8 +232,16 @@ function addProductToNir() {
   });
 }
 
+function deleteRow() {
+  $('#medstable').on('click', '#delete-row', function(){
+    $(this).closest ('tr').remove();
+});
+}
+
 
 jQuery(document).ready(() => {
     facturaModal();
     addProductToNir();
+    deleteRow();
+    $('#document-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);
 });

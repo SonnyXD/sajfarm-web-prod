@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Returning;
+use App\Models\ReturningItem;
 use App\Models\Item;
 use App\Models\Inventory;
 use App\Models\ItemStock;
@@ -44,17 +45,15 @@ class ReturningController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, array(
-            'from-location' => 'required',
-            'document-date' => 'required',
-            'ambulance-select' => 'nullable'
+            'from-location-id' => 'required',
+            'document-date' => 'required'
         ));
     
         $returning = new \App\Models\Returning();
-        $returning->inventory_id = $request->input('from-location');
+        $returning->inventory_id = $request->input('from-location-id');
         $returning->document_date = $request->input('document-date');
-        $returning->ambulance_id = $request->input('ambulance-select') ?? null;
 
-        $ambulance_id = $request->input('ambulance-select');
+        //$ambulance_id = $request->input('ambulance-select');
    
         $returning->save();
 
@@ -62,16 +61,16 @@ class ReturningController extends Controller
 
         $old_date = $request->input('document-date');
         $new_date = date("d-m-Y", strtotime($old_date));  
-        $from_location = Inventory::where('id', $request->input('from-location'))->get();
+        $from_location = Inventory::where('id', $request->input('from-location-id'))->first();
 
-        $span_amb = '';
+        // $span_amb = '';
 
-        if($ambulance_id === null) {
-            $span_amb = '<span style="font-weight: bold; float: right;">Gestiune de iesire: '. $from_location->first()->name .'</span>';
-        } else {
-            $amb_name = Ambulance::where('id', $ambulance_id)->get()->first()->license_plate;
-            $span_amb = '<span style="font-weight: bold; float: right;">Gestiune de iesire: '. $from_location->first()->name .' - '. $amb_name .'</span>';
-        }
+        // if($ambulance_id === null) {
+        //     $span_amb = '<span style="font-weight: bold; float: right;">Gestiune de iesire: '. $from_location->first()->name .'</span>';
+        // } else {
+        //     $amb_name = Ambulance::where('id', $ambulance_id)->get()->first()->license_plate;
+        //     $span_amb = '<span style="font-weight: bold; float: right;">Gestiune de iesire: '. $from_location->first()->name .' - '. $amb_name .'</span>';
+        // }
 
         $user = Auth::user();
         $returning = Returning::all();
@@ -95,10 +94,6 @@ class ReturningController extends Controller
         <br>
         <span style="font-weight: bold; float: right;">Numar document: '. $returning_id . ' / ' . $new_date .'</span>
         <br>
-        '. $span_amb .'
-        <br>
-        <br>
-        <br>
         <br>
 ';
 
@@ -114,6 +109,7 @@ class ReturningController extends Controller
         <th style="font-weight: bold; text-align: center;">Lot</th>
         <th style="font-weight: bold; text-align: center;">Data expirare</th>
         <th style="font-weight: bold; text-align: center;">Motiv</th>
+        <th style="font-weight: bold; text-align: center;">Gestiunea din care iese</th>
         </tr>
         ';
 
@@ -124,29 +120,41 @@ class ReturningController extends Controller
             $item->quantity -= $product['productQty'];
             $item->save();
 
+            $returning_item = new \App\Models\ReturningItem();
+
+            $returning_item->item_stock_id = $product['productId'];
+            $returning_item->returning_id = $returning_id;
+            $returning_item->item_id = $item->item_id;
+            $returning_item->quantity = $product['productQty'];
+            $returning_item->reason = $product['productReason'];
+            $returning_item->ambulance_id = $product['productAmb'];
+
+            $returning_item->save();
+
+            $from = "";
+
+            if(!empty($returning_item->ambulance_id)) {
+                $from = ReturningItem::with('ambulance')->where('ambulance_id', '=', $product['productAmb'])->first()->ambulance->license_plate;
+            }
+            
+            if(empty($from)) {
+                $from = $from_location->name;
+            }
+
             $html.= '<tr>
-            <td style="font-weight: bold; text-align: center;">'. $item->invoice_item->product_code .'</td>
-            <td style="font-weight: bold; text-align: center;">'. $product['productName'] .'</td>
-            <td style="font-weight: bold; text-align: center;">'. $product['productUmText'] .'</td>
-            <td style="font-weight: bold; text-align: center;">'. $product['productQty'] .'</td>
-            <td style="font-weight: bold; text-align: center;">'. $item->invoice_item->price .'</td>
-            <td style="font-weight: bold; text-align: center;">'. $item->invoice_item->price * $product['productQty'] .'</td>
-            <td style="font-weight: bold; text-align: center;">'. $item->invoice_item->lot .'</td>
-            <td style="font-weight: bold; text-align: center;">'. $item->invoice_item->exp_date .'</td>
-            <td style="font-weight: bold; text-align: center;">'. $product['productReason'] .'</td>
+            <td style="text-align: center;">'. $item->invoice_item->product_code .'</td>
+            <td style="text-align: center;">'. $product['productName'] .'</td>
+            <td style="text-align: center;">'. $product['productUmText'] .'</td>
+            <td style="text-align: center;">'. $product['productQty'] .'</td>
+            <td style="text-align: center;">'. $item->invoice_item->price .'</td>
+            <td style="text-align: center;">'. $item->invoice_item->price * $product['productQty'] .'</td>
+            <td style="text-align: center;">'. $item->invoice_item->lot .'</td>
+            <td style="text-align: center;">'. $item->invoice_item->exp_date .'</td>
+            <td style="text-align: center;">'. $product['productReason'] .'</td>
+            <td style="text-align: center;">'. $from .'</td>
         </tr>';
 
         $total_value += $item->invoice_item->price * $product['productQty'];
-
-        $returning_item = new \App\Models\ReturningItem();
-
-        $returning_item->item_stock_id = $product['productId'];
-        $returning_item->returning_id = $returning_id;
-        $returning_item->item_id = $item->item_id;
-        $returning_item->quantity = $product['productQty'];
-        $returning_item->reason = $product['productReason'];
-
-        $returning_item->save();
         }
 
         $html .= '<br>';

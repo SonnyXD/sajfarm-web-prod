@@ -3,10 +3,11 @@
         <x-form id="return-items" method="POST" action="{{ route('returnings.store') }}">
           <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
           <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
+          <input type="hidden" id="from-location-id" name="from-location-id" value=""/>
         <div class="form-group row">
                 <div class="col">
                 <label>Din:</label>
-                <select class="meds-single-select w-100" id="from-location" name="from-location">
+                <select class="form-control" id="from-location" name="from-location">
                     @if( $inventories->count() )
                       @foreach ($inventories as $inventory)
                           <option value="{{ $inventory->id }}">{{ $inventory->name }}</option>
@@ -14,8 +15,8 @@
                     @endif
                 </select>
             </div>
-            <div class="col">
-                    <label>Ambulanta:</label>
+            <!-- <div class="col">
+                     <label>Ambulanta:</label>
                     <div class="the-basics">
                     <select class="meds-single-select w-100" id="ambulance-select" name="ambulance-select">
                       <option value="">Fara ambulanta</option>
@@ -25,8 +26,8 @@
                       @endforeach
                     @endif
                     </select>
-                    </div>
-                  </div>
+                    </div> -->
+                <!-- </div>  -->
             </div>
             <div class="form-group row">
                     <div class="col">
@@ -84,6 +85,12 @@
                           <th>
                             Motiv
                           </th>
+                          <th>
+                            Ambulanta
+                          </th>
+                          <th>
+                            
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -104,7 +111,7 @@
                   <label for="recipient-name" class="col-form-label">Nume Produs:</label>
                   <x-input class="form-control" id="product-name" name="product-name" disabled="disabled"/>
                 </div>
-                <div class="form-group" id="cim-input">
+                <div class="form-group">
                   <label for="recipient-name" class="col-form-label">UM:</label>
                   <x-input class="form-control" id="um" name="um" disabled="disabled"/>
                 </div>
@@ -115,6 +122,17 @@
                 <div class="form-group">
                   <label for="recipient-name" class="col-form-label">Motiv:</label>
                   <x-input class="form-control" id="reason" name="reason"/>
+                </div>
+                <div class="form-group">
+                  <label for="recipient-name" class="col-form-label">Ambulanta:</label><br>
+                  <select class="w-100" id="ambulance-select" name="ambulance-select">
+                        <option value="">Fara ambulanta</option>
+                      @if( $ambulances->count() )
+                        @foreach ($ambulances as $ambulance)
+                            <option value="{{ $ambulance->id }}">{{ $ambulance->license_plate }}</option>
+                        @endforeach
+                      @endif
+                      </select>
                 </div>
                 <div class="modal-footer">
                     <x-button type="button" class="btn btn-success" id="add-product-return">Adauga</x-button>

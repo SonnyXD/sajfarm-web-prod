@@ -135,6 +135,9 @@
                           <th>
                             Valoare
                           </th>
+                          <th>
+                            
+                          </th>
                         </tr>
                       </thead>
                       <tbody>

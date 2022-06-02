@@ -43,21 +43,22 @@ class TransferController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, array(
-            'from-location' => 'required',
-            'to-location' => 'required',
+            'from-location-id' => 'required',
+            'to-location-id' => 'required',
             'document-date' => 'required'
         ));
     
         $transfer = new \App\Models\Transfer();
-        $transfer->from_inventory_id = $request->input('from-location');
-        $transfer->to_inventory_id = $request->input('to-location');
+        $transfer->from_inventory_id = $request->input('from-location-id');
+        $transfer->to_inventory_id = $request->input('to-location-id');
         $transfer->document_date = $request->input('document-date');
         $transfer->save();
 
         $old_date = $request->input('document-date');
-        $new_date = date("d-m-Y", strtotime($old_date));  
-        $from_location = Inventory::where('id', $request->input('from-location'))->get();
-        $to_location = Inventory::where('id', $request->input('to-location'))->get();
+        $new_date = date("d-m-Y", strtotime($old_date));
+
+        $from_location = Inventory::where('id', $request->input('from-location-id'))->get();
+        $to_location = Inventory::where('id', $request->input('to-location-id'))->get();
 
         $user = Auth::user();
         $transfers = Transfer::all();
@@ -125,14 +126,14 @@ class TransferController extends Controller
             $detailedItem = \App\Models\ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit')->find($productPost['productId']);
             //dd($itemStock);
             $html.= '<tr>
-                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productName'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productUmText'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productQty'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->price .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->price * $productPost['productQty'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
-                <td style="font-weight: bold; text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
+                <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
+                <td style="text-align: center;">'. $productPost['productName'] .'</td>
+                <td style="text-align: center;">'. $productPost['productUmText'] .'</td>
+                <td style="text-align: center;">'. $productPost['productQty'] .'</td>
+                <td style="text-align: center;">'. $detailedItem->invoice_item->price .'</td>
+                <td style="text-align: center;">'. $detailedItem->invoice_item->price * $productPost['productQty'] .'</td>
+                <td style="text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
+                <td style="text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
             </tr>';
 
             $total_value += $detailedItem->invoice_item->price * $productPost['productQty'];
@@ -198,7 +199,7 @@ class TransferController extends Controller
 
         $html .= '<span style="float: left;">Farm. Sef<br>'.$institution[0]->pharmacy_manager.'</span><br><br>
                   <span style="float: right;">As. Farm. <br>'.$institution[0]->assistent.'<br><br></span>
-                  <span style="text-align: right;">Primitor:</span>';
+                  <p style="text-align: right;">Primitor:</p>';
 
         $html .= '</html>';
 

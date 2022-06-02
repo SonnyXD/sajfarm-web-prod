@@ -16,7 +16,7 @@ class MinimumQuantity extends Model
     public $timestamps = false;
 
     public function item() {
-        return $this->hasOne( Item::class );
+        return $this->belongsTo( Item::class );
     }
 
     public function inventory() {

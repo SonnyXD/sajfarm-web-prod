@@ -90,7 +90,7 @@
                   <div class="form-group">
                     <x-button disabled="disabled">Adauga in Farmacie si genereaza NIR-ul</x-button>
                 </div>
-                <div id="test" style="display:none"></div>
+                
     </x-form>
    
     </x-container>
@@ -134,6 +134,9 @@
                           </th>
                           <th>
                             Valoare
+                          </th>
+                          <th>
+                            
                           </th>
                         </tr>
                       </thead>

@@ -93,7 +93,7 @@ class RoutesController extends Controller
 
         //dd($all_items);
 
-        $minimum_quantities_farm = MinimumQuantity::where('inventory_id', '=', 1)->get();
+        $minimum_quantities_farm = MinimumQuantity::with('item')->where('inventory_id', '=', 1)->get();
         $minimum_quantities_stoc3 = MinimumQuantity::where('inventory_id', '=', 2)->get();
 
         //$item_sum = ItemStock::where()->sum('quantity'); //join cu inventory_id si item_id -> dupa astea te iei ca sa faci suma

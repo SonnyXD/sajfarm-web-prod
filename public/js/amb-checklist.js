@@ -23,7 +23,6 @@ function getInventoryItems() {
   
   let selectedSubstation = $('#substation-select').val();
   if (selectedSubstation == undefined) {
-    console.log('inside if');
     selectedSubstation = $('#substation-select option:first()').val();
   }
   
@@ -83,7 +82,6 @@ else
 }
   
    $('#add-product-checklist-sub').on('click', function() {
-    console.log($('#product-quantity').val(), $('#product-quantity').attr('max'));
 
     if (parseInt($('#product-quantity').val()) > parseInt($('#product-quantity').attr('max'))) {
         $('#modal-alert').css('display','block');
@@ -106,9 +104,20 @@ else
       return;
     }
 
+    let from = $("#substation-select option:selected").val();
+
+    $('#from-location-id').attr('value', from);
+
+    $('#substation-select').prop('disabled', 'disabled');
+
     $('#modal-alert').css('display','none');
+
+    let i = $("#medstable").data('lineCounter');
+      if (i == undefined) {
+        i = 0;
+      }
   
-    let i = $('#medstable').find('tbody tr').length;
+    //let i = $('#medstable').find('tbody tr').length;
   
     let productId = $('#meds').find(':selected').val();
   
@@ -122,33 +131,68 @@ else
   
     let productUM = $('#um').find(':selected').val();
   
-    let container = $('#test');
+    // let container = $('#test');
+
+    let containerForm = $('<div></div>', {style: "display:none"});
   
-    let newInput = '<input name="product['+i+'][productId]" value=' + productId + ' />';
-    let newInput2 = '<input name="product['+i+'][productName]" value="' + med_name[0] + '" />';
-    let newInput3 = '<input name="product['+i+'][productUmText]" value="' + med_name[1].replace(/ /g,'') + '" />';
+    let newInput = '<input form="checklist" name="product['+i+'][productId]" value=' + productId + ' />';
+    let newInput2 = '<input form="checklist" name="product['+i+'][productName]" value="' + med_name[0] + '" />';
+    let newInput3 = '<input form="checklist" name="product['+i+'][productUmText]" value="' + med_name[1].replace(/ /g,'') + '" />';
     //let newInput4 = '<input name="product['+i+'][productUm]" value="' + productUM + '" />';
-    let newInput5 = '<input name="product['+i+'][productQty]" value=' + productQuantity + ' />';
+    let newInput5 = '<input form="checklist" name="product['+i+'][productQty]" value=' + productQuantity + ' />';
   
-    container.append(newInput);
-    container.append(newInput2);
-    container.append(newInput3);
+    containerForm.append(newInput);
+    containerForm.append(newInput2);
+    containerForm.append(newInput3);
     //container.append(newInput4);
-    container.append(newInput5);
+    containerForm.append(newInput5);
   
-    let output = '<tr>';
+    // let output = '<tr>';
+    //   $('#meds-modal input:not([type=hidden], [type=checkbox]), #meds-modal select').each(function() {
+    //     if(!$(this).is("select"))
+    //       output += '<td>' + $(this).val() + '</td>';
+    //     else if($(this).is("select")) 
+    //       output += '<td>' + $('#um option:selected').text() + '</td>';
+    //     else if( !$(this).val() )
+    //       output += '<td>' + '' + '</td>';
+    //   });
+  
+    //   output += '</tr>';
+
+    let tr = $('<tr></<tr>');
       $('#meds-modal input:not([type=hidden], [type=checkbox]), #meds-modal select').each(function() {
-        if(!$(this).is("select"))
-          output += '<td>' + $(this).val() + '</td>';
-        else if($(this).is("select")) 
-          output += '<td>' + $('#um option:selected').text() + '</td>';
-        else if( !$(this).val() )
-          output += '<td>' + '' + '</td>';
+        if(!$(this).is("select")) {
+          tr.append($('<td>' + $(this).val() + '</td>'));
+        } else if ($(this).is('select')) {
+          tr.append('<td>'+$('#um option:selected').text()+'</td>');
+        } else if (!(this).val()) {
+          tr.append('<td></td>');
+        }
+      
       });
+
+      let actionTd = $('<td></td>');
+      actionTd.append('<button type="button" class="btn btn-danger" id="delete-row">Sterge</button>');
+      actionTd.append(containerForm);
+
+      tr.append(actionTd);
+      let oldText = $('#meds').find('option:selected').text();
+      let oldTextArray = oldText.split('[/]');
+
+      let newNumber = parseInt(oldTextArray[2]) - parseInt($('#product-quantity').val());
+
+      let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3];
+
+      $('#meds').find('option:selected').text(newText);
+      //$('#meds').trigger('change.select2');
+      $('#meds').select2('destroy');
+      $('#meds').select2();
+
+      i++;
+
+      $("#medstable").data('lineCounter', i);
   
-      output += '</tr>';
-  
-      $('#medstable tbody').append(output);
+      $('#medstable tbody').append(tr);
       testInputs();
       $('#meds-modal').modal('toggle');
       $('#meds-modal form')[0].reset();
@@ -156,7 +200,40 @@ else
   });
   }
 
+  function deleteRow() {
+    $('#medstable').on('click', '#delete-row', function(){
+      
+      let oldText = $('#meds').find('option:selected').text();
+      let oldTextArray = oldText.split('[/]');
+
+      let td = $(this).closest ('tr').find('td:nth-child(3)');
+
+      let newNumber = parseInt(oldTextArray[2]) + parseInt(td.text());
+
+      let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3];
+      $('#meds').find('option:selected').text(newText);
+      //$('#meds').trigger('change.select2');
+      $('#meds').select2('destroy');
+      $('#meds').select2();
+      
+      $(this).closest ('tr').remove();
+
+      let rowCount = $('#medstable tbody tr').length;
+
+      if (rowCount === 0)
+        $('#print').attr('disabled', 'disabled');
+      else if($('#document-date').val() == "")
+        $('#print').attr('disabled', 'disabled');
+      else 
+      $('#print').attr('disabled', false);
+      
+
+  });
+  }
+
 jQuery(document).ready(() => {
     getInventoryItems();
     checklistModal();
+    deleteRow();
+    $('#document-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);
 });

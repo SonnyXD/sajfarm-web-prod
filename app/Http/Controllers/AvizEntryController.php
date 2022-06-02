@@ -151,16 +151,16 @@ class AvizEntryController extends Controller
             $total_value = $total_value + $productPost['productValue'];
 
             $html.= '<tr>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productCim'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productCode'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productName'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productLot'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. date("d-m-Y", strtotime($productPost['productExp'])) .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productUmText'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productQty'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productPrice'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productTvaPrice'] .'</td>
-                <td style="font-weight: bold; text-align: center;">'. $productPost['productValue'] .'</td>
+                <td style="text-align: center;">'. $productPost['productCim'] .'</td>
+                <td style="text-align: center;">'. $productPost['productCode'] .'</td>
+                <td style="text-align: center;">'. $productPost['productName'] .'</td>
+                <td style="text-align: center;">'. $productPost['productLot'] .'</td>
+                <td style="text-align: center;">'. date("d-m-Y", strtotime($productPost['productExp'])) .'</td>
+                <td style="text-align: center;">'. $productPost['productUmText'] .'</td>
+                <td style="text-align: center;">'. $productPost['productQty'] .'</td>
+                <td style="text-align: center;">'. $productPost['productPrice'] .'</td>
+                <td style="text-align: center;">'. $productPost['productTvaPrice'] .'</td>
+                <td style="text-align: center;">'. $productPost['productValue'] .'</td>
             </tr>';
 
             $item_stock = new \App\Models\ItemStock();

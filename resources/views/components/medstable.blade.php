@@ -15,9 +15,7 @@
                           <th>
                             Nume
                           </th>
-                          @if ($inventory_id == 1 || $inventory_id == 2) 
                             <th>Cantitate Totala</th>
-                          @endif
                         </tr>
                       </thead>
                       <tbody>
@@ -41,6 +39,15 @@
                                 @php
                                   $i++;
                                 @endphp
+                              @elseif ($inventory_id != 2)
+                                @php
+                                  $item_sum = \App\Models\ItemStock::with('inventory', 'item')->where('inventory_id', '=', $inventory_id)->where('item_id', '=', $item->id)->sum('quantity');
+                                @endphp
+                                  @if($item_sum == 0)
+                                    <td style="color: red; font-weight: bold;">{{$item_sum}}</td>
+                                  @else
+                                    <td>{{$item_sum}}</td>
+                                  @endif
                             @endif
                             @if ($inventory_id == 2)
                               @php
