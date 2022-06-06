@@ -320,6 +320,7 @@ class ConsumptionController extends Controller
                     <td style="text-align: center;">'. $checklist->ambulance->license_plate .'</td>
                     <td style="text-align: center;">'. $checklist->patient_number .'</td>
                 </tr>';
+                $total_value += $detailedItem->invoice_item->price * $item->quantity;
                 } else {
                     $html.= '<tr>
                     <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
@@ -331,10 +332,11 @@ class ConsumptionController extends Controller
                     <td style="text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
                     <td style="text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
                 </tr>';
+                $total_value += $detailedItem->invoice_item->price * $total_quantity;
                 }
 
 
-            $total_value += $detailedItem->invoice_item->price * $item->quantity;
+            
             }
             
             //delete checklist here and checklist items
