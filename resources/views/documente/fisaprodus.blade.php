@@ -1,9 +1,9 @@
 <x-layout>
     <x-container :title="$title">
-        <x-form id="fisa-produs">
+        <x-form id="fisa-produs" method="GET" action="{{ route('productfile.store') }}">
         <div class="form-group">
                     <label>Medicament/Material Sanitar:</label>
-                    <select class="meds-single-select w-100">
+                    <select class="meds-single-select w-100" id="meds" name="meds">
                       @if($items->count())
                         @foreach($items as $item)
                           <option value="{{$item->id}}">{{$item->name}}</option>

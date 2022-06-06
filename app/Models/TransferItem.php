@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\Item;
 use \App\Models\ItemStock;
+use \App\Models\InvoiceItem;
 
 class TransferItem extends Model
 {
@@ -21,5 +22,9 @@ class TransferItem extends Model
 
     public function item_stock() {
         return $this->hasMany( ItemStock::class );
+    }
+
+    public function invoice_item() {
+        return $this->belongsTo( InvoiceItem::class );
     }
 }

@@ -157,11 +157,27 @@ class ReturningController extends Controller
         $total_value += $item->invoice_item->price * $product['productQty'];
         }
 
+        $html .= '</table>';
+
+        $html .= '<br>';
+
         $html .= '<br>';
 
         $html .= 'Total valoare: '. $total_value .'';
 
-        $html .= '</table>';
+        $html .= '<br>';
+
+        $html .= '<br>';
+
+        $html .= 'Gestionari:';
+
+        $html .= '<br>';
+
+        $html .= '<span style="text-align: left;">Farm. Sef<br>'.$institution[0]->pharmacy_manager.'<br></span>';
+        
+        $html .= '<br>';
+
+        $html .= '<span style="text-align: left;">As. Farm. <br>'.$institution[0]->assistent.'</span>';
 
         $html .= '</html>';
 
