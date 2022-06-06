@@ -98,6 +98,7 @@ where ci.used = 0 and a.id = 1
                     date("d-m-Y", strtotime($checklist->checklist_date)),
                     $checklist->tour
                 );
+
                 $html .= "</tr>";
 
                 $html .= '<tr class="treeview tr-'. $i .'">';
@@ -151,6 +152,8 @@ where ci.used = 0 and a.id = 1
     {
         $checklists = Checklist::with('medic', 'ambulance')->where('medic_id', $request->medic)->get();
 
+        //dd($checklists);
+
         $checklist_items = ChecklistItem::join('item_stocks', 'item_stocks.id', '=', 'checklist_items.item_stock_id')
         ->join('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
         ->join('items', 'invoice_items.item_id', '=', 'items.id')
@@ -176,6 +179,8 @@ where ci.used = 0 and a.id = 1
             );
         }
 
+        //dd($checklistItemsArray);
+
         $html = "";
 
         $i = 0;
@@ -193,6 +198,7 @@ where ci.used = 0 and a.id = 1
                     date("d-m-Y", strtotime($checklist->checklist_date)),
                     $checklist->tour
                 );
+
                 $html .= "</tr>";
 
                 $html .= "</tr>";
@@ -219,15 +225,19 @@ where ci.used = 0 and a.id = 1
 
                 $html .= '<tbody>';
 
-                foreach($checklistItemsArray[$checklist->id] as $item) {
+                if(isset($checklistItemsArray[$checklist->id])) {
+                    foreach($checklistItemsArray[$checklist->id] as $item) {
 
-                    $html .= '<tr>';
-                    $html .= '<td>'. $item['name'] .'</td>';   
-                    $html .= '<td>'. $item['quantity'] .'</td>';  
-                    $html .= '<td>'. $item['measure_unit'] .'</td>';   
-                    $html .= '</tr>';
-
+                        $html .= '<tr>';
+                        $html .= '<td>'. $item['name'] .'</td>';   
+                        $html .= '<td>'. $item['quantity'] .'</td>';  
+                        $html .= '<td>'. $item['measure_unit'] .'</td>';   
+                        $html .= '</tr>';
+    
+                    }
                 }
+
+                
 
                 $html .= '</tbody>';
 

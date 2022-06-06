@@ -334,7 +334,7 @@ class ConsumptionController extends Controller
                 }
 
 
-            $total_value += $detailedItem->invoice_item->price * $total_quantity;
+            $total_value += $detailedItem->invoice_item->price * $item->quantity;
             }
             
             //delete checklist here and checklist items
