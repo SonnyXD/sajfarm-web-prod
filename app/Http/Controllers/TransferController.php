@@ -70,7 +70,7 @@ class TransferController extends Controller
         $html = '<html>
                 <head>
                 <style>
-                td, th {border: 2px solid black;}
+                td, th {border: 1px solid black;}
                 </style>
                 </head>
                 ';
@@ -80,11 +80,11 @@ class TransferController extends Controller
         <span style="float: left;">Utilizator: '. $user->name .'</span>
         <h2 style="font-weight:bold; text-align: center;">BON DE TRANSFER</h2>
         <br>
-        <span style="font-weight: bold; float: right;">Numar document: '. $transfer_id . ' / ' . $new_date .'</span>
+        <span style="float: right;">Numar document: '. $transfer_id . ' / ' . $new_date .'</span>
         <br>
-        <span style="font-weight: bold; float: right;">Gestiune de iesire: '. $from_location->first()->name .'</span>
+        <span style="float: right;">Gestiune de iesire: '. $from_location->first()->name .'</span>
         <br>
-        <span style="font-weight: bold; float: right;">Gestiune de intrare: '. $to_location->first()->name .'</span>
+        <span style="float: right;">Gestiune de intrare: '. $to_location->first()->name .'</span>
         <br>
         <br>
         <br>

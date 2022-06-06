@@ -20,6 +20,6 @@ class Returning extends Model
     public $timestamps = false;
 
     public function inventory() {
-        return $this->hasMany( Inventory::class );
+        return $this->belongsTo( Inventory::class );
     }
 }

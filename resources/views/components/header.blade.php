@@ -11,6 +11,8 @@
 <link rel="stylesheet" href="/css/css/vendor.bundle.base.css">
 <link rel="stylesheet" href="/js/select2/select2.min.css">
 <link rel="stylesheet" href="/js/select2-bootstrap-theme/select2-bootstrap.min.css"> 
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap.min.css">
+
 <!-- endinject -->
 <!-- Plugin css for this page -->
 <link rel="stylesheet" href="/css/select.dataTables.min.css">

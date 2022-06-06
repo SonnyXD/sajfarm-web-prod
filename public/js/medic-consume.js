@@ -71,10 +71,26 @@ function conditions() {
     }
     
     }
+
+    function treeviewDisplay() {
+      jQuery('#med-checklists > tbody').on('click', '> tr:not(.treeview)', function() {
+          const treeview = jQuery('#med-checklists tbody tr.treeview.tr-' + jQuery(this).data('count'));
+    
+          if( treeview.hasClass('active') ) {
+            treeview.removeClass('active');
+          } else {
+            jQuery('#med-checklists tbody tr.treeview').removeClass('active');
+            treeview.addClass('active');
+            treeview[0].style.display = "";
+          }
+          
+      });
+    }
     
     jQuery(document).ready(() => {
         conditions();
         getChecklists();
+        treeviewDisplay();
         $('#from-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);
         $('#until-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);
         $('#document-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);

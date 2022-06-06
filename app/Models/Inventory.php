@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use \App\Models\ItemStock;
 use \App\Models\Item;
 use \App\Models\Checklist;
+use \App\Models\Transfer;
 
 class Inventory extends Model
 {
@@ -24,5 +25,10 @@ class Inventory extends Model
     public function checklist()
     {
         return $this->hasMany( Checklist::class );
+    }
+
+    public function transfer()
+    {
+        return $this->hasMany( Transfer::class, 'from_inventory_id');
     }
 }

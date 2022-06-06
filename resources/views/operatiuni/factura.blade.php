@@ -50,6 +50,12 @@
                       <x-input type="date" id="due-date" name="due-date"/>
                       </div>
                     </div>
+                    <div class="col">
+                      <label>Data Introducerii</label>
+                      <div id="bloodhound">
+                      <x-input type="date" id="insertion-date" name="insertion-date"/>
+                      </div>
+                    </div>
                   </div>
                   <div class="form-group row">
                     <div class="col">

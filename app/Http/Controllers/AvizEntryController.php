@@ -86,7 +86,7 @@ class AvizEntryController extends Controller
         $html = '<html>
                 <head>
                 <style>
-                td, th {border: 2px solid black;}
+                td, th {border: 1px solid black;}
                 </style>
                 </head>
                 ';
@@ -96,15 +96,15 @@ class AvizEntryController extends Controller
                 <span style="float: left;">Utilizator: '. $user->name .'</span>
                 <h2 style="font-weight:bold; text-align: center;">NOTA DE INTRARE RECEPTIE</h2>
                 <br>
-                <span style="font-weight: bold; float: right;">Numar document: '. $aviz_id . ' / ' . $new_date .'</span>
+                <span style="float: right;">Numar document: '. $aviz_id . ' / ' . $new_date .'</span>
                 <br>
-                <span style="font-weight: bold; float: right;">Furnizor: '. $provider->first()->name .'</span>
+                <span style="float: right;">Furnizor: '. $provider->first()->name .'</span>
                 <br>
-                <span style="font-weight: bold; float: right;">Gestiune: DEPOZIT FARMACIE</span>
+                <span style="float: right;">Gestiune: DEPOZIT FARMACIE</span>
                 <br>
-                <span style="font-weight: bold; float: right;">Document intrare: Aviz intrare - '. $request->input('type') .' - '. $aviz_number .'</span>
+                <span style="float: right;">Document intrare: Aviz intrare - '. $request->input('type') .' - '. $aviz_number .'</span>
                 <br>
-                <span style="font-weight: bold; float: right;">Data scadenta: '. $new_due_date .'</span>
+                <span style="float: right;">Data scadenta: '. $new_due_date .'</span>
                 <br>
                 <br>
                 <br>
@@ -165,7 +165,8 @@ class AvizEntryController extends Controller
 
             $item_stock = new \App\Models\ItemStock();
             $item_stock->item_id = $productPost['productId'];
-            $item_stock->inventory_id = Inventory::where('name', $request->input('type'))->first()->id;
+            //$item_stock->inventory_id = Inventory::where('name', $request->input('type'))->first()->id;
+            $item_stock->inventory_id = 1;
             $item_stock->invoice_item_id = AvizEntryItem::all()->last()->id;
             $item_stock->quantity = $productPost['productQty'];
             $item_stock->save();

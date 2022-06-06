@@ -68,20 +68,35 @@ else
   
     //let i = $('#medstable').find('tbody tr').length;
 
-    let i = $("#medstable").data('lineCounter');
-      if (i == undefined) {
-        i = 0;
-      }
+    // let i = $("#medstable").data('lineCounter');
+    //   if (i == undefined) {
+    //     i = 0;
+    //   }
   
     let productId = $('#meds').find(':selected').val();
+
+    let productQuantity = $('#product-quantity').val();
+
+    let foundTr = $('#medstable').find('> tbody > tr[data-productid="'+productId+'"]');
+
+    if (foundTr.length) {
+      let oldQte = foundTr.attr('data-productquantity');
+      let newQte = parseInt(oldQte) + parseInt(productQuantity);
+      foundTr.find('._productQte').val(newQte);
+      foundTr.find('>td:nth-child(3)').text(newQte);
+
+    } else {
+
+    let i = $("#checklist").data('lineCounter');
+    if (i == undefined) {
+      i = 0;
+    }
   
     let productName = $('#meds').find(':selected').text();
   
     let med_name = productName.split("[/]");
   
     let productUmText = $('#um').find(':selected').text();
-  
-    let productQuantity = $('#product-quantity').val();
   
     let productUM = $('#um').find(':selected').val();
   
@@ -91,7 +106,7 @@ else
     let newInput2 = '<input form="checklist" name="product['+i+'][productName]" value="' + med_name[0] + '" />';
     let newInput3 = '<input form="checklist" name="product['+i+'][productUmText]" value="' + med_name[1].replace(/ /g,'') + '" />';
     //let newInput4 = '<input name="product['+i+'][productUm]" value="' + productUM + '" />';
-    let newInput5 = '<input form="checklist" name="product['+i+'][productQty]" value=' + productQuantity + ' />';
+    let newInput5 = '<input form="checklist" class="_productQte" name="product['+i+'][productQty]" value=' + productQuantity + ' />';
   
     containerForm.append(newInput);
     containerForm.append(newInput2);
@@ -112,6 +127,9 @@ else
     //   output += '</tr>';
 
     let tr = $('<tr></<tr>');
+
+    tr.attr('data-productid', productId);
+    tr.attr('data-productquantity', productQuantity);
       $('#meds-modal input:not([type=hidden], [type=checkbox]), #meds-modal select').each(function() {
         if(!$(this).is("select")) {
           tr.append($('<td>' + $(this).val() + '</td>'));
@@ -128,6 +146,14 @@ else
       actionTd.append(containerForm);
 
       tr.append(actionTd);
+
+      i++;
+
+      $("#checklist").data('lineCounter', i);
+  
+      $('#medstable tbody').append(tr);
+
+    }
       let oldText = $('#meds').find('option:selected').text();
       let oldTextArray = oldText.split('[/]');
 
@@ -140,11 +166,6 @@ else
       $('#meds').select2('destroy');
       $('#meds').select2();
 
-      i++;
-
-      $("#medstable").data('lineCounter', i);
-  
-      $('#medstable tbody').append(tr);
       testInputs();
       $('#meds-modal').modal('toggle');
       $('#meds-modal form')[0].reset();

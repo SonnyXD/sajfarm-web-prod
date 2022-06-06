@@ -77,15 +77,15 @@ class ConsumptionController extends Controller
             if($checklist_sub == "Stoc 3") {
                 $checklist_sub = "Statie centrala";
             }
-            $span = '<span style="font-weight: bold; float: right;">Substatie: '. $checklist_sub .'</span><br>
-            <span style="font-weight: bold; float: right;">Ambulanta: '. $from_name .'</span>';
+            $span = '<span style="float: right;">Substatie: '. $checklist_sub .'</span><br>
+            <span style="float: right;">Ambulanta: '. $from_name .'</span>';
         } else {
             $checklists = \App\Models\Checklist::with('checklistitems', 'inventory', 'medic', 'ambulance', 'assistent', 'ambulancier')
             ->whereBetween('checklist_date', [$from, $to])->where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
             $from_name = Medic::where('id', $request->input('medic-select'))->get()->first()->name;
             $checklist_amb = \App\Models\Checklist::with('ambulance')->where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
             $checklist_patients = \App\Models\Checklist::where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
-            $span = '<span style="font-weight: bold; float: right;">Medic: '. $from_name .'</span><br>';
+            $span = '<span style="float: right;">Medic: '. $from_name .'</span><br>';
 
             //$span .= '<span style="font-weight: bold; float: right;">Ambulante: ';
 
@@ -158,7 +158,7 @@ class ConsumptionController extends Controller
         $html = '<html>
                 <head>
                 <style>
-                td, th {border: 2px solid black;}
+                td, th {border: 1px solid black;}
                 </style>
                 </head>
                 ';
@@ -168,9 +168,9 @@ class ConsumptionController extends Controller
         <span style="float: left;">Utilizator: '. $user->name .'</span>
         <h2 style="font-weight:bold; text-align: center;">BON DE CONSUM</h2>
         <br>
-        <span style="font-weight:bold; float: right;">Perioada: '. date("d-m-Y", strtotime($from)) .' - '. date("d-m-Y", strtotime($to)) .'</span>
+        <span style="float: right;">Perioada: '. date("d-m-Y", strtotime($from)) .' - '. date("d-m-Y", strtotime($to)) .'</span>
         <br>
-        <span style="font-weight: bold; float: right;">Numar document: '. $consumption_id . ' / ' . $new_date .'</span>
+        <span style="float: right;">Numar document: '. $consumption_id . ' / ' . $new_date .'</span>
         <br>
         '. $span .'
         <br>
@@ -213,6 +213,7 @@ class ConsumptionController extends Controller
         //dd($checklists);
         $total_value = 0;
         $i = 1;
+        $skippingId = array();
         foreach($checklists as $checklist)
         {
 
@@ -248,9 +249,52 @@ class ConsumptionController extends Controller
             // $consumption->document_date = $request->input('document-date');
             // $consumption->save();
 
+            
+            $total_quantity = 0;
+
+            
+
             foreach($checklist->checklistitems as $item)
             {
+                // if($item->used == 1) {
+                //     continue;
+                // }
+                if(!empty( $amb_id )) {
+                    if (in_array($item->item_stock_id, $skippingId)) {
+                        continue;
+                    }
+                }
+                
+
+                
+
                 $detailedItem = \App\Models\ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit')->find($item->item_stock_id);
+
+                $checklist_items = \App\Models\ChecklistItem::join('checklists', 'checklist_items.checklist_id', '=', 'checklists.id')
+                ->where('checklists.ambulance_id', '=', $amb_id)
+                ->where('checklist_items.item_stock_id', '=', $item->item_stock_id)
+                ->where('checklist_items.used', '=', 0)
+                ->where('checklists.used', '=', 0)
+                ->select('checklist_items.used', 'checklist_items.quantity', 'checklists.id', 'checklist_items.id as cid')
+                ->get();
+
+
+                $skippingId[] = $item->item_stock_id;
+
+                //$checklist_items = \App\Models\Checklist::with('checklistitems')->where()->get();
+
+                //dd($checklist_items);
+
+                foreach($checklist_items as $checklist_item) {
+                    //dd($checklist_item);
+                    $total_quantity += $checklist_item->quantity;
+                    $checklist_item->used = 1;
+                    $checklist_item->save();
+                    //$skippingId[] = $checklist_item->cid;
+                    //dd($checklist_item);
+                }
+
+                //dd($total_quantity);
                 
                 $consumItem = new \App\Models\ConsumptionItem();
                 $consumItem->consumption_id = $consumption->id;
@@ -281,18 +325,16 @@ class ConsumptionController extends Controller
                     <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
                     <td style="text-align: center;">'. $detailedItem->item->name .'</td>
                     <td style="text-align: center;">'. $detailedItem->invoice_item->measure_unit->name .'</td>
-                    <td style="text-align: center;">'. $item->quantity .'</td>
+                    <td style="text-align: center;">'. $total_quantity .'</td>
                     <td style="text-align: center;">'. $detailedItem->invoice_item->price .'</td>
-                    <td style="text-align: center;">'. $detailedItem->invoice_item->price * $item->quantity .'</td>
+                    <td style="text-align: center;">'. $detailedItem->invoice_item->price * $total_quantity .'</td>
                     <td style="text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
                     <td style="text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
                 </tr>';
                 }
 
 
-                
-
-            $total_value += $detailedItem->invoice_item->price * $item->quantity;
+            $total_value += $detailedItem->invoice_item->price * $total_quantity;
             }
             
             //delete checklist here and checklist items

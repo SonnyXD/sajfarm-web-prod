@@ -92,6 +92,12 @@
             <span class="menu-title">Baza de Date</span>
         </a>
         </li>
+        <li class="nav-item">
+        <a class="nav-link" href="/documente/documente-generate">
+            <i class="menu-icon mdi mdi-file-document-box-search-outline"></i>
+            <span class="menu-title">Documente Generate</span>
+        </a>
+        </li>
     </ul>
 </nav> 
 <!-- partial -->

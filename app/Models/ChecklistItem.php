@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use \App\Models\Item;
 use \App\Models\ItemStock;
 use \App\Models\Checklist;
+use \App\Models\Ambulance;
 
 class ChecklistItem extends Model
 {

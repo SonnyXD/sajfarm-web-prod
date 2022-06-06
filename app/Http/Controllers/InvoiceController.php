@@ -14,6 +14,7 @@ use Auth;
 
 class InvoiceController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -72,7 +73,8 @@ class InvoiceController extends Controller
             'discount-procent' => 'required',
             'discount-value' => 'required',
             'total-value' => 'required',
-            'nir-number' => 'nullable'
+            'nir-number' => 'nullable',
+            'insertion-date' => 'required'
         ));
     
         $invoice = new \App\Models\Invoice();
@@ -83,6 +85,7 @@ class InvoiceController extends Controller
         $invoice->discount_procent = $request->input('discount-procent');
         $invoice->discount_value = $request->input('discount-value');
         $invoice->total = $request->input('total-value');
+        $invoice->insertion_date = $request->input('insertion-date');
         $invoice->save();
 
         // $medicament = new \App\Models\ItemStock();
@@ -114,7 +117,7 @@ class InvoiceController extends Controller
         $html = '<html>
                 <head>
                 <style>
-                td, th {border: 2px solid black;}
+                td, th {border: 1px solid black;}
                 </style>
                 </head>
                 ';
@@ -124,15 +127,15 @@ class InvoiceController extends Controller
                 <span style="float: left;">Utilizator: '. $user->name .'</span>
                 <h2 style="font-weight:bold; text-align: center;">NOTA DE INTRARE RECEPTIE</h2>
                 <br>
-                <span style="font-weight: bold; float: right;">Numar document: '. $invoice_id . ' / ' . $new_date .'</span>
+                <span style="float: right;">Numar document: '. $invoice_id . ' / ' . $new_date .'</span>
                 <br>
-                <span style="font-weight: bold; float: right;">Furnizor: '. $provider->first()->name .'</span>
+                <span style="float: right;">Furnizor: '. $provider->first()->name .'</span>
                 <br>
-                <span style="font-weight: bold; float: right;">Gestiune: DEPOZIT FARMACIE</span>
+                <span style="float: right;">Gestiune: DEPOZIT FARMACIE</span>
                 <br>
-                <span style="font-weight: bold; float: right;">Document intrare: Factura fiscala - '. $invoice_number .'</span>
+                <span style="float: right;">Document intrare: Factura fiscala - '. $invoice_number .'</span>
                 <br>
-                <span style="font-weight: bold; float: right;">Data scadenta: '. $new_due_date .'</span>
+                <span style="float: right;">Data scadenta: '. $new_due_date .'</span>
                 <br>
                 <br>
                 <br>
@@ -143,7 +146,7 @@ class InvoiceController extends Controller
         <tr>
           <th style="font-weight: bold; text-align: center;">Cod CIM</th>
           <th style="font-weight: bold; text-align: center;">Cod Produs</th>
-          <th style="font-weight: bold; text-align: center;">Nume</th>
+          <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
           <th style="font-weight: bold; text-align: center;">Lot</th>
           <th style="font-weight: bold; text-align: center;">Data Exp.</th>
           <th style="font-weight: bold; text-align: center;">UM</th>
@@ -224,11 +227,17 @@ class InvoiceController extends Controller
         </tr>
     </table>';
 
-    $html .= '<br><span style="text-align: left;">Farm. Sef<br>'.$institution[0]->pharmacy_manager.'<br></span>';
+    $html .= '<br>';
+
+    $html .= 'Gestionari:';
+
+    $html .= '<br>';
+
+    $html .= '<span style="text-align: left;">Farm. Sef<br>'.$institution[0]->pharmacy_manager.'<br></span>';
     
     $html .= '<br>';
 
-    $html .= '<span style="text-align: right;">As. Farm. <br>'.$institution[0]->assistent.'</span>';
+    $html .= '<span style="text-align: left;">As. Farm. <br>'.$institution[0]->assistent.'</span>';
 
     $html .= '</html>';
 
@@ -253,8 +262,8 @@ class InvoiceController extends Controller
         return redirect('/operatiuni/intrare-factura')
             ->with('success', 'Factura inregistrata cu succes!')->with('download',);
     
-        return redirect('/operatiuni/intrare-factura')
-           ->with('success', 'Factura inregistrata cu succes!');
+        // return redirect('/operatiuni/intrare-factura')
+        //    ->with('success', 'Factura inregistrata cu succes!');
         // $invoice = $this->invoice_form($request);
 
         // $filename = 'pdfs/nir'.$invoice->invoice_id.'.pdf';

@@ -281,6 +281,8 @@ Route::get('/documente/balanta', array('uses' => 'App\Http\Controllers\RoutesCon
 
 Route::get('/documente/baza-de-date', array('uses' => 'App\Http\Controllers\RoutesController@baza_date'));
 
+Route::get('/documente/documente-generate', array('uses' => 'App\Http\Controllers\RoutesController@documente_generate'));
+
 //Route::get('/fun', [App\Http\Controllers\GeneratePDFController::class, 'invoice']);
 
 Route::get('intrare-factura', 'App\Http\Controllers\InvoiceController@store')->name('invoices.store');

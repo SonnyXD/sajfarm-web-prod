@@ -82,7 +82,7 @@ class ReturningController extends Controller
         $html = '<html>
                 <head>
                 <style>
-                td, th {border: 2px solid black;}
+                td, th {border: 1px solid black;}
                 </style>
                 </head>
                 ';
@@ -92,7 +92,7 @@ class ReturningController extends Controller
         <span style="float: left;">Utilizator: '. $user->name .'</span>
         <h2 style="font-weight:bold; text-align: center;">PROCES VERBAL RETUR</h2>
         <br>
-        <span style="font-weight: bold; float: right;">Numar document: '. $returning_id . ' / ' . $new_date .'</span>
+        <span style="float: right;">Numar document: '. $returning_id . ' / ' . $new_date .'</span>
         <br>
         <br>
 ';
@@ -134,7 +134,7 @@ class ReturningController extends Controller
             $from = "";
 
             if(!empty($returning_item->ambulance_id)) {
-                $from = ReturningItem::with('ambulance')->where('ambulance_id', '=', $product['productAmb'])->first()->ambulance->license_plate;
+                $from = $from_location->name.' - '.ReturningItem::with('ambulance')->where('ambulance_id', '=', $product['productAmb'])->first()->ambulance->license_plate;
             }
             
             if(empty($from)) {
@@ -149,7 +149,7 @@ class ReturningController extends Controller
             <td style="text-align: center;">'. $item->invoice_item->price .'</td>
             <td style="text-align: center;">'. $item->invoice_item->price * $product['productQty'] .'</td>
             <td style="text-align: center;">'. $item->invoice_item->lot .'</td>
-            <td style="text-align: center;">'. $item->invoice_item->exp_date .'</td>
+            <td style="text-align: center;">'. date("d-m-Y", strtotime($item->invoice_item->exp_date )).'</td>
             <td style="text-align: center;">'. $product['productReason'] .'</td>
             <td style="text-align: center;">'. $from .'</td>
         </tr>';

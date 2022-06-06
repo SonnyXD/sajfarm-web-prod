@@ -20,7 +20,11 @@ class Transfer extends Model
     
     public $timestamps = false;
 
-    public function inventory() {
-        return $this->hasMany( Inventory::class );
+    public function inventory_from() {
+        return $this->belongsTo( Inventory::class , 'from_inventory_id');
+    }
+
+    public function inventory_to() {
+        return $this->belongsTo( Inventory::class , 'to_inventory_id');
     }
 }

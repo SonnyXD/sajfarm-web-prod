@@ -32,14 +32,14 @@ function addProductToNir() {
   let rowCount = 0;
 
   
-  $('#document-number, #document-date, #due-date, #discount-procent, #discount-value, #total-value').change(function() {
+  $('#document-number, #document-date, #due-date, #discount-procent, #discount-value, #total-value, #insertion-date').change(function() {
       testInputs();
   });
 
   function testInputs() {
     let valid = true;
 
-    $('#document-number, #document-date, #due-date, #discount-procent, #discount-value, #total-value').each(function() {
+    $('#document-number, #document-date, #due-date, #discount-procent, #discount-value, #total-value, #insertion-date').each(function() {
       //console.log({input: $(this), valid: $(this).val().length === 0, value: $(this).val(), length: $(this).val().length});//
       if ($(this).val().length === 0) {
         valid = false;
@@ -244,4 +244,5 @@ jQuery(document).ready(() => {
     addProductToNir();
     deleteRow();
     $('#document-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);
+    $('#insertion-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);
 });

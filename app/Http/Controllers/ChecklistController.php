@@ -72,7 +72,13 @@ class ChecklistController extends Controller
             //     return $query->where('lot', '=', $item->invoice_item->lot);
             // })->with('checklist_item')->where('lot', $product['productLot'])->get()->first();
 
-            $new_item = ChecklistItem::where('item_stock_id', '=', $product['productId'])->get()->first();
+            // $new_item = ChecklistItem::where('item_stock_id', '=', $product['productId'])->first();
+
+            $new_item = ChecklistItem::where('item_stock_id', '=', $product['productId'])->first();
+
+            //$new_item = ChecklistItem::orderBy('id', 'desc')->first();
+
+            //dd($new_item);
 
             if($new_item === null) {
                 $newItem = new \App\Models\ChecklistItem();
@@ -92,11 +98,20 @@ class ChecklistController extends Controller
                 $newItem->quantity = $product['productQty'];
                 $newItem->used = 0;
                 $newItem->save();
-                //nice. si mai e o chestie.
             } else {
-                $new_item->quantity += $product['productQty']; // gresit aici. gata
-                $new_item->save();
+                $newItem = new \App\Models\ChecklistItem();
+                $newItem->checklist_id = $checklist->id;
+                $newItem->item_id = $item->item->id;
+                $newItem->item_stock_id = $product['productId'];
+                $newItem->quantity = $product['productQty'];
+                $newItem->used = 0;
+                $newItem->save();
             }
+                //nice. si mai e o chestie.
+            // } else {
+            //     $new_item->quantity += $product['productQty']; // gresit aici. gata
+            //     $new_item->save();
+            // }
 
             // $checklist_product = new \App\Models\ChecklistItem();
             // $checklist_product->checklist_id = $checklist->id;

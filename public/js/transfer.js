@@ -121,87 +121,112 @@
 
       $('#modal-alert').css('display','none');
 
-      let i = $("#bon-transfer").data('lineCounter');
-      if (i == undefined) {
-        i = 0;
-      }
-    
-      //let i = $('#medstable').find('tbody tr').length;
-    
-      let productId = $('#meds').find(':selected').val();
-    
-      let productName = $('#meds').find(':selected').text();
-    
-      let med_name = productName.split("[/]");
-    
-      let productUmText = $('#um').find(':selected').text();
-    
-      let productQuantity = $('#product-quantity').val();
-    
-      let productUM = $('#um').find(':selected').val();
-    
-      let containerForm = $('<div></div>', {style: "display:none"});
-    
-      let newInput = '<input form="bon-transfer" name="product['+i+'][productId]" value=' + productId + ' />';
-      let newInput2 = '<input form="bon-transfer" name="product['+i+'][productName]" value="' + med_name[0] + '" />';
-      let newInput3 = '<input form="bon-transfer" name="product['+i+'][productUmText]" value="' + med_name[1].replace(/ /g,'') + '" />';
-      //let newInput4 = '<input name="product['+i+'][productUm]" value="' + productUM + '" />';
-      let newInput5 = '<input form="bon-transfer" name="product['+i+'][productQty]" value=' + productQuantity + ' />';
-    
-      containerForm.append(newInput);
-      containerForm.append(newInput2);
-      containerForm.append(newInput3);
-      //container.append(newInput4);
-      containerForm.append(newInput5);
-    
-      // let output = '<tr>';
-      //   $('#meds-modal input:not([type=hidden], [type=checkbox]), #meds-modal select').each(function() {
-      //     if(!$(this).is("select"))
-      //       output += '<td>' + $(this).val() + '</td>';
-      //     else if($(this).is("select")) 
-      //       output += '<td>' + $('#um option:selected').text() + '</td>';
-      //     else if( !$(this).val() )
-      //       output += '<td>' + '' + '</td>';
-      //   });
-    
-      //   output += '</tr>';
 
-      let tr = $('<tr></<tr>');
-      $('#meds-modal input:not([type=hidden], [type=checkbox]), #meds-modal select').each(function() {
-        if(!$(this).is("select")) {
-          tr.append($('<td>' + $(this).val() + '</td>'));
-        } else if ($(this).is('select')) {
-          tr.append('<td>'+$('#um option:selected').text()+'</td>');
-        } else if (!(this).val()) {
-          tr.append('<td></td>');
+      let productId = $('#meds').find(':selected').val();
+      let productQuantity = $('#product-quantity').val();
+
+      let foundTr = $('#medstable').find('> tbody > tr[data-productid="'+productId+'"]');
+      
+
+      if (foundTr.length) {
+        let oldQte = foundTr.attr('data-productquantity');
+        let newQte = parseInt(oldQte) + parseInt(productQuantity);
+        foundTr.find('._productQte').val(newQte);
+        foundTr.find('>td:nth-child(3)').text(newQte);
+
+      } else {
+
+        let i = $("#bon-transfer").data('lineCounter');
+        if (i == undefined) {
+          i = 0;
         }
       
-      });
-
-      let actionTd = $('<td></td>');
-      actionTd.append('<button type="button" class="btn btn-danger" id="delete-row">Sterge</button>');
-      actionTd.append(containerForm);
-
-      tr.append(actionTd);
-      let oldText = $('#meds').find('option:selected').text();
-      let oldTextArray = oldText.split('[/]');
-
-      let newNumber = parseInt(oldTextArray[2]) - parseInt($('#product-quantity').val());
-
-      let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3];
-      $('#meds').find('option:selected').text(newText);
-      //$('#meds').trigger('change.select2');
-      $('#meds').select2('destroy');
-      $('#meds').select2();
-
-
-      i++;
-      $("#bon-transfer").data('lineCounter', i);
+        //let i = $('#medstable').find('tbody tr').length;
+      
+        
+      
+        let productName = $('#meds').find(':selected').text();
+      
+        let med_name = productName.split("[/]");
+      
+        let productUmText = $('#um').find(':selected').text();
+      
+        
+      
+        let productUM = $('#um').find(':selected').val();
+      
+        let containerForm = $('<div></div>', {style: "display:none"});
+      
+        let newInput = '<input form="bon-transfer" name="product['+i+'][productId]" value=' + productId + ' />';
+        let newInput2 = '<input form="bon-transfer" name="product['+i+'][productName]" value="' + med_name[0] + '" />';
+        let newInput3 = '<input form="bon-transfer" name="product['+i+'][productUmText]" value="' + med_name[1].replace(/ /g,'') + '" />';
+        //let newInput4 = '<input name="product['+i+'][productUm]" value="' + productUM + '" />';
+        let newInput5 = '<input form="bon-transfer" class="_productQte" name="product['+i+'][productQty]" value=' + productQuantity + ' />';
+      
+        containerForm.append(newInput);
+        containerForm.append(newInput2);
+        containerForm.append(newInput3);
+        //container.append(newInput4);
+        containerForm.append(newInput5);
+      
     
+
+        let tr = $('<tr></<tr>');
+
+        tr.attr('data-productid', productId);
+        tr.attr('data-productquantity', productQuantity);
+
+        $('#meds-modal input:not([type=hidden], [type=checkbox]), #meds-modal select').each(function() {
+          if(!$(this).is("select")) {
+            tr.append($('<td>' + $(this).val() + '</td>'));
+          } else if ($(this).is('select')) {
+            tr.append('<td>'+$('#um option:selected').text()+'</td>');
+          } else if (!(this).val()) {
+            tr.append('<td></td>');
+          }
+        
+        });
+
+        let actionTd = $('<td></td>');
+        actionTd.append('<button type="button" class="btn btn-danger" id="delete-row">Sterge</button>');
+        actionTd.append(containerForm);
+
+        tr.append(actionTd);
+        // let oldText = $('#meds').find('option:selected').text();
+        // let oldTextArray = oldText.split('[/]');
+
+        // let newNumber = parseInt(oldTextArray[2]) - parseInt($('#product-quantity').val());
+
+        // let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3];
+        // // $('#meds').find('option:selected').text(newText);
+        // // //$('#meds').trigger('change.select2');
+        // // $('#meds').select2('destroy');
+        // // $('#meds').select2();
+
+
+        i++;
+        $("#bon-transfer").data('lineCounter', i);
+      
         $('#medstable tbody').append(tr);
-        testInputs();
-        $('#meds-modal').modal('toggle');
-        $('#meds-modal form')[0].reset();
+
+    }
+
+    let oldText = $('#meds').find('option:selected').text();
+    let oldTextArray = oldText.split('[/]');
+
+    let newNumber = parseInt(oldTextArray[2]) - parseInt($('#product-quantity').val());
+
+    let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3];
+    $('#meds').find('option:selected').text(newText);
+    //$('#meds').trigger('change.select2');
+    $('#meds').select2('destroy');
+    $('#meds').select2();
+    
+    testInputs();
+    $('#meds-modal').modal('toggle');
+    $('#meds-modal form')[0].reset();
+
+    
     
     });
 

@@ -20,6 +20,7 @@ use \App\Models\ItemStock;
 use \App\Models\Assistent;
 use \App\Models\Ambulancier;
 use \App\Models\Consumption;
+use \App\Models\Checklist;
 use \App\Models\MinimumQuantity;
 use DB;
 
@@ -182,9 +183,12 @@ class RoutesController extends Controller
         $invoices = Invoice::all();
         $aviz = AvizEntry::all();
 
+        $donation = Category::where('name', 'Donatii')->first()->id;
+        $sponsor = Category::where('name', 'Sponsorizari')->first()->id;
+
         $title = 'Aviz Intrare';
 
-        return view('operatiuni.aviz', ['providers' => $providers, 'items' => $items, 'units' => $units, 'invoices' => $invoices, 'aviz' => $aviz, 'title' => $title]);
+        return view('operatiuni.aviz', ['providers' => $providers, 'items' => $items, 'units' => $units, 'invoices' => $invoices, 'aviz' => $aviz, 'title' => $title, 'donation_category' => $donation, 'sponsor_category' => $sponsor]);
     }
 
     public function retur()
@@ -268,6 +272,24 @@ class RoutesController extends Controller
         $title = 'Baza de Date';
 
         return view('documente.database', ['title' => $title]);
+    }
+
+    public function documente_generate() 
+    {
+        $title = 'Documente Generate';
+        //$transfers = Transfer::with('inventory')->join('inventories', 'transfers.from_inventory_id', '=', 'inventories.id')->get();
+        $transfers = Transfer::with('inventory_from')->get();
+        $transfers_to = Transfer::with('inventory_to')->get();
+
+        $nirs = Invoice::all();
+
+        $consumptions = Consumption::with('inventory')->get();
+
+        $returnings = Returning::with('inventory')->get();
+
+        $entries = AvizEntry::all();
+
+        return view('documente.documente-generate', ['title' => $title, 'transfers' => $transfers, 'transfers_to' => $transfers_to, 'nirs' => $nirs, 'consumptions' => $consumptions, 'returnings' => $returnings, 'entries' => $entries]);
     }
 
 }

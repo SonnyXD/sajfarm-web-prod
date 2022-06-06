@@ -128,22 +128,32 @@ $('#print').attr('disabled', false);
 
     $('#modal-alert').css('display','none');
 
-  //let i = $('#medstable').find('tbody tr').length;
-
-  let i = $("#return-items").data('lineCounter');
-  if (i == undefined) {
-    i = 0;
-  }
+  let i = $('#medstable').find('tbody tr').length;
 
   let productId = $('#meds').find(':selected').val();
+
+  let productQuantity = $('#product-quantity').val();
+
+  //let foundTr = $('#medstable').find('> tbody > tr[data-productid="'+productId+'"]');
+
+  // if (foundTr.length) {
+  //   let oldQte = foundTr.attr('data-productquantity');
+  //   let newQte = parseInt(oldQte) + parseInt(productQuantity);
+  //   foundTr.find('._productQte').val(newQte);
+  //   foundTr.find('>td:nth-child(3)').text(newQte);
+
+  // } else {
+
+    // let i = $("#checklist").data('lineCounter');
+    // if (i == undefined) {
+    //   i = 0;
+    // }
 
   let productName = $('#meds').find(':selected').text();
 
   let med_name = productName.split("[/]");
 
   let productUmText = $('#um').find(':selected').text();
-
-  let productQuantity = $('#product-quantity').val();
 
   let productReason = $("#reason").val();
 
@@ -157,13 +167,13 @@ $('#print').attr('disabled', false);
   let newInput2 = '<input form="return-items" name="product['+i+'][productName]" value="' + med_name[0] + '" />';
   let newInput3 = '<input form="return-items" name="product['+i+'][productUmText]" value="' + med_name[1].replace(/ /g,'') + '" />';
   let newInput4 = '<input form="return-items" name="product['+i+'][productReason]" value="' + productReason + '" />';
-  let newInput5 = '<input form="return-items" name="product['+i+'][productQty]" value=' + productQuantity + ' />';
+  let newInput5 = '<input form="return-items" class="_productQte" name="product['+i+'][productQty]" value=' + productQuantity + ' />';
   let newInput6 = "";
 
   if(!productAmbId) {
-    newInput6 = '<input form="return-items" name="product['+i+'][productAmb]" value="" />';
+    newInput6 = '<input form="return-items" class="_productAmb" name="product['+i+'][productAmb]" value="" />';
   } else {
-    newInput6 = '<input form="return-items" name="product['+i+'][productAmb]" value=' + productAmbId + ' />';
+    newInput6 = '<input form="return-items" class="_productAmb" name="product['+i+'][productAmb]" value=' + productAmbId + ' />';
   }
 
   containerForm.append(newInput);
@@ -185,7 +195,10 @@ $('#print').attr('disabled', false);
 
   //   output += '</tr>';
 
-  let tr = $('<tr></<tr>');
+    let tr = $('<tr></<tr>');
+
+    // tr.attr('data-productid', productId);
+    // tr.attr('data-productquantity', productQuantity);
       $('#meds-modal input:not([type=hidden], [type=checkbox]), #meds-modal select').each(function() {
         if(!$(this).is("select")) {
           tr.append($('<td>' + $(this).val() + '</td>'));
@@ -203,6 +216,14 @@ $('#print').attr('disabled', false);
       actionTd.append(containerForm);
 
       tr.append(actionTd);
+
+      i++;
+
+      $("#return-items").data('lineCounter', i);
+
+      $('#medstable tbody').append(tr);
+
+    //}
       let oldText = $('#meds').find('option:selected').text();
       let oldTextArray = oldText.split('[/]');
 
@@ -218,11 +239,7 @@ $('#print').attr('disabled', false);
       $('#meds').select2('destroy');
       $('#meds').select2();
 
-
-      i++;
-      $("#return-items").data('lineCounter', i);
-
-    $('#medstable tbody').append(tr);
+  
     testInputs();
     $('#modal-alert').css('display','none');
     $('#modal-alert-404').css('display','none');

@@ -78,7 +78,9 @@
                     <select class="meds-single-select w-100" name="meds" id="meds">
                     @if( $items->count() )
                         @foreach ($items as $item)
+                          @if($item->category_id == $donation_category)
                             <option value="{{ $item->id }}">{{ $item->name }}</option>
+                          @endif
                         @endforeach
                     @endif
                     </select>
