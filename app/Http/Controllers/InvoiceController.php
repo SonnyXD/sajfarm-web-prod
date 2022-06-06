@@ -108,7 +108,9 @@ class InvoiceController extends Controller
         $provider = Provider::where('id', $provider_id)->get();
         $invoice_number = $request->input('document-number');
         $old_due_date = $request->input('due-date');
-        $new_due_date = date("d-m-Y", strtotime($old_due_date));  
+        $new_due_date = date("d-m-Y", strtotime($old_due_date));
+        $old_insertion_date = $request->input('insertion-date');
+        $new_insertion_date = date("d-m-Y", strtotime($old_insertion_date));
 
         $institution = Institution::all();
 
@@ -136,6 +138,8 @@ class InvoiceController extends Controller
                 <span style="float: right;">Document intrare: Factura fiscala - '. $invoice_number .'</span>
                 <br>
                 <span style="float: right;">Data scadenta: '. $new_due_date .'</span>
+                <br>
+                <span style="float: right;">Data introducerii facturii: '. $new_insertion_date .'</span>
                 <br>
                 <br>
                 <br>
