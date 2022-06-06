@@ -256,6 +256,7 @@ class ConsumptionController extends Controller
 
             foreach($checklist->checklistitems as $item)
             {
+                $total_quantity = 0;
                 // if($item->used == 1) {
                 //     continue;
                 // }

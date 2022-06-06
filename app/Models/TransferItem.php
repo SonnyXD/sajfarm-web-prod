@@ -23,8 +23,4 @@ class TransferItem extends Model
     public function item_stock() {
         return $this->hasMany( ItemStock::class );
     }
-
-    public function invoice_item() {
-        return $this->belongsTo( InvoiceItem::class );
-    }
 }

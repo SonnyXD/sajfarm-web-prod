@@ -69,7 +69,8 @@ class ProductFileController extends Controller
         ->select('invoices.id as invoice_id',  'invoice_items.*', 'providers.name as provider_name')
         ->get();
 
-        $transfer_items = TransferItem::with('item_stock')
+        $transfer_items = TransferItem::join('item_stocks', 'transfer_items.item_stock_id', '=', 'item_stocks.id')
+        ->select('item_stocks.*', 'transfer_items.*')
         ->get();
 
         dd($transfer_items->first());
