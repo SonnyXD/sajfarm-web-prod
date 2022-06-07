@@ -11,6 +11,8 @@ use \App\Models\Transfer;
 use \App\Models\TransferItem;
 use \App\Models\Consumption;
 use \App\Models\ConsumptionItem;
+use \App\Models\Returning;
+use \App\Models\ReturningItem;
 use Session;
 use PDF;
 use Auth;
@@ -70,22 +72,63 @@ class ProductFileController extends Controller
         ->get();
 
         $transfer_items = TransferItem::join('item_stocks', 'transfer_items.item_stock_id', '=', 'item_stocks.id')
-        ->select('item_stocks.*', 'transfer_items.*')
+        ->join('invoice_items', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
+        ->join('transfers', 'transfer_items.transfer_id', '=', 'transfers.id')
+        ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+        ->join('inventories', 'transfers.from_inventory_id', '=', 'inventories.id')
+        ->join('inventories as inv', 'transfers.to_inventory_id', '=', 'inv.id')
+        ->where('transfer_items.item_id', '=', $med_id)
+        ->whereBetween('transfers.document_date', [$old_from_date, $old_until_date])
+        ->select('transfers.id as transfer_id', 'invoice_items.*',
+        'item_stocks.quantity as remaining_quantity', 'item_stocks.id as item_stock_id',
+        'transfer_items.quantity as used_quantity', 'inventories.name as from_inventory',
+        'inv.name as to_inventory')
         ->get();
 
-        dd($transfer_items->first());
+        $returning_items = ReturningItem::join('item_stocks', 'returning_items.item_stock_id', '=', 'item_stocks.id')
+        ->join('invoice_items', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
+        ->join('returnings', 'returning_items.returning_id', '=', 'returnings.id')
+        ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+        ->join('inventories', 'returnings.inventory_id', '=', 'inventories.id')
+        ->leftjoin('ambulances', 'returning_items.ambulance_id', '=', 'ambulances.id')
+        ->where('returning_items.item_id', '=', $med_id)
+        ->whereBetween('returnings.document_date', [$old_from_date, $old_until_date])
+        ->select('returnings.id as returning_id', 'invoice_items.*',
+        'item_stocks.quantity as remaining_quantity', 'item_stocks.id as item_stock_id',
+        'returning_items.quantity as used_quantity', 'ambulances.license_plate as ambulance_license_plate',
+        'inventories.name as from_inventory')
+        ->get();
+
+        $consumption_items = ConsumptionItem::join('item_stocks', 'consumption_items.item_stock_id', '=', 'item_stocks.id')
+        ->join('invoice_items', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
+        ->join('consumptions', 'consumption_items.consumption_id', '=', 'consumptions.id')
+        ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+        ->join('items', 'consumption_items.item_id', '=', 'items.id')
+        ->join('inventories', 'consumptions.inventory_id', '=', 'inventories.id')
+        ->leftjoin('ambulances', 'consumptions.ambulance_id', '=', 'ambulances.id')
+        ->leftjoin('medics', 'consumptions.medic_id', '=', 'medics.id')
+        ->where('consumption_items.item_id', '=', $med_id)
+        ->whereBetween('consumptions.document_date', [$old_from_date, $old_until_date])
+        ->select('consumptions.id as consumption_id', 'invoice_items.*',
+        'item_stocks.quantity as remaining_quantity', 'item_stocks.id as item_stock_id',
+        ConsumptionItem::raw('SUM(consumption_items.quantity) as used_quantity'),
+        'inventories.name as from_inventory')
+        ->groupBy('consumptions.id')
+        ->groupBy('item_stocks.id')
+        ->get();
+
+        //dd($consumption_items);
         
         $institution = Institution::all();
 
         $filename = 'fisa produs '. $med_name .' '. $new_from_date .' '. $new_until_date .'.pdf';
 
-        $html = '<html>
+        $html = "<html>
                 <head>
                 <style>
                 td, th {border: 1px solid black;}
                 </style>
-                </head>
-                ';
+                </head>";
         
         $html .= ' <span style="font-weight: bold; float: left;">'. $institution[0]->name .'</span>
         <br>
@@ -100,18 +143,19 @@ class ProductFileController extends Controller
         <br>';
 
         $html .= '
-        <table>
-        <tr>
-          <th style="font-weight: bold; text-align: center;">Cod CIM</th>
-          <th style="font-weight: bold; text-align: center;">Cod Produs</th>
+        <table style="border: 1px solid black;">
+        <tr style="border: 1px solid black;">
+          <th style="font-weight: bold; text-align: center; border: 1px solid black;">Data</th>
+          <th style="font-weight: bold; text-align: center;">Tip Document</th>
           <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
+          <th style="font-weight: bold; text-align: center;">Detalii</th>
+          <th style="font-weight: bold; text-align: center;">Intrare</th>
+          <th style="font-weight: bold; text-align: center;">Iesire</th>
+          <th style="font-weight: bold; text-align: center;">Stoc Curent</th>
           <th style="font-weight: bold; text-align: center;">Lot</th>
-          <th style="font-weight: bold; text-align: center;">Data Exp.</th>
-          <th style="font-weight: bold; text-align: center;">UM</th>
-          <th style="font-weight: bold; text-align: center;">Cantitate</th>
-          <th style="font-weight: bold; text-align: center;">Pret Unitar</th>
-          <th style="font-weight: bold; text-align: center;">Pret cu TVA</th>
-          <th style="font-weight: bold; text-align: center;">Valoare (RON)</th>
+          <th style="font-weight: bold; text-align: center;">Furnizor</th>
+          <th style="font-weight: bold; text-align: center;">Data exp.</th>
+          <th style="font-weight: bold; text-align: center;">Pret</th>
         </tr>
         ';
 

@@ -276,7 +276,8 @@ class ConsumptionController extends Controller
                 ->where('checklist_items.item_stock_id', '=', $item->item_stock_id)
                 ->where('checklist_items.used', '=', 0)
                 ->where('checklists.used', '=', 0)
-                ->select('checklist_items.used', 'checklist_items.quantity', 'checklists.id', 'checklist_items.id as cid')
+                ->select('checklist_items.used', 'checklist_items.quantity', 'checklists.id', 'checklist_items.id as cid',
+                'checklist_items.item_id', 'checklist_items.item_stock_id')
                 ->get();
 
 
@@ -291,18 +292,25 @@ class ConsumptionController extends Controller
                     $total_quantity += $checklist_item->quantity;
                     $checklist_item->used = 1;
                     $checklist_item->save();
+
+                    $consumItem = new \App\Models\ConsumptionItem();
+                    $consumItem->consumption_id = $consumption->id;
+                    $consumItem->item_id = $checklist_item->item_id;
+                    $consumItem->item_stock_id = $checklist_item->item_stock_id;
+                    $consumItem->quantity = $checklist_item->quantity;
+                    $consumItem->save();
                     //$skippingId[] = $checklist_item->cid;
                     //dd($checklist_item);
                 }
 
                 //dd($total_quantity);
                 
-                $consumItem = new \App\Models\ConsumptionItem();
-                $consumItem->consumption_id = $consumption->id;
-                $consumItem->item_id = $item->item_id;
-                $consumItem->item_stock_id = $item->item_stock_id;
-                $consumItem->quantity = $item->quantity;
-                $consumItem->save();
+                // $consumItem = new \App\Models\ConsumptionItem();
+                // $consumItem->consumption_id = $consumption->id;
+                // $consumItem->item_id = $item->item_id;
+                // $consumItem->item_stock_id = $item->item_stock_id;
+                // $consumItem->quantity = $item->quantity;
+                // $consumItem->save();
                 //generez document
 
                 $item->used = 1;
