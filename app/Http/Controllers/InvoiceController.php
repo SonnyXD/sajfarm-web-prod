@@ -218,15 +218,15 @@ class InvoiceController extends Controller
         <td style="text-align: center;">Semnatura</td>
         </tr>
         <tr>
-        <td colspan="1"></td>
-        <td colspan="1"></td>
-        </tr>
-        <tr>
-        <td colspan="1"></td>
+        <td style="text-align: center;" colspan="1">Director medical dr. '. $institution[0]->medical_director .'</td>
         <td colspan="1"></td>
         </tr>
         <tr>
+        <td style="text-align: center;" colspan="1">As. sef '. $institution[0]->assistent_manager .'</td>
         <td colspan="1"></td>
+        </tr>
+        <tr>
+        <td style="text-align: center;" colspan="1">Ec. '. $institution[0]->pharmacy_ec .'</td>
         <td colspan="1"></td>
         </tr>
     </table>';

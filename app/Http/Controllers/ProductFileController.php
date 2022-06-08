@@ -13,6 +13,7 @@ use \App\Models\Consumption;
 use \App\Models\ConsumptionItem;
 use \App\Models\Returning;
 use \App\Models\ReturningItem;
+use \App\Models\ItemStock;
 use Session;
 use PDF;
 use Auth;
@@ -64,12 +65,20 @@ class ProductFileController extends Controller
         $new_until_date = date("d-m-Y", strtotime($old_until_date));
 
         $invoice_items = InvoiceItem::with('invoice')
+        ->join('item_stocks', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
         ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
-        ->join('providers', 'invoices.provider_id', '=', 'providers.id')
-        ->where('item_id', '=', $med_id)
+        ->leftjoin('providers', 'invoices.provider_id', '=', 'providers.id')
+        ->where('invoice_items.item_id', '=', $med_id)
         ->whereBetween('invoices.insertion_date', [$old_from_date, $old_until_date])
-        ->select('invoices.id as invoice_id',  'invoice_items.*', 'providers.name as provider_name')
+        ->select('invoices.id as invoice_id',  'invoice_items.*', 'providers.name as provider_name',
+        'invoices.insertion_date as insertion_date',
+        ItemStock::raw('SUM(item_stocks.quantity) as remaining_quantity'))
+        // ->groupBy('item_stocks.id')
+        ->groupBy('item_stocks.inventory_id')
+        ->groupBy('invoice_items.id')
         ->get();
+
+       dd($invoice_items);
 
         $transfer_items = TransferItem::join('item_stocks', 'transfer_items.item_stock_id', '=', 'item_stocks.id')
         ->join('invoice_items', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
@@ -123,6 +132,8 @@ class ProductFileController extends Controller
 
         $filename = 'fisa produs '. $med_name .' '. $new_from_date .' '. $new_until_date .'.pdf';
 
+        $html = "";
+
         $html = "<html>
                 <head>
                 <style>
@@ -143,9 +154,9 @@ class ProductFileController extends Controller
         <br>';
 
         $html .= '
-        <table style="border: 1px solid black;">
-        <tr style="border: 1px solid black;">
-          <th style="font-weight: bold; text-align: center; border: 1px solid black;">Data</th>
+        <table>
+        <tr>
+          <th style="font-weight: bold; text-align: center;">Data</th>
           <th style="font-weight: bold; text-align: center;">Tip Document</th>
           <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
           <th style="font-weight: bold; text-align: center;">Detalii</th>
@@ -158,6 +169,28 @@ class ProductFileController extends Controller
           <th style="font-weight: bold; text-align: center;">Pret</th>
         </tr>
         ';
+
+        //dd($invoice_items);
+
+        foreach($invoice_items as $item) {
+            $html .= '<tr>';
+            $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['insertion_date'])) .'</td>';
+            $html .= '<td style="text-align: center;">Intrare factura</td>';
+            $html .= '<td style="text-align: center;">'. $med_name .'</td>';
+            $html .= '<td style="text-align: center;">NIR</td>';
+            $html .= '<td style="text-align: center;">'. $item['quantity'] .'</td>';
+            $html .= '<td style="text-align: center;">0</td>';
+            $html .= '<td style="text-align: center;">Intrare factura</td>';
+            $html .= '<td style="text-align: center;">Intrare factura</td>';
+            $html .= '<td style="text-align: center;">Intrare factura</td>';
+            $html .= '<td style="text-align: center;">Intrare factura</td>';
+            $html .= '<td style="text-align: center;">Intrare factura</td>';
+            $html .= '</tr>';
+        }
+
+        $html .= '</table>';
+
+        $html .= '</html>';
 
         PDF::SetTitle('Fisa Produs');
         PDF::AddPage('L', 'A4');
