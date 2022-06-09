@@ -283,7 +283,7 @@ class RoutesController extends Controller
 
         $nirs = Invoice::all();
 
-        $consumptions = Consumption::with('inventory')->get();
+        $consumptions = Consumption::with('inventory', 'ambulance', 'medic')->get();
 
         $returnings = Returning::with('inventory')->get();
 

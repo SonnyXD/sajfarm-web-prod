@@ -231,7 +231,7 @@ $('#print').attr('disabled', false);
 
       
 
-      let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3];
+      let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3] + ' [/] ' + oldTextArray[4];
 
       console.log(newText);
       $('#meds').find('option:selected').text(newText);

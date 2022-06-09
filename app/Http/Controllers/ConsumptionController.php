@@ -72,7 +72,11 @@ class ConsumptionController extends Controller
             ->whereBetween('checklist_date', [$from, $to])->where('ambulance_id', '=', $amb_id)->where('used', '=', 0)->get();
             $from_name = Ambulance::where('id', $request->input('ambulance-select'))->get()->first()->license_plate;
 
-            $checklist_sub = \App\Models\Checklist::with('inventory')->where('ambulance_id', '=', $amb_id)->first()?->inventory->name;
+            //$checklist_sub = \App\Models\Checklist::with('inventory')->where('ambulance_id', '=', $amb_id)->first()?->inventory->name;
+
+            $sub = $request->input('substation-select');
+
+            $checklist_sub = \App\Models\Inventory::where('id', $sub)->first()->name;
 
             if($checklist_sub == "Stoc 3") {
                 $checklist_sub = "Statie centrala";
@@ -85,7 +89,17 @@ class ConsumptionController extends Controller
             $from_name = Medic::where('id', $request->input('medic-select'))->get()->first()->name;
             $checklist_amb = \App\Models\Checklist::with('ambulance')->where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
             $checklist_patients = \App\Models\Checklist::where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
-            $span = '<span style="float: right;">Medic: '. $from_name .'</span><br>';
+
+            $sub = $request->input('substation-select');
+
+            $checklist_sub = \App\Models\Inventory::where('id', $sub)->first()->name;
+
+            if($checklist_sub == "Stoc 3") {
+                $checklist_sub = "Statie centrala";
+            }
+
+            $span = '<span style="float: right;">Substatie: '. $checklist_sub .'</span><br>
+            <span style="float: right;">Medic: '. $from_name .'</span><br>';
 
             //$span .= '<span style="font-weight: bold; float: right;">Ambulante: ';
 
@@ -182,7 +196,7 @@ class ConsumptionController extends Controller
             <table>
             <tr>
             <th style="font-weight: bold; text-align: center;">Cod Produs</th>
-            <th style="font-weight: bold; text-align: center;">Nume</th>
+            <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
             <th style="font-weight: bold; text-align: center;">UM</th>
             <th style="font-weight: bold; text-align: center;">Cantitate</th>
             <th style="font-weight: bold; text-align: center;">Pret</th>
@@ -214,6 +228,9 @@ class ConsumptionController extends Controller
         $total_value = 0;
         $i = 1;
         $skippingId = array();
+
+        $substation_id = $request->input('substation-select');
+
         foreach($checklists as $checklist)
         {
 
@@ -229,7 +246,7 @@ class ConsumptionController extends Controller
 
             if($i == 1) {
                 $consumption = new \App\Models\Consumption();
-                $consumption->inventory_id = $checklist->inventory->id;
+                $consumption->inventory_id = $substation_id;
                 $consumption->medic_id = $checklist->medic->id ?? null;
                 $consumption->ambulance_id = $checklist->ambulance->id;
                 $consumption->patient_number = $checklist->patient_number;

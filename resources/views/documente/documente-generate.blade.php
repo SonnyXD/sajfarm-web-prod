@@ -71,6 +71,8 @@
       </th>
       <th class="th-sm">Din
       </th>
+      <th class="th-sm">Autosanitara/Medic
+      </th>
       <th class="th-sm">Data
       </th>
     </tr>
@@ -82,6 +84,7 @@
             <td>{{$consumption->id}}</td>
         <td><a target="_blank" href="/pdfs/consum{{$consumption->id}}.pdf">Consum {{$consumption->id}}</a></td>
             <td>{{$consumption->inventory->name}}</td>
+            <td>{{$consumption->ambulance->license_plate}} / {{$consumption->medic->name ?? ''}}</td>
             <td>{{date("d-m-Y", strtotime($consumption->document_date))}}</td>
         </tr>
         @endforeach

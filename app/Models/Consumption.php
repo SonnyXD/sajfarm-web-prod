@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\Checklist;
 use \App\Models\Inventory;
+use \App\Models\Ambulance;
+use \App\Models\Medic;
 
 class Consumption extends Model
 {
@@ -25,5 +27,13 @@ class Consumption extends Model
 
     public function inventory() {
         return $this->belongsTo( Inventory::class );
+    }
+
+    public function ambulance() {
+        return $this->belongsTo(Ambulance::class);
+    }
+
+    public function medic() {
+        return $this->belongsTo(Medic::class);
     }
 }

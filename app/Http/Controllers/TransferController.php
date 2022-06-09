@@ -95,7 +95,7 @@ class TransferController extends Controller
         <table>
         <tr>
         <th style="font-weight: bold; text-align: center;">Cod Produs</th>
-        <th style="font-weight: bold; text-align: center;">Nume</th>
+        <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
         <th style="font-weight: bold; text-align: center;">UM</th>
         <th style="font-weight: bold; text-align: center;">Cantitate</th>
         <th style="font-weight: bold; text-align: center;">Pret</th>

@@ -23,15 +23,17 @@ class LogicForms extends Controller
             // if($item->invoice_item->measure_unit === null) {
             //     dd($item);
             // }
+           // dd($item);
             if ($item->quantity > 0) {
                 //dd($item->invoice_item->measure_unit->name);
                 $html .= sprintf(
-                    '<option value="%s">%s [/] %s [/] %s [/] %s</option>',
+                    '<option value="%s">%s [/] %s [/] %s [/] %s [/] %s</option>',
                     $item->id,
                     $item->item->name,
                     $item->invoice_item->measure_unit->name,
                     $item->quantity,
-                    date("d-m-Y", strtotime($item->invoice_item->exp_date))
+                    date("d-m-Y", strtotime($item->invoice_item->exp_date)),
+                    $item->invoice_item->tva_price
                 );
             }
         }

@@ -45,6 +45,7 @@
   }
 
   function transferModal() {
+    let total_value = 0;
       $('#add-in-preview').click(function () {
         let selected_med = $("#meds option:selected").text();
         let med_name = selected_med.split("[/]");
@@ -214,9 +215,13 @@
     let oldText = $('#meds').find('option:selected').text();
     let oldTextArray = oldText.split('[/]');
 
+    total_value = total_value + (parseInt(productQuantity) * parseFloat(oldTextArray[4]));
+
     let newNumber = parseInt(oldTextArray[2]) - parseInt($('#product-quantity').val());
 
-    let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3];
+    let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3] + ' [/] ' + oldTextArray[4];
+
+    $('#total-value-preview').text('Total valoare: ' + total_value);
     $('#meds').find('option:selected').text(newText);
     //$('#meds').trigger('change.select2');
     $('#meds').select2('destroy');

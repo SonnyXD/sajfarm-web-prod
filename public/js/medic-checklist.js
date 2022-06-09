@@ -159,7 +159,7 @@ else
 
       let newNumber = parseInt(oldTextArray[2]) - parseInt($('#product-quantity').val());
 
-      let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3];
+      let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3] + ' [/] ' + oldTextArray[4];
 
       $('#meds').find('option:selected').text(newText);
       //$('#meds').trigger('change.select2');

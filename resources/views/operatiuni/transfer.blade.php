@@ -104,6 +104,7 @@
                 </div>
               </div>
             </div>
+            <h5 id="total-value-preview"></h5>
         </div>
 
             <x-modal>
