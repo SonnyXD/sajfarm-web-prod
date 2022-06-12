@@ -14,6 +14,7 @@ use \App\Models\ConsumptionItem;
 use \App\Models\Returning;
 use \App\Models\ReturningItem;
 use \App\Models\ItemStock;
+use \App\Models\Inventory;
 use Session;
 use PDF;
 use Auth;
@@ -78,12 +79,13 @@ class ProductFileController extends Controller
         ->groupBy('invoice_items.id')
         ->get();
 
-       dd($invoice_items);
+       //dd($invoice_items);
 
         $transfer_items = TransferItem::join('item_stocks', 'transfer_items.item_stock_id', '=', 'item_stocks.id')
         ->join('invoice_items', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
         ->join('transfers', 'transfer_items.transfer_id', '=', 'transfers.id')
         ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+        ->leftjoin('providers', 'invoices.provider_id', '=', 'providers.id')
         ->join('inventories', 'transfers.from_inventory_id', '=', 'inventories.id')
         ->join('inventories as inv', 'transfers.to_inventory_id', '=', 'inv.id')
         ->where('transfer_items.item_id', '=', $med_id)
@@ -91,7 +93,10 @@ class ProductFileController extends Controller
         ->select('transfers.id as transfer_id', 'invoice_items.*',
         'item_stocks.quantity as remaining_quantity', 'item_stocks.id as item_stock_id',
         'transfer_items.quantity as used_quantity', 'inventories.name as from_inventory',
-        'inv.name as to_inventory')
+        'inv.name as to_inventory', TransferItem::raw('SUM(transfer_items.quantity) as used_quantity'),
+        'transfers.document_date', 'providers.name as provider_name')
+        ->groupBy('transfer_items.transfer_id')
+        ->groupBy('transfer_items.item_stock_id')
         ->get();
 
         $returning_items = ReturningItem::join('item_stocks', 'returning_items.item_stock_id', '=', 'item_stocks.id')
@@ -105,8 +110,10 @@ class ProductFileController extends Controller
         ->select('returnings.id as returning_id', 'invoice_items.*',
         'item_stocks.quantity as remaining_quantity', 'item_stocks.id as item_stock_id',
         'returning_items.quantity as used_quantity', 'ambulances.license_plate as ambulance_license_plate',
-        'inventories.name as from_inventory')
+        'inventories.name as from_inventory', 'returnings.document_date as document_date')
         ->get();
+
+        //dd($returning_items);
 
         $consumption_items = ConsumptionItem::join('item_stocks', 'consumption_items.item_stock_id', '=', 'item_stocks.id')
         ->join('invoice_items', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
@@ -121,12 +128,20 @@ class ProductFileController extends Controller
         ->select('consumptions.id as consumption_id', 'invoice_items.*',
         'item_stocks.quantity as remaining_quantity', 'item_stocks.id as item_stock_id',
         ConsumptionItem::raw('SUM(consumption_items.quantity) as used_quantity'),
-        'inventories.name as from_inventory')
-        ->groupBy('consumptions.id')
-        ->groupBy('item_stocks.id')
+        'inventories.name as from_inventory', 'ambulances.license_plate as license_plate',
+        'medics.name as medic_name', 'consumptions.document_date as document_date')
+        ->groupBy('consumption_items.consumption_id')
+        ->groupBy('consumption_items.item_stock_id')
         ->get();
 
-        //dd($consumption_items);
+       
+
+        if($invoice_items->isEmpty() && $returning_items->isEmpty() && $consumption_items->isEmpty() && $transfer_items->isEmpty()) {
+            return redirect('/documente/fisa-produs')
+            ->with('error', 'Nu exista istoric pentru perioada selectata!');
+        }
+
+        //dd($invoice_items);
         
         $institution = Institution::all();
 
@@ -149,8 +164,31 @@ class ProductFileController extends Controller
         <span style="float: right;">Produs: '. $med_name .'</span>
         <br>
         <span style="float: right;">Perioada: '. $new_from_date .' - '. $new_until_date .'</span>
-        <br>
-        <br>
+        <br>';
+
+        $inventories = Inventory::get();
+
+        foreach($inventories as $inventory) {
+            $remaining_quantity = ItemStock::leftjoin('inventories', 'item_stocks.inventory_id', '=', 'inventories.id')
+            ->leftjoin('invoice_items', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
+            ->where('item_stocks.item_id', '=', $med_id)
+            ->where('item_stocks.inventory_id', '=', $inventory->id)
+            ->select(ItemStock::raw('SUM(item_stocks.quantity) as remaining_quantity'),
+            'inventories.name as inventory_name', 'invoice_items.tva_price as tva_price')
+            ->groupBy('item_stocks.inventory_id')
+            ->first();
+
+            if($remaining_quantity == null) {
+                $html .= '<span style="float: right;">Stoc Curent / Valoare '. $inventory->name .': 0 / 0</span>
+                <br>';
+                continue;
+            }
+            
+            $html .= '<span style="float: right;">Stoc Curent / Valoare '. $remaining_quantity->inventory_name .': '. $remaining_quantity->remaining_quantity .' / '. $remaining_quantity->remaining_quantity * $remaining_quantity->tva_price .'</span>
+            <br>';
+        }
+
+        $html .= '<br>
         <br>';
 
         $html .= '
@@ -158,37 +196,126 @@ class ProductFileController extends Controller
         <tr>
           <th style="font-weight: bold; text-align: center;">Data</th>
           <th style="font-weight: bold; text-align: center;">Tip Document</th>
-          <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
           <th style="font-weight: bold; text-align: center;">Detalii</th>
           <th style="font-weight: bold; text-align: center;">Intrare</th>
           <th style="font-weight: bold; text-align: center;">Iesire</th>
-          <th style="font-weight: bold; text-align: center;">Stoc Curent</th>
           <th style="font-weight: bold; text-align: center;">Lot</th>
           <th style="font-weight: bold; text-align: center;">Furnizor</th>
           <th style="font-weight: bold; text-align: center;">Data exp.</th>
           <th style="font-weight: bold; text-align: center;">Pret</th>
+          <th style="font-weight: bold; text-align: center;">Pret TVA</th>
+          <th style="font-weight: bold; text-align: center;">Valoare</th>
         </tr>
         ';
 
         //dd($invoice_items);
 
+        $invoice_value = 0;
+        $transfer_value = 0;
+        $consumption_value = 0;
+        $returning_value = 0;
+
         foreach($invoice_items as $item) {
             $html .= '<tr>';
             $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['insertion_date'])) .'</td>';
             $html .= '<td style="text-align: center;">Intrare factura</td>';
-            $html .= '<td style="text-align: center;">'. $med_name .'</td>';
             $html .= '<td style="text-align: center;">NIR</td>';
             $html .= '<td style="text-align: center;">'. $item['quantity'] .'</td>';
             $html .= '<td style="text-align: center;">0</td>';
-            $html .= '<td style="text-align: center;">Intrare factura</td>';
-            $html .= '<td style="text-align: center;">Intrare factura</td>';
-            $html .= '<td style="text-align: center;">Intrare factura</td>';
-            $html .= '<td style="text-align: center;">Intrare factura</td>';
-            $html .= '<td style="text-align: center;">Intrare factura</td>';
+            $html .= '<td style="text-align: center;">'. $item['lot'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['provider_name'] .'</td>';
+            $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['price'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['tva_price'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['tva_price'] * $item['quantity'] .'</td>';
             $html .= '</tr>';
+            $invoice_value += ($item['tva_price'] * $item['quantity']);
+        }
+
+        foreach($transfer_items as $item) {
+            $html .= '<tr>';
+            $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['document_date'])) .'</td>';
+            $html .= '<td style="text-align: center;">Transfer</td>';
+            $html .= '<td style="text-align: center;">'. $item['from_inventory'] .' -> '. $item['to_inventory'] .'</td>';
+            $html .= '<td style="text-align: center;">0</td>';
+            $html .= '<td style="text-align: center;">'. $item['used_quantity'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['lot'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['provider_name'] .'</td>';
+            $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['price'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['tva_price'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['tva_price'] * $item['used_quantity'] .'</td>';
+            $html .= '</tr>';
+            $transfer_value += ($item['tva_price'] * $item['used_quantity']);
+        }
+
+        foreach($consumption_items as $item) {
+            $details = "";
+            if($item['medic_name'] != null) {
+                $details = $item['from_inventory'] .' - '. $item['license_plate'] . ' - ' . $item['medic_name'];
+            }
+            else {
+                $details = $item['from_inventory'] .' - '. $item['license_plate'];
+            }
+            $html .= '<tr>';
+            $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['document_date'])) .'</td>';
+            $html .= '<td style="text-align: center;">Consum</td>';
+            $html .= '<td style="text-align: center;">'. $details .'</td>';
+            $html .= '<td style="text-align: center;">0</td>';
+            $html .= '<td style="text-align: center;">'. $item['used_quantity'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['lot'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['provider_name'] .'</td>';
+            $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['price'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['tva_price'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['tva_price'] * $item['used_quantity'] .'</td>';
+            $html .= '</tr>';
+            $consumption_value += ($item['tva_price'] * $item['used_quantity']);
+        }
+
+        foreach($returning_items as $item) {
+            $details = "";
+            if($item['ambulance_license_plate'] != null) {
+                $details = $item['from_inventory'] .' - '. $item['ambulance_license_plate'];
+            }
+            else {
+                $details = $item['from_inventory'];
+            }
+            $html .= '<tr>';
+            $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['document_date'])) .'</td>';
+            $html .= '<td style="text-align: center;">Retur</td>';
+            $html .= '<td style="text-align: center;">'. $details .'</td>';
+            $html .= '<td style="text-align: center;">0</td>';
+            $html .= '<td style="text-align: center;">'. $item['used_quantity'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['lot'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['provider_name'] .'</td>';
+            $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['price'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['tva_price'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['tva_price'] * $item['used_quantity'] .'</td>';
+            $html .= '</tr>';
+            $returning_value += ($item['tva_price'] * $item['used_quantity']);
         }
 
         $html .= '</table>';
+
+        $html .= '<br>';
+
+        $html .= '<br>';
+
+        $html .= '<span>Total valoare intrata: '. $invoice_value .'</span>';
+
+        $html .= '<br>';
+
+        $html .= '<span>Total valoare transferata: '. $transfer_value .'</span>';
+
+        $html .= '<br>';
+
+        $html .= '<span>Total valoare consumata: '. $consumption_value .'</span>';
+
+        $html .= '<br>';
+
+        $html .= '<span>Total valoare returnata: '. $returning_value .'</span>';
 
         $html .= '</html>';
 
@@ -196,7 +323,9 @@ class ProductFileController extends Controller
         PDF::AddPage('L', 'A4');
         PDF::writeHTML($html, true, false, true, false, '');
 
-        PDF::Output(public_path($filename), 'D');
+        //PDF::Output(public_path($filename), 'D');
+
+        PDF::Output('name.pdf', 'I');
 
         //return response()->download($filename);
     }

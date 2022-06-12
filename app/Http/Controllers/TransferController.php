@@ -130,13 +130,13 @@ class TransferController extends Controller
                 <td style="text-align: center;">'. $productPost['productName'] .'</td>
                 <td style="text-align: center;">'. $productPost['productUmText'] .'</td>
                 <td style="text-align: center;">'. $productPost['productQty'] .'</td>
-                <td style="text-align: center;">'. $detailedItem->invoice_item->price .'</td>
-                <td style="text-align: center;">'. $detailedItem->invoice_item->price * $productPost['productQty'] .'</td>
+                <td style="text-align: center;">'. $detailedItem->invoice_item->tva_price .'</td>
+                <td style="text-align: center;">'. $detailedItem->invoice_item->tva_price * $productPost['productQty'] .'</td>
                 <td style="text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
                 <td style="text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
             </tr>';
 
-            $total_value += $detailedItem->invoice_item->price * $productPost['productQty'];
+            $total_value += $detailedItem->invoice_item->tva_price * $productPost['productQty'];
 
         $item = ItemStock::with('invoice_item')->where('id', $productPost['productId'])->get()->first();
         $item->quantity -= $productPost['productQty'];

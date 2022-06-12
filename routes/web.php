@@ -309,6 +309,8 @@ Route::post('modificare-cant-min', 'App\Http\Controllers\MinimumQuantityControll
 
 Route::get('fisa-produs', 'App\Http\Controllers\ProductFileController@store')->name('productfile.store');
 
+Route::get('balanta', 'App\Http\Controllers\BalanceController@store')->name('balance.store');
+
 //Route::post('intrare-factura', 'App\Http\Controllers\InvoiceItemController@store')->name('invoiceitems.store');
 
 // Route::get('/operatiuni/intrare-factura', function () {

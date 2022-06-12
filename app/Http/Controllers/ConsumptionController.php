@@ -229,6 +229,12 @@ class ConsumptionController extends Controller
         $i = 1;
         $skippingId = array();
 
+        $subset = $checklists->map(function ($checklist) {
+            return collect($checklist->toArray())
+                ->only(['id'])
+                ->all();
+        });
+
         $substation_id = $request->input('substation-select');
 
         foreach($checklists as $checklist)
@@ -279,24 +285,38 @@ class ConsumptionController extends Controller
                 // }
                 if(!empty( $amb_id )) {
                     if (in_array($item->item_stock_id, $skippingId)) {
+                        $item->used = 1;
+                        $item->save();
                         continue;
                     }
                 }
                 
-
-                
+                $checklist_items = "";
 
                 $detailedItem = \App\Models\ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit')->find($item->item_stock_id);
 
-                $checklist_items = \App\Models\ChecklistItem::join('checklists', 'checklist_items.checklist_id', '=', 'checklists.id')
-                ->where('checklists.ambulance_id', '=', $amb_id)
-                ->where('checklist_items.item_stock_id', '=', $item->item_stock_id)
-                ->where('checklist_items.used', '=', 0)
-                ->where('checklists.used', '=', 0)
-                ->select('checklist_items.used', 'checklist_items.quantity', 'checklists.id', 'checklist_items.id as cid',
-                'checklist_items.item_id', 'checklist_items.item_stock_id')
-                ->get();
-
+                if(!empty($amb_id)) {
+                    $checklist_items = \App\Models\ChecklistItem::leftjoin('checklists', 'checklist_items.checklist_id', '=', 'checklists.id')
+                    ->where('checklists.ambulance_id', '=', $amb_id)
+                    ->where('checklist_items.item_stock_id', '=', $item->item_stock_id)
+                    ->where('checklist_items.used', '=', 0)
+                    ->where('checklists.used', '=', 0)
+                    ->whereIn('checklists.id', $subset)
+                    ->select('checklist_items.used', 'checklist_items.quantity', 'checklists.id', 'checklist_items.id as cid',
+                    'checklist_items.item_id', 'checklist_items.item_stock_id')
+                    ->get();
+                    //dd($checklist_items);
+                } else {
+                    $checklist_items = \App\Models\ChecklistItem::join('checklists', 'checklist_items.checklist_id', '=', 'checklists.id')
+                    ->where('checklists.medic_id', '=', $med_id)
+                    ->where('checklist_items.item_stock_id', '=', $item->item_stock_id)
+                    ->where('checklist_items.used', '=', 0)
+                    ->where('checklists.used', '=', 0)
+                    ->where('checklists.id', '=', $checklist->id)
+                    ->select('checklist_items.used', 'checklist_items.quantity', 'checklists.id', 'checklist_items.id as cid',
+                    'checklist_items.item_id', 'checklist_items.item_stock_id')
+                    ->get();
+                }
 
                 $skippingId[] = $item->item_stock_id;
 

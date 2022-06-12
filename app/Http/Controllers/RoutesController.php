@@ -262,16 +262,38 @@ class RoutesController extends Controller
     {
         $inventories = Inventory::all();
 
+        $categories = Category::all();
+
         $title = 'Balanta';
 
-        return view('documente.balanta', ['inventories' => $inventories, 'title' => $title]);
+        return view('documente.balanta', ['inventories' => $inventories, 'title' => $title, 'categories' => $categories]);
     }
 
     public function baza_date()
     {
         $title = 'Baza de Date';
 
-        return view('documente.database', ['title' => $title]);
+        $items = Item::with('category')->get();
+
+        $substations = Substation::all();
+
+        $amb_types = AmbulanceType::all();
+
+        $ambulances = Ambulance::leftjoin('substations', 'ambulances.substation_id', '=', 'substations.id')
+        ->leftjoin('ambulance_types', 'ambulances.ambulance_type_id', '=', 'ambulance_types.id')
+        ->select('ambulances.license_plate', 'substations.name as sub_name', 'ambulance_types.name as ambulance_type',
+        'ambulances.id')
+        ->get();
+
+        $providers = Provider::all();
+
+        $medics = Medic::all();
+
+        $assistents = Assistent::all();
+
+        $m_units = MeasureUnit::all();
+
+        return view('documente.database', ['title' => $title, 'items' => $items, 'substations' => $substations, 'amb_types' => $amb_types, 'ambulances' => $ambulances, 'providers' => $providers, 'medics' => $medics, 'assistents' => $assistents, 'm_units' => $m_units]);
     }
 
     public function documente_generate() 
