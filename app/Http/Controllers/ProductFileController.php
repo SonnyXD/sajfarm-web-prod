@@ -74,9 +74,9 @@ class ProductFileController extends Controller
         ->select('invoices.id as invoice_id',  'invoice_items.*', 'providers.name as provider_name',
         'invoices.insertion_date as insertion_date',
         ItemStock::raw('SUM(item_stocks.quantity) as remaining_quantity'))
-        // ->groupBy('item_stocks.id')
-        ->groupBy('item_stocks.inventory_id')
-        ->groupBy('invoice_items.id')
+        //->groupBy('item_stocks.id')
+        ->groupBy('invoice_items.invoice_id')
+        ->groupBy('item_stocks.invoice_item_id')
         ->get();
 
        //dd($invoice_items);
@@ -96,13 +96,15 @@ class ProductFileController extends Controller
         'inv.name as to_inventory', TransferItem::raw('SUM(transfer_items.quantity) as used_quantity'),
         'transfers.document_date', 'providers.name as provider_name')
         ->groupBy('transfer_items.transfer_id')
-        ->groupBy('transfer_items.item_stock_id')
+        //->groupBy('transfer_items.item_stock_id')
+        //->groupBy('transfer_items.id')
         ->get();
 
         $returning_items = ReturningItem::join('item_stocks', 'returning_items.item_stock_id', '=', 'item_stocks.id')
         ->join('invoice_items', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
         ->join('returnings', 'returning_items.returning_id', '=', 'returnings.id')
         ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+        ->leftjoin('providers', 'invoices.provider_id', '=', 'providers.id')
         ->join('inventories', 'returnings.inventory_id', '=', 'inventories.id')
         ->leftjoin('ambulances', 'returning_items.ambulance_id', '=', 'ambulances.id')
         ->where('returning_items.item_id', '=', $med_id)
@@ -110,15 +112,16 @@ class ProductFileController extends Controller
         ->select('returnings.id as returning_id', 'invoice_items.*',
         'item_stocks.quantity as remaining_quantity', 'item_stocks.id as item_stock_id',
         'returning_items.quantity as used_quantity', 'ambulances.license_plate as ambulance_license_plate',
-        'inventories.name as from_inventory', 'returnings.document_date as document_date')
+        'inventories.name as from_inventory', 'returnings.document_date as document_date', 'providers.name as provider_name')
         ->get();
 
-        //dd($returning_items);
+        //dd($transfer_items);
 
         $consumption_items = ConsumptionItem::join('item_stocks', 'consumption_items.item_stock_id', '=', 'item_stocks.id')
         ->join('invoice_items', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
         ->join('consumptions', 'consumption_items.consumption_id', '=', 'consumptions.id')
         ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+        ->leftjoin('providers', 'invoices.provider_id', '=', 'providers.id')
         ->join('items', 'consumption_items.item_id', '=', 'items.id')
         ->join('inventories', 'consumptions.inventory_id', '=', 'inventories.id')
         ->leftjoin('ambulances', 'consumptions.ambulance_id', '=', 'ambulances.id')
@@ -129,9 +132,10 @@ class ProductFileController extends Controller
         'item_stocks.quantity as remaining_quantity', 'item_stocks.id as item_stock_id',
         ConsumptionItem::raw('SUM(consumption_items.quantity) as used_quantity'),
         'inventories.name as from_inventory', 'ambulances.license_plate as license_plate',
-        'medics.name as medic_name', 'consumptions.document_date as document_date')
+        'medics.name as medic_name', 'consumptions.document_date as document_date',
+        'providers.name as provider_name')
         ->groupBy('consumption_items.consumption_id')
-        ->groupBy('consumption_items.item_stock_id')
+        //->groupBy('consumption_items.item_stock_id')
         ->get();
 
        
@@ -199,6 +203,7 @@ class ProductFileController extends Controller
           <th style="font-weight: bold; text-align: center;">Detalii</th>
           <th style="font-weight: bold; text-align: center;">Intrare</th>
           <th style="font-weight: bold; text-align: center;">Iesire</th>
+          <th style="font-weight: bold; text-align: center;">Stoc Curent</th>
           <th style="font-weight: bold; text-align: center;">Lot</th>
           <th style="font-weight: bold; text-align: center;">Furnizor</th>
           <th style="font-weight: bold; text-align: center;">Data exp.</th>
@@ -216,12 +221,13 @@ class ProductFileController extends Controller
         $returning_value = 0;
 
         foreach($invoice_items as $item) {
-            $html .= '<tr>';
+            $html .= '<tr nobr="true">';
             $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['insertion_date'])) .'</td>';
             $html .= '<td style="text-align: center;">Intrare factura</td>';
-            $html .= '<td style="text-align: center;">NIR</td>';
+            $html .= '<td style="text-align: center;">NIR '. $item['invoice_id'] .'</td>';
             $html .= '<td style="text-align: center;">'. $item['quantity'] .'</td>';
             $html .= '<td style="text-align: center;">0</td>';
+            $html .= '<td style="text-align: center;">'. $item['remaining_quantity'] .'</td>';
             $html .= '<td style="text-align: center;">'. $item['lot'] .'</td>';
             $html .= '<td style="text-align: center;">'. $item['provider_name'] .'</td>';
             $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>';
@@ -233,12 +239,13 @@ class ProductFileController extends Controller
         }
 
         foreach($transfer_items as $item) {
-            $html .= '<tr>';
+            $html .= '<tr nobr="true">';
             $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['document_date'])) .'</td>';
-            $html .= '<td style="text-align: center;">Transfer</td>';
+            $html .= '<td style="text-align: center;">Transfer '. $item['transfer_id'] .'</td>';
             $html .= '<td style="text-align: center;">'. $item['from_inventory'] .' -> '. $item['to_inventory'] .'</td>';
             $html .= '<td style="text-align: center;">0</td>';
             $html .= '<td style="text-align: center;">'. $item['used_quantity'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['remaining_quantity'] .'</td>';
             $html .= '<td style="text-align: center;">'. $item['lot'] .'</td>';
             $html .= '<td style="text-align: center;">'. $item['provider_name'] .'</td>';
             $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>';
@@ -257,12 +264,13 @@ class ProductFileController extends Controller
             else {
                 $details = $item['from_inventory'] .' - '. $item['license_plate'];
             }
-            $html .= '<tr>';
+            $html .= '<tr nobr="true">';
             $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['document_date'])) .'</td>';
-            $html .= '<td style="text-align: center;">Consum</td>';
+            $html .= '<td style="text-align: center;">Consum '. $item['consumption_id'] .'</td>';
             $html .= '<td style="text-align: center;">'. $details .'</td>';
             $html .= '<td style="text-align: center;">0</td>';
             $html .= '<td style="text-align: center;">'. $item['used_quantity'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['remaining_quantity'] .'</td>';
             $html .= '<td style="text-align: center;">'. $item['lot'] .'</td>';
             $html .= '<td style="text-align: center;">'. $item['provider_name'] .'</td>';
             $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>';
@@ -281,12 +289,13 @@ class ProductFileController extends Controller
             else {
                 $details = $item['from_inventory'];
             }
-            $html .= '<tr>';
+            $html .= '<tr nobr="true">';
             $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['document_date'])) .'</td>';
-            $html .= '<td style="text-align: center;">Retur</td>';
+            $html .= '<td style="text-align: center;">Retur '. $item['returning_id'] .'</td>';
             $html .= '<td style="text-align: center;">'. $details .'</td>';
             $html .= '<td style="text-align: center;">0</td>';
             $html .= '<td style="text-align: center;">'. $item['used_quantity'] .'</td>';
+            $html .= '<td style="text-align: center;">'. $item['remaining_quantity'] .'</td>';
             $html .= '<td style="text-align: center;">'. $item['lot'] .'</td>';
             $html .= '<td style="text-align: center;">'. $item['provider_name'] .'</td>';
             $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>';
@@ -319,9 +328,21 @@ class ProductFileController extends Controller
 
         $html .= '</html>';
 
+        PDF::setFooterCallback(function($pdf) {
+
+            // Position at 15 mm from bottom
+            $pdf->SetY(-15);
+            // Set font
+            $pdf->SetFont('helvetica', 'I', 10);
+            // Page number
+            $pdf->Cell(0, 10, 'Pagina '.$pdf->getAliasNumPage().'/'.$pdf->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    
+    });
+
         PDF::SetTitle('Fisa Produs');
         PDF::AddPage('L', 'A4');
         PDF::writeHTML($html, true, false, true, false, '');
+        //PDF::SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
         //PDF::Output(public_path($filename), 'D');
 

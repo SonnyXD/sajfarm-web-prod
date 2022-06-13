@@ -125,7 +125,7 @@ class TransferController extends Controller
             //$detailedItem = \App\Models\ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit')->find($productPost->item_stock_id);
             $detailedItem = \App\Models\ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit')->find($productPost['productId']);
             //dd($itemStock);
-            $html.= '<tr>
+            $html.= '<tr nobr="true">
                 <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
                 <td style="text-align: center;">'. $productPost['productName'] .'</td>
                 <td style="text-align: center;">'. $productPost['productUmText'] .'</td>
@@ -202,6 +202,17 @@ class TransferController extends Controller
                   <p style="text-align: right;">Primitor:</p>';
 
         $html .= '</html>';
+
+        PDF::setFooterCallback(function($pdf) {
+
+            // Position at 15 mm from bottom
+            $pdf->SetY(-15);
+            // Set font
+            $pdf->SetFont('helvetica', 'I', 10);
+            // Page number
+            $pdf->Cell(0, 10, 'Pagina '.$pdf->getAliasNumPage().'/'.$pdf->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    
+    });
 
         PDF::SetTitle('Transfer');
         PDF::AddPage('L', 'A4');

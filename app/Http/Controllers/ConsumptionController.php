@@ -354,7 +354,7 @@ class ConsumptionController extends Controller
                 $item->save();
 
                 if(empty( $amb_id )) {
-                    $html.= '<tr>
+                    $html.= '<tr nobr="true">
                     <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
                     <td style="text-align: center;">'. $detailedItem->item->name .'</td>
                     <td style="text-align: center;">'. $detailedItem->invoice_item->measure_unit->name .'</td>
@@ -368,7 +368,7 @@ class ConsumptionController extends Controller
                 </tr>';
                 $total_value += $detailedItem->invoice_item->price * $item->quantity;
                 } else {
-                    $html.= '<tr>
+                    $html.= '<tr nobr="true">
                     <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
                     <td style="text-align: center;">'. $detailedItem->item->name .'</td>
                     <td style="text-align: center;">'. $detailedItem->invoice_item->measure_unit->name .'</td>
@@ -466,6 +466,17 @@ class ConsumptionController extends Controller
         $html .= '<br>';
 
         $html .= '</html>';
+
+        PDF::setFooterCallback(function($pdf) {
+
+            // Position at 15 mm from bottom
+            $pdf->SetY(-15);
+            // Set font
+            $pdf->SetFont('helvetica', 'I', 10);
+            // Page number
+            $pdf->Cell(0, 10, 'Pagina '.$pdf->getAliasNumPage().'/'.$pdf->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    
+    });
 
         PDF::SetTitle('Consum');
         PDF::AddPage('L', 'A4');

@@ -182,7 +182,7 @@ class InvoiceController extends Controller
 
             $total_value = $total_value + $productPost['productValue'];
 
-            $html.= '<tr>
+            $html.= '<tr nobr="true">
                 <td style="text-align: center;">'. $productPost['productCim'] .'</td>
                 <td style="text-align: center;">'. $productPost['productCode'] .'</td>
                 <td style="text-align: center;">'. $productPost['productName'] .'</td>
@@ -210,22 +210,22 @@ class InvoiceController extends Controller
                     Total valoare: '. $total_value .'<br><br><br>';     
 
         $html .= '<table class="footer-table">
-        <tr>
+        <tr nobr="true">
         <td colspan="2" style="text-align: center;">Comisia de receptie</td>
         </tr>
-        <tr>
+        <tr nobr="true">
         <td style="text-align: center;">Nume si prenume</td>
         <td style="text-align: center;">Semnatura</td>
         </tr>
-        <tr>
+        <tr nobr="true">
         <td style="text-align: center;" colspan="1">Director medical dr. '. $institution[0]->medical_director .'</td>
         <td colspan="1"></td>
         </tr>
-        <tr>
+        <tr nobr="true">
         <td style="text-align: center;" colspan="1">As. sef '. $institution[0]->assistent_manager .'</td>
         <td colspan="1"></td>
         </tr>
-        <tr>
+        <tr nobr="true">
         <td style="text-align: center;" colspan="1">Ec. '. $institution[0]->pharmacy_ec .'</td>
         <td colspan="1"></td>
         </tr>
@@ -245,7 +245,16 @@ class InvoiceController extends Controller
 
     $html .= '</html>';
 
+    PDF::setFooterCallback(function($pdf) {
 
+        // Position at 15 mm from bottom
+        $pdf->SetY(-15);
+        // Set font
+        $pdf->SetFont('helvetica', 'I', 10);
+        // Page number
+        $pdf->Cell(0, 10, 'Pagina '.$pdf->getAliasNumPage().'/'.$pdf->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+
+});
         
         PDF::SetTitle('NIR');
         PDF::AddPage('L', 'A4');

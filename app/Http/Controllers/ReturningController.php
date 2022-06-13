@@ -141,7 +141,7 @@ class ReturningController extends Controller
                 $from = $from_location->name;
             }
 
-            $html.= '<tr>
+            $html.= '<tr nobr="true">
             <td style="text-align: center;">'. $item->invoice_item->product_code .'</td>
             <td style="text-align: center;">'. $product['productName'] .'</td>
             <td style="text-align: center;">'. $product['productUmText'] .'</td>
@@ -180,6 +180,17 @@ class ReturningController extends Controller
         $html .= '<span style="text-align: left;">As. Farm. <br>'.$institution[0]->assistent.'</span>';
 
         $html .= '</html>';
+
+        PDF::setFooterCallback(function($pdf) {
+
+            // Position at 15 mm from bottom
+            $pdf->SetY(-15);
+            // Set font
+            $pdf->SetFont('helvetica', 'I', 10);
+            // Page number
+            $pdf->Cell(0, 10, 'Pagina '.$pdf->getAliasNumPage().'/'.$pdf->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    
+    });
 
         PDF::SetTitle('Proces Verbal Retur');
         PDF::AddPage('L', 'A4');
