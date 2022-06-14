@@ -98,8 +98,7 @@ class ConsumptionController extends Controller
                 $checklist_sub = "Statie centrala";
             }
 
-            $span = '<span style="float: right;">Substatie: '. $checklist_sub .'</span><br>
-            <span style="float: right;">Medic: '. $from_name .'</span><br>';
+            $span = '<span style="float: right;">Medic: '. $from_name .'</span><br>';
 
             //$span .= '<span style="font-weight: bold; float: right;">Ambulante: ';
 
@@ -205,6 +204,7 @@ class ConsumptionController extends Controller
             <th style="font-weight: bold; text-align: center;">Data expirare</th>
             <th style="font-weight: bold; text-align: center;">Ambulanta</th>
             <th style="font-weight: bold; text-align: center;">Nr fisa pacient</th>
+            <th style="font-weight: bold; text-align: center;">Substatie</th>
             </tr>
             ';
         } else {
@@ -354,6 +354,7 @@ class ConsumptionController extends Controller
                 $item->save();
 
                 if(empty( $amb_id )) {
+                    $substation = Inventory::where('id', $checklist->inventory_id)->first()->name;
                     $html.= '<tr nobr="true">
                     <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
                     <td style="text-align: center;">'. $detailedItem->item->name .'</td>
@@ -365,6 +366,7 @@ class ConsumptionController extends Controller
                     <td style="text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
                     <td style="text-align: center;">'. $checklist->ambulance->license_plate .'</td>
                     <td style="text-align: center;">'. $checklist->patient_number .'</td>
+                    <td style="text-align: center;">'. $substation .'</td>
                 </tr>';
                 $total_value += $detailedItem->invoice_item->price * $item->quantity;
                 } else {

@@ -314,4 +314,13 @@ class RoutesController extends Controller
         return view('documente.documente-generate', ['title' => $title, 'transfers' => $transfers, 'transfers_to' => $transfers_to, 'nirs' => $nirs, 'consumptions' => $consumptions, 'returnings' => $returnings, 'entries' => $entries]);
     }
 
+    public function centralizator()
+    {
+        $title = 'Centralizator';
+
+        $inventories = Inventory::all();
+
+        return view('documente.centralizator', ['title' => $title, 'inventories' => $inventories]);
+    }
+
 }

@@ -8,6 +8,7 @@ use \App\Models\Checklist;
 use \App\Models\Inventory;
 use \App\Models\Ambulance;
 use \App\Models\Medic;
+use \App\Models\ConsumptionItem;
 
 class Consumption extends Model
 {
@@ -35,5 +36,9 @@ class Consumption extends Model
 
     public function medic() {
         return $this->belongsTo(Medic::class);
+    }
+
+    public function consumption_item() {
+        return $this->hasMany( ConsumptionItem::class );
     }
 }

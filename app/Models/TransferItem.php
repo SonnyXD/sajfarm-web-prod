@@ -23,4 +23,12 @@ class TransferItem extends Model
     public function item_stock() {
         return $this->hasMany( ItemStock::class );
     }
+
+    public function item_detail() {
+        return $this->belongsTo( Item::class, 'item_id' );
+    }
+
+    public function item_stock_detail() {
+        return $this->belongsto( ItemStock::class, 'item_stock_id' );
+    }
 }

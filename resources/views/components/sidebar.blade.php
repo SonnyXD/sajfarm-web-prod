@@ -63,6 +63,12 @@
         </a>
         </li>
         <li class="nav-item">
+        <a class="nav-link" href="/documente/centralizator">
+            <i class="menu-icon mdi mdi-arrow-collapse-all"></i>
+            <span class="menu-title">Centralizator</span>
+        </a>
+        </li>
+        <li class="nav-item">
         <a class="nav-link" href="/documente/expira-in-6-luni">
             <i class="menu-icon mdi mdi-timer-sand"></i>
             <span class="menu-title">Expira In 6 Luni</span>

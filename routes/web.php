@@ -283,6 +283,8 @@ Route::get('/documente/baza-de-date', array('uses' => 'App\Http\Controllers\Rout
 
 Route::get('/documente/documente-generate', array('uses' => 'App\Http\Controllers\RoutesController@documente_generate'));
 
+Route::get('/documente/centralizator', array('uses' => 'App\Http\Controllers\RoutesController@centralizator'));
+
 //Route::get('/fun', [App\Http\Controllers\GeneratePDFController::class, 'invoice']);
 
 Route::get('intrare-factura', 'App\Http\Controllers\InvoiceController@store')->name('invoices.store');
@@ -310,6 +312,8 @@ Route::post('modificare-cant-min', 'App\Http\Controllers\MinimumQuantityControll
 Route::get('fisa-produs', 'App\Http\Controllers\ProductFileController@store')->name('productfile.store');
 
 Route::get('balanta', 'App\Http\Controllers\BalanceController@store')->name('balance.store');
+
+Route::get('centralizator', 'App\Http\Controllers\CentralizatorController@store')->name('centralizator.store');
 
 //Route::post('intrare-factura', 'App\Http\Controllers\InvoiceItemController@store')->name('invoiceitems.store');
 
