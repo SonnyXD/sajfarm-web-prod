@@ -86,6 +86,7 @@ class InvoiceController extends Controller
         $invoice->discount_value = $request->input('discount-value');
         $invoice->total = $request->input('total-value');
         $invoice->insertion_date = $request->input('insertion-date');
+        $invoice->aviz = 0;
         $invoice->save();
 
         // $medicament = new \App\Models\ItemStock();

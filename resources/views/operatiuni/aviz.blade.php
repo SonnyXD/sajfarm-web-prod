@@ -30,10 +30,10 @@
                     <div class="col">
                       <label>NIR</label>
                       <div id="bloodhound">
-                      @if( !$aviz->count() )
+                      @if( !$invoices->count() )
                           <x-input type="number" name="nir-number" id="nir-number" disabled="disabled" value="1"/>
                         @else 
-                          <x-input type="number" name="nir-number" id="nir-number" disabled="disabled" value="{{$aviz->last()->id + 1}}"/>
+                          <x-input type="number" name="nir-number" id="nir-number" disabled="disabled" value="{{$invoices->last()->id + 1}}"/>
                         @endif
                       </div>
                     </div>
@@ -49,6 +49,12 @@
                       <label>Data Scadenta</label>
                       <div id="bloodhound">
                       <x-input type="date" id="due-date" name="due-date"/>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <label>Data Introducerii</label>
+                      <div id="bloodhound">
+                      <x-input type="date" id="insertion-date" name="insertion-date"/>
                       </div>
                     </div>
                   </div>
@@ -78,7 +84,7 @@
                     <select class="meds-single-select w-100" name="meds" id="meds">
                     @if( $items->count() )
                         @foreach ($items as $item)
-                          @if($item->category_id == $donation_category)
+                          @if($item->category_id == $donation_category || $item->category_id == $sponsor_category)
                             <option value="{{ $item->id }}">{{ $item->name }}</option>
                           @endif
                         @endforeach

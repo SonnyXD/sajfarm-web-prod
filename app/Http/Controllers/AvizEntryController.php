@@ -50,6 +50,7 @@ class AvizEntryController extends Controller
             'document-number' => 'required',
             'document-date' => 'required',
             'due-date' => 'required',
+            'insertion-date' => 'required',
             'discount-procent' => 'required',
             'discount-value' => 'required',
             'total-value' => 'required',
@@ -66,6 +67,20 @@ class AvizEntryController extends Controller
         $aviz->discount_value = $request->input('discount-value');
         $aviz->total = $request->input('total-value');
         $aviz->save();
+
+        $invoice = new \App\Models\Invoice();
+        $invoice->provider_id = $request->input('furnizor-select');
+        $invoice->number = $request->input('document-number');
+        $invoice->document_date = $request->input('document-date');
+        $invoice->due_date = $request->input('due-date');
+        $invoice->insertion_date = $request->input('insertion-date');
+        $invoice->discount_procent = $request->input('discount-procent');
+        $invoice->discount_value = $request->input('discount-value');
+        $invoice->total = $request->input('total-value');
+        $invoice->aviz = 1;
+        $invoice->save();
+
+        $last_invoice_id = Invoice::orderBy('id', 'desc')->first()->id;
     
         $avize = AvizEntry::all();
         $aviz_id = $avize->last()->id;
@@ -96,7 +111,7 @@ class AvizEntryController extends Controller
                 <span style="float: left;">Utilizator: '. $user->name .'</span>
                 <h2 style="font-weight:bold; text-align: center;">NOTA DE INTRARE RECEPTIE</h2>
                 <br>
-                <span style="float: right;">Numar document: '. $aviz_id . ' / ' . $new_date .'</span>
+                <span style="float: right;">Numar document: '. $last_invoice_id . ' / ' . $new_date .'</span>
                 <br>
                 <span style="float: right;">Furnizor: '. $provider->first()->name .'</span>
                 <br>
@@ -148,6 +163,21 @@ class AvizEntryController extends Controller
             $aviz_item->value = $productPost['productValue'];
             $aviz_item->save();
 
+            $invoice_item = new \App\Models\InvoiceItem();
+            $invoice_item->invoice_id = $last_invoice_id;
+            $invoice_item->item_id = $productPost['productId'];
+            $invoice_item->cim_code = $productPost['productCim'];
+            $invoice_item->product_code = $productPost['productCode'];
+            $invoice_item->quantity = $productPost['productQty'];
+            $invoice_item->exp_date = $productPost['productExp'];
+            $invoice_item->lot = $productPost['productLot'];
+            $invoice_item->measure_unit_id = $productPost['productUm'];
+            $invoice_item->price = $productPost['productPrice'];
+            $invoice_item->tva = $productPost['productTva'];
+            $invoice_item->tva_price = $productPost['productTvaPrice'];
+            $invoice_item->value = $productPost['productValue'];
+            $invoice_item->save();
+
             $total_value = $total_value + $productPost['productValue'];
 
             $html.= '<tr>
@@ -167,7 +197,7 @@ class AvizEntryController extends Controller
             $item_stock->item_id = $productPost['productId'];
             //$item_stock->inventory_id = Inventory::where('name', $request->input('type'))->first()->id;
             $item_stock->inventory_id = 1;
-            $item_stock->invoice_item_id = AvizEntryItem::all()->last()->id;
+            $item_stock->invoice_item_id = InvoiceItem::orderBy('id', 'desc')->first()->id;
             $item_stock->quantity = $productPost['productQty'];
             $item_stock->save();
             
@@ -240,9 +270,18 @@ class AvizEntryController extends Controller
 
         $html .= '</html>';
 
+        PDF::setFooterCallback(function($pdf) {
 
+            // Position at 15 mm from bottom
+            $pdf->SetY(-15);
+            // Set font
+            $pdf->SetFont('helvetica', 'I', 10);
+            // Page number
+            $pdf->Cell(0, 10, 'Pagina '.$pdf->getAliasNumPage().'/'.$pdf->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    
+    });
         
-        PDF::SetTitle('NIR');
+        PDF::SetTitle('NIR Aviz');
         PDF::AddPage('L', 'A4');
         PDF::writeHTML($html, true, false, true, false, '');
 

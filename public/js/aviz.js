@@ -240,4 +240,5 @@ jQuery(document).ready(() => {
     addProductToNir();
     deleteRow();
     $('#document-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);
+    $('#insertion-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);
 });

@@ -217,7 +217,9 @@ class RoutesController extends Controller
 
         $title = 'Rapoarte';
 
-        return view('documente.raport', ['inventories' => $inventories, 'title' => $title]);
+        $ambulances = Ambulance::all();
+
+        return view('documente.raport', ['inventories' => $inventories, 'title' => $title, 'ambulances' => $ambulances]);
     }
 
     public function proprietati()

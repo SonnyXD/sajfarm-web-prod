@@ -61,7 +61,9 @@ Route::get('login', [AuthController::class, 'index'])->name('login');
 //Route::get('register', [AuthController::class, 'registration'])->name('register');
 Route::post('register', [AuthController::class, 'postRegistration'])->name('register.post');
 Route::post('/', [AuthController::class, 'postLogin'])->name('login.post'); 
+
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+//Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/register', [AuthController::class, 'index'])->name('login');
 
@@ -314,6 +316,8 @@ Route::get('fisa-produs', 'App\Http\Controllers\ProductFileController@store')->n
 Route::get('balanta', 'App\Http\Controllers\BalanceController@store')->name('balance.store');
 
 Route::get('centralizator', 'App\Http\Controllers\CentralizatorController@store')->name('centralizator.store');
+
+Route::get('rapoarte', 'App\Http\Controllers\ReportController@store')->name('report.store');
 
 //Route::post('intrare-factura', 'App\Http\Controllers\InvoiceItemController@store')->name('invoiceitems.store');
 

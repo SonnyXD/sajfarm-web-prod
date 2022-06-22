@@ -24,11 +24,13 @@
   <tbody>
       @if($nirs->count())
         @foreach($nirs as $nir)
+          @if($nir->aviz == 0)
         <tr>
             <td>{{$nir->id}}</td>
         <td><a target="_blank" href="/pdfs/nir{{$nir->id}}.pdf">NIR {{$nir->id}}</a></td>
             <td>{{date("d-m-Y", strtotime($nir->document_date))}}</td>
         </tr>
+          @endif
         @endforeach
       @endif
 </table>

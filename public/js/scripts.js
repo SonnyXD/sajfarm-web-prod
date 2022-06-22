@@ -414,6 +414,12 @@ console.log( {valid, rowCount});
   });
 }
 
+$( document ).ajaxError(function( event, jqxhr, settings, thrownError ) {
+  if (jqxhr.status == 401) {
+      window.location.replace("/login");
+  }
+});
+
 function getInventoryItems() {
 //   $('#from-location').on('change', function() {
 //     let inventoryId = $(this).val();
@@ -673,5 +679,14 @@ jQuery(document).ready(() => {
   //transferModal();
   //checklistModal();
   //checklistMedicModal();
+
+  
 });
 
+// setTimeout(function() { 
+//   // window.location.replace("/logout");
+//   //$.post('/logout')
+//   $.post( "logout", function( data ) {
+//     alert('logged out');
+//   });
+// }, 2000);
