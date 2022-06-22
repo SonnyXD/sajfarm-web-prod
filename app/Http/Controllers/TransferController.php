@@ -143,10 +143,17 @@ class TransferController extends Controller
         $item->save();
         //$new_item = ItemStock::with('invoiceitem')->where('lot', $item->lot)->get()->first();
 
-        $new_item = ItemStock::whereHas('invoice_item', function ($query) use ($item) {
-            return $query->where('lot', '=', $item->invoice_item->lot);
-        })->where('inventory_id', $request->input('to-location'))->get()->first();
+        // $new_item = ItemStock::whereHas('invoice_item', function ($query) use ($item) {
+        //     return $query->where('lot', '=', $item->invoice_item->lot);
+        // })->where('inventory_id', $request->input('to-location-id'))->get()->first();
 
+        $new_item = ItemStock::leftjoin('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
+        ->where('inventory_id', $request->input('to-location-id'))
+        ->where('invoice_items.id', $item->invoice_item_id)
+        ->select('item_stocks.*')
+        ->get()
+        ->first();
+        //dd($new_item);
         // nu ai inventory id cu 1 aici, da, dar daca nu am, tocmai ca inserez o linie noua in item_ ok. testam.
         // Tre sa fie in inventory, ca altfel il ia tot pe primul :))). aaa ok :)) dai sa testam sa vad ce returneazaok
         // in ce inventory id tre sa se duca  ? primul 1
@@ -156,7 +163,7 @@ class TransferController extends Controller
         // mai fa acelasi transfer odata, sa vedem daca adauga. ok
 
         // Vezi acu.ok        dd($new_item);
-        if($new_item === null) {
+        if($new_item == null) {
             $newItem = new \App\Models\ItemStock();
             $newItem->quantity = $productPost['productQty'];
             $newItem->inventory_id = $to_location->first()->id;
@@ -165,9 +172,20 @@ class TransferController extends Controller
             $newItem->save();
         } else {
             // dam doar debug daca exista deja sa vedem. ok
+            //dd("merge");
+            //dd($new_item->quantity);
             $new_item->quantity += $productPost['productQty']; // gresit aici. gata
+            //dd($new_item->quantity);
             $new_item->save();
+
             //nice. si mai e o chestie.
+
+            // $newItem = new \App\Models\ItemStock();
+            // $newItem->quantity = $productPost['productQty'];
+            // $newItem->inventory_id = $to_location->first()->id;
+            // $newItem->item_id = $item->item_id;
+            // $newItem->invoice_item_id = $item->invoice_item_id;
+            // $newItem->save();
         }
         // $newItem = new \App\Models\ItemStock();
         // $newItem->quantity = $productPost['productQty'];

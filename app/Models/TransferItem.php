@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use \App\Models\Item;
 use \App\Models\ItemStock;
 use \App\Models\InvoiceItem;
+use \App\Models\Transfer;
 
 class TransferItem extends Model
 {
@@ -30,5 +31,9 @@ class TransferItem extends Model
 
     public function item_stock_detail() {
         return $this->belongsto( ItemStock::class, 'item_stock_id' );
+    }
+
+    public function transfer() {
+        return $this->belongsTo( Transfer::class );
     }
 }
