@@ -203,8 +203,10 @@ class AvizEntryController extends Controller
             
         }
 
+        $html .= '</table>';
+
         $html .= '<br>
-                    Total valoare: '. $total_value .'';
+                    Total valoare: '. $total_value .'<br><br><br>';
 
         // $invoices = Invoice::all();
         // $invoice_id = $invoices->last()->id;
@@ -264,9 +266,41 @@ class AvizEntryController extends Controller
         // </tr>
         // ';
         
-        $html .= '';
+        //$html .= '';
 
-        $html .= '</table>';
+        $html .= '<table class="footer-table">
+        <tr nobr="true">
+        <td colspan="2" style="text-align: center;">Comisia de receptie</td>
+        </tr>
+        <tr nobr="true">
+        <td style="text-align: center;">Nume si prenume</td>
+        <td style="text-align: center;">Semnatura</td>
+        </tr>
+        <tr nobr="true">
+        <td style="text-align: center;" colspan="1">Director medical dr. '. $institution[0]->medical_director .'</td>
+        <td colspan="1"></td>
+        </tr>
+        <tr nobr="true">
+        <td style="text-align: center;" colspan="1">As. sef '. $institution[0]->assistent_manager .'</td>
+        <td colspan="1"></td>
+        </tr>
+        <tr nobr="true">
+        <td style="text-align: center;" colspan="1">Ec. '. $institution[0]->pharmacy_ec .'</td>
+        <td colspan="1"></td>
+        </tr>
+    </table>';
+
+    $html .= '<br>';
+
+    $html .= 'Gestionari:';
+
+    $html .= '<br>';
+
+    $html .= '<span style="text-align: left;">Farm. Sef<br>'.$institution[0]->pharmacy_manager.'<br></span>';
+    
+    $html .= '<br>';
+
+    $html .= '<span style="text-align: left;">As. Farm. <br>'.$institution[0]->assistent.'</span>';
 
         $html .= '</html>';
 
