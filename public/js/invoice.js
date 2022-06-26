@@ -69,6 +69,8 @@ function addProductToNir() {
   //     $('#add-product').attr('disabled', false);
   // });
 
+  let totalValue = 0;
+
   $('#add-product').on('click', function() {
 
     if(!$('#product-code').val()) {
@@ -133,6 +135,12 @@ function addProductToNir() {
     let productTvaPrice = $('#product-tva-price').val();
 
     let productValue = $('#product-value').val();
+
+    let totalValueInput = $('#total-value').val() || 0;
+
+    totalValue = parseFloat(totalValueInput) + parseFloat(productValue);
+    
+    $("#total-value").val(totalValue.toFixed(4));
 
     let containerForm = $('<div></div>', {style: "display:none"});
 
@@ -234,6 +242,10 @@ function addProductToNir() {
 
 function deleteRow() {
   $('#medstable').on('click', '#delete-row', function(){
+    let totalValue = $( "#total-value" ).val();
+    let deletedQty = $(this).closest('tr').find('td:nth-child(11)').text();
+    totalValue = parseFloat(totalValue).toFixed(4) - parseFloat(deletedQty).toFixed(4);
+    $( "#total-value" ).val(totalValue.toFixed(4));
     $(this).closest ('tr').remove();
 });
 }
