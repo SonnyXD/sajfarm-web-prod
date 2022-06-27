@@ -11,6 +11,7 @@ use App\Models\ItemStock;
 use App\Models\Institution;
 use App\Models\Ambulance;
 use App\Models\Medic;
+use App\Models\Staff;
 use Session;
 use PDF;
 use Auth;
@@ -54,6 +55,8 @@ class ConsumptionController extends Controller
             'from-date' => 'required',
             'until-date' => 'required'
         ));
+
+        $staff = Staff::all();
 
         $from = date($request->input('from-date'));
         $to = date($request->input('until-date'));
@@ -465,7 +468,54 @@ class ConsumptionController extends Controller
 
         //dd($assistents);
 
-        $html .= '<br>';
+        $html .= '<br>'; 
+
+        $html .= '<br>'; 
+        
+        $html .= '<span>Gestionari</span><br>';
+
+        $html .= '<table>';
+
+        $html .= '<tr nobr="true">
+        <th style="font-weight: bold; text-align: center;">Nume</th>
+        <th style="font-weight: bold; text-align: center;">Semnatura</th>
+        </tr>';
+
+        $html .= '<tr nobr="true">
+        <td style="text-align: center;">Farm. sef '. $institution[0]->pharmacy_manager .'</td>
+        <td style="text-align: center;"></td>
+        </tr>';
+
+        $html .= '<tr nobr="true">
+        <td style="text-align: center;">As. farm. '. $institution[0]->assistent .'</td>
+        <td style="text-align: center;"></td>
+        </tr>';
+            
+        $html .= '</table>';
+
+        $html .= '<br>'; 
+
+        $html .= '<br>'; 
+
+        $html .= '<span>Responsabili Stoc 3</span><br>';
+
+        $html .= '<table>';
+
+        $html .= '<tr nobr="true">
+            <th style="font-weight: bold; text-align: center;">Nume</th>
+            <th style="font-weight: bold; text-align: center;">Semnatura</th>
+        </tr>';
+
+        foreach($staff as $person) {
+            if($person['inventory_id'] == 2) {
+                $html .= '<tr nobr="true">
+                            <td style="text-align: center;">'. $person['name'] .'</td>
+                            <td style="text-align: center;"></td>
+                    </tr>';
+            }
+        }
+
+        $html .= '</table>';
 
         $html .= '</html>';
 
