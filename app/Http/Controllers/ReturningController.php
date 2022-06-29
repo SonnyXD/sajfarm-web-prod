@@ -98,18 +98,17 @@ class ReturningController extends Controller
 ';
 
         $html .= '
-        <table>
+        <table width: 100%>
         <tr>
-        <th style="font-weight: bold; text-align: center;">Cod Produs</th>
-        <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
-        <th style="font-weight: bold; text-align: center;">UM</th>
-        <th style="font-weight: bold; text-align: center;">Cantitate</th>
-        <th style="font-weight: bold; text-align: center;">Pret</th>
-        <th style="font-weight: bold; text-align: center;">Valoare</th>
-        <th style="font-weight: bold; text-align: center;">Lot</th>
-        <th style="font-weight: bold; text-align: center;">Data expirare</th>
-        <th style="font-weight: bold; text-align: center;">Motiv</th>
-        <th style="font-weight: bold; text-align: center;">Gestiunea din care iese</th>
+        <th style="font-weight: bold; text-align: center; width: 18%;">Denumire Produs</th>
+        <th style="font-weight: bold; text-align: center; width: 10%;">UM</th>
+        <th style="font-weight: bold; text-align: center; width: 10%;">Cantitate</th>
+        <th style="font-weight: bold; text-align: center; width: 10%;">Pret</th>
+        <th style="font-weight: bold; text-align: center; width: 10%;">Valoare</th>
+        <th style="font-weight: bold; text-align: center; width: 10%;">Lot</th>
+        <th style="font-weight: bold; text-align: center; width: 12%;">Data expirare</th>
+        <th style="font-weight: bold; text-align: center; width: 10%;">Motiv</th>
+        <th style="font-weight: bold; text-align: center; width: 10%;">Gestiunea din care iese</th>
         </tr>
         ';
 
@@ -142,7 +141,6 @@ class ReturningController extends Controller
             }
 
             $html.= '<tr nobr="true">
-            <td style="text-align: center;">'. $item->invoice_item->product_code .'</td>
             <td style="text-align: center;">'. $product['productName'] .'</td>
             <td style="text-align: center;">'. $product['productUmText'] .'</td>
             <td style="text-align: center;">'. $product['productQty'] .'</td>
@@ -193,7 +191,7 @@ class ReturningController extends Controller
     });
 
         PDF::SetTitle('Proces Verbal Retur');
-        PDF::AddPage('L', 'A4');
+        PDF::AddPage('P', 'A4');
         PDF::writeHTML($html, true, false, true, false, '');
 
         PDF::Output(public_path($filename), 'F');

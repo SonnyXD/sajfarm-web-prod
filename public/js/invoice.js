@@ -136,11 +136,13 @@ function addProductToNir() {
 
     let productValue = $('#product-value').val();
 
-    let totalValueInput = $('#total-value').val() || 0;
+    totalValueParagraph = $('#total-value-preview').text();
 
-    totalValue = parseFloat(totalValueInput) + parseFloat(productValue);
+    let totalValuePreview = parseFloat(totalValueParagraph.match(/[0-9.]+/g)) || 0;
+
+    totalValue = parseFloat(totalValuePreview) + parseFloat(productValue);
     
-    $("#total-value").val(totalValue.toFixed(4));
+    $('#total-value-preview').text('Total valoare: ' + totalValue);
 
     let containerForm = $('<div></div>', {style: "display:none"});
 
@@ -242,10 +244,13 @@ function addProductToNir() {
 
 function deleteRow() {
   $('#medstable').on('click', '#delete-row', function(){
-    let totalValue = $( "#total-value" ).val();
+    let totalValue = $( "#total-value-preview" ).text();
+    totalValueFloat = parseFloat(totalValue.match(/[0-9.]+/g));
     let deletedQty = $(this).closest('tr').find('td:nth-child(11)').text();
-    totalValue = parseFloat(totalValue).toFixed(4) - parseFloat(deletedQty).toFixed(4);
-    $( "#total-value" ).val(totalValue.toFixed(4));
+    //console.log(totalValue + ' = ' + totalValueFloat + ' - ' + deletedQty);
+    totalValue = parseFloat(totalValueFloat).toFixed(4) - parseFloat(deletedQty).toFixed(4);
+    // $( "#total-value-preview" ).val(totalValue.toFixed(4));
+    $( "#total-value-preview" ).text('Total valoare: ' + totalValue);
     $(this).closest ('tr').remove();
 });
 }

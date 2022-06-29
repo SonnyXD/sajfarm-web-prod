@@ -94,7 +94,6 @@ class TransferController extends Controller
         $html .= '
         <table>
         <tr>
-        <th style="font-weight: bold; text-align: center;">Cod Produs</th>
         <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
         <th style="font-weight: bold; text-align: center;">UM</th>
         <th style="font-weight: bold; text-align: center;">Cantitate</th>
@@ -126,7 +125,6 @@ class TransferController extends Controller
             $detailedItem = \App\Models\ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit')->find($productPost['productId']);
             //dd($itemStock);
             $html.= '<tr nobr="true">
-                <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
                 <td style="text-align: center;">'. $productPost['productName'] .'</td>
                 <td style="text-align: center;">'. $productPost['productUmText'] .'</td>
                 <td style="text-align: center;">'. $productPost['productQty'] .'</td>
@@ -233,7 +231,7 @@ class TransferController extends Controller
     });
 
         PDF::SetTitle('Transfer');
-        PDF::AddPage('L', 'A4');
+        PDF::AddPage('P', 'A4');
         PDF::writeHTML($html, true, false, true, false, '');
 
         PDF::Output(public_path($filename), 'F');

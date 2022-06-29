@@ -197,7 +197,6 @@ class ConsumptionController extends Controller
             $html .= '
             <table>
             <tr>
-            <th style="font-weight: bold; text-align: center;">Cod Produs</th>
             <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
             <th style="font-weight: bold; text-align: center;">UM</th>
             <th style="font-weight: bold; text-align: center;">Cantitate</th>
@@ -214,8 +213,7 @@ class ConsumptionController extends Controller
             $html .= '
             <table>
             <tr>
-            <th style="font-weight: bold; text-align: center;">Cod Produs</th>
-            <th style="font-weight: bold; text-align: center;">Nume</th>
+            <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
             <th style="font-weight: bold; text-align: center;">UM</th>
             <th style="font-weight: bold; text-align: center;">Cantitate</th>
             <th style="font-weight: bold; text-align: center;">Pret</th>
@@ -359,7 +357,6 @@ class ConsumptionController extends Controller
                 if(empty( $amb_id )) {
                     $substation = Inventory::where('id', $checklist->inventory_id)->first()->name;
                     $html.= '<tr nobr="true">
-                    <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
                     <td style="text-align: center;">'. $detailedItem->item->name .'</td>
                     <td style="text-align: center;">'. $detailedItem->invoice_item->measure_unit->name .'</td>
                     <td style="text-align: center;">'. $item->quantity .'</td>
@@ -374,7 +371,6 @@ class ConsumptionController extends Controller
                 $total_value += $detailedItem->invoice_item->price * $item->quantity;
                 } else {
                     $html.= '<tr nobr="true">
-                    <td style="text-align: center;">'. $detailedItem->invoice_item->product_code .'</td>
                     <td style="text-align: center;">'. $detailedItem->item->name .'</td>
                     <td style="text-align: center;">'. $detailedItem->invoice_item->measure_unit->name .'</td>
                     <td style="text-align: center;">'. $total_quantity .'</td>
@@ -531,7 +527,7 @@ class ConsumptionController extends Controller
     });
 
         PDF::SetTitle('Consum');
-        PDF::AddPage('L', 'A4');
+        PDF::AddPage('P', 'A4');
         PDF::writeHTML($html, true, false, true, false, '');
 
         PDF::Output(public_path($filename), 'F');

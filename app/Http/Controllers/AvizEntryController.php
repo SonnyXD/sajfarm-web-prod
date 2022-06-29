@@ -316,7 +316,7 @@ class AvizEntryController extends Controller
     });
         
         PDF::SetTitle('NIR Aviz');
-        PDF::AddPage('L', 'A4');
+        PDF::AddPage('P', 'A4');
         PDF::writeHTML($html, true, false, true, false, '');
 
         //PDF::Output(public_path($filename), 'D');

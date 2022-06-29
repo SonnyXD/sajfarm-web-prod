@@ -36,3 +36,4 @@
     </x-container>
     
 </x-layout>
+<script src="/js/properties.js"></script>

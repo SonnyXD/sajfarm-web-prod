@@ -150,7 +150,6 @@ class InvoiceController extends Controller
         <table>
         <tr>
           <th style="font-weight: bold; text-align: center;">Cod CIM</th>
-          <th style="font-weight: bold; text-align: center;">Cod Produs</th>
           <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
           <th style="font-weight: bold; text-align: center;">Lot</th>
           <th style="font-weight: bold; text-align: center;">Data Exp.</th>
@@ -185,7 +184,6 @@ class InvoiceController extends Controller
 
             $html.= '<tr nobr="true">
                 <td style="text-align: center;">'. $productPost['productCim'] .'</td>
-                <td style="text-align: center;">'. $productPost['productCode'] .'</td>
                 <td style="text-align: center;">'. $productPost['productName'] .'</td>
                 <td style="text-align: center;">'. $productPost['productLot'] .'</td>
                 <td style="text-align: center;">'. date("d-m-Y", strtotime($productPost['productExp'])) .'</td>
@@ -258,7 +256,7 @@ class InvoiceController extends Controller
 });
         
         PDF::SetTitle('NIR');
-        PDF::AddPage('L', 'A4');
+        PDF::AddPage('P', 'A4');
         PDF::writeHTML($html, true, false, true, false, '');
 
         //PDF::Output(public_path($filename), 'D');
