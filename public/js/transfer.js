@@ -221,7 +221,7 @@
 
     let newText = oldTextArray[0] + ' [/] ' + oldTextArray[1] + ' [/] ' + newNumber + ' [/] ' + oldTextArray[3] + ' [/] ' + oldTextArray[4];
 
-    $('#total-value-preview').text('Total valoare: ' + total_value);
+    $('#total-value-preview').text('Total valoare: ' + total_value.toFixed(4));
     $('#meds').find('option:selected').text(newText);
     //$('#meds').trigger('change.select2');
     $('#meds').select2('destroy');

@@ -319,6 +319,11 @@ Route::get('centralizator', 'App\Http\Controllers\CentralizatorController@store'
 
 Route::get('rapoarte', 'App\Http\Controllers\ReportController@store')->name('report.store');
 
+Route::get('expira-in-6-luni', 'App\Http\Controllers\ExpirareController@store')->name('expirare.store');
+
+Route::get('inventar', 'App\Http\Controllers\InventoryController@store')->name('inventory.store');
+
+
 //Route::post('intrare-factura', 'App\Http\Controllers\InvoiceItemController@store')->name('invoiceitems.store');
 
 // Route::get('/operatiuni/intrare-factura', function () {
