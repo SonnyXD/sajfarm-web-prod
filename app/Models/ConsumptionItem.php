@@ -21,6 +21,10 @@ class ConsumptionItem extends Model
     }
 
     public function item_stock() {
-        return $this->belongsto( ItemStock::class );
+        return $this->belongsTo( ItemStock::class );
+    }
+
+    public function consumption() {
+        return $this->belongsTo( Consumption::class );
     }
 }

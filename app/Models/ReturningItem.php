@@ -21,7 +21,11 @@ class ReturningItem extends Model
     }
 
     public function item_stock() {
-        return $this->hasMany( ItemStock::class );
+        return $this->belongsTo( ItemStock::class );
+    }
+
+    public function item_stock_belongs() {
+        return $this->belongsTo( ItemStock::class, 'id' );
     }
 
     public function ambulance() {

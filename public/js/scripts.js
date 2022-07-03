@@ -189,15 +189,15 @@ function avizConditions() {
 }
 
 function reportConditions() {
-  $( "#report-type" ).change(function() {
-    let selected_option = $('#report-type option:selected').val();
+  // $( "#report-type" ).change(function() {
+  //   let selected_option = $('#report-type option:selected').val();
 
-    if(selected_option === 'consum') {
-      $("#sub-picker").css("display", "block");
-    } else {
-      $("#sub-picker").css("display", "none");
-    }
-  });
+  //   if(selected_option === '2') {
+  //     $("#ambulance-select").css("display", "none");
+  //   } else {
+  //     $("#ambulance-select").css("display", "block");
+  //   }
+  //});
 }
 
 function facturaModal() {
@@ -413,12 +413,6 @@ console.log( {valid, rowCount});
     // });
   });
 }
-
-$( document ).ajaxError(function( event, jqxhr, settings, thrownError ) {
-  if (jqxhr.status == 401) {
-      window.location.replace("/login");
-  }
-});
 
 function getInventoryItems() {
 //   $('#from-location').on('change', function() {

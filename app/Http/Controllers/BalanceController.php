@@ -59,8 +59,6 @@ class BalanceController extends Controller
 
         $user = Auth::user();
 
-        $six_months = date('Y-m-d', strtotime('+6 month'));
-
         $inventory_id = $request->input('inventory-select');
         $inventory_name = Inventory::where('id', '=', $inventory_id)->first()->name;
 
@@ -401,41 +399,24 @@ class BalanceController extends Controller
             // 'invoice_items.price as price', 'item_stocks.id as is_id')
             // ->get(); //QUERY BUN INCOMPLET!!!!!!!!!!!!!!!!
 
-            $details = Transfer::leftjoin('transfer_items', 'transfer_items.transfer_id', '=', 'transfers.id')
-            ->leftjoin('items', 'transfer_items.item_id', '=', 'items.id')
-            ->leftjoin('item_stocks', 'transfer_items.item_stock_id', '=', 'item_stocks.id')
-            ->leftjoin('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
-            ->leftjoin('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
-            ->leftjoin('measure_units', 'invoice_items.measure_unit_id', '=', 'measure_units.id')
-            ->leftjoin('inventories', 'item_stocks.inventory_id', '=', 'inventories.id')
-            ->where('transfers.to_inventory_id', '=', $inventory_id)
-            ->whereIn('transfer_items.item_id', $subset)
-            ->where('transfers.document_date', '<=', $old_until_date)
-            //->groupby('transfer_items.item_stock_id')
-            ->select('items.name as item_name', 'measure_units.name as um', 'transfers.document_date as acquisition_date',
-            'invoice_items.price as price', 'item_stocks.id as is_id')
-            ->get(); //QUERY BUN INCOMPLET!!!!!!!!!!!!!!!!
 
-            //dd($details);
-
-            // $entries = ItemStock::join('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
-            // ->join('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
-            // ->join('transfer_items', 'transfer_items.item_stock_id', '=', 'item_stocks.id')
-            // ->join('transfers', 'transfers.id', '=', 'transfer_items.transfer_id')
-            // ->where('transfers.document_date', '<=', $old_until_date)
-            // ->where('item_stocks.inventory_id', $inventory_id)
+            // Base information
+            // $details = Transfer::leftjoin('transfer_items', 'transfer_items.transfer_id', '=', 'transfers.id')
+            // ->leftjoin('items', 'transfer_items.item_id', '=', 'items.id')
+            // ->leftjoin('item_stocks', 'transfer_items.item_stock_id', '=', 'item_stocks.id')
+            // ->leftjoin('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
+            // ->leftjoin('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
+            // ->leftjoin('measure_units', 'invoice_items.measure_unit_id', '=', 'measure_units.id')
+            // ->leftjoin('inventories', 'item_stocks.inventory_id', '=', 'inventories.id')
+            // ->where('transfers.to_inventory_id', '=', $inventory_id)
             // ->whereIn('transfer_items.item_id', $subset)
-            // ->select('transfer_items.quantity as ii_quantity', 'item_stocks.id as is_id')
-            // ->get();
+            // ->where('transfers.document_date', '<=', $old_until_date)
+            // //->groupby('transfer_items.item_stock_id')
+            // ->select('items.name as item_name', 'measure_units.name as um', 'transfers.document_date as acquisition_date',
+            // 'invoice_items.price as price', 'item_stocks.id as is_id')
+            // ->get(); //QUERY BUN INCOMPLET!!!!!!!!!!!!!!!!
 
-            // $entries = ItemStock::join('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
-            // ->join('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
-            // ->where('invoices.document_date', '<=', $old_until_date)
-            // ->where('item_stocks.inventory_id', $inventory_id)
-            // ->whereIn('invoice_items.item_id', $subset)
-            // ->select('invoice_items.quantity as ii_quantity', 'item_stocks.id as is_id')
-            // ->get();
-
+            // transfer quantities
             $entries = ItemStock::join('transfer_items', 'item_stocks.id', '=', 'transfer_items.item_stock_id')
             ->join('transfers', 'transfers.id', '=', 'transfer_items.transfer_id')
             ->where('transfers.document_date', '<=', $old_until_date)
@@ -454,32 +435,35 @@ class BalanceController extends Controller
             
 
             foreach($entries as $entry) {
-                $entries_array[$entry['is_id']] = array('initial' => $entry['ii_quantity'],
-                'starting_quantity' => 0,
-                'ending_quantity' => 0,
-                'item_name' => '',
-                'um' => '',
-                'price' => 0,
-                'acquisition_date' => '',
-                'consumption_quantity' => 0);
+
+                if (!isset($entries_array[$entry['is_id']])) {
+                    $entries_array[$entry['is_id']] = array('initial' => 0,
+                    'starting_quantity' => 0,
+                    'ending_quantity' => 0,
+                    'item_name' => '',
+                    'um' => '',
+                    'price' => 0,
+                    'acquisition_date' => '',
+                    'consumption_quantity' => 0);
+                }
+                $entries_array[$entry['is_id']]['initial'] = $entry['ii_quantity'];
+
+
+             
             }
 
-            foreach($details as $detail) {
-                $entries_array[$detail['is_id']]['item_name'] = $detail['item_name'];
-                $entries_array[$detail['is_id']]['um'] = $detail['um'];
-                $entries_array[$detail['is_id']]['price'] = $detail['price'];
-                $entries_array[$detail['is_id']]['acquisition_date'] = $detail['acquisition_date'];
-            }
 
-            //dd($entries_array);
+            // base value
+            // foreach($details as $detail) {
+            //     $entries_array[$detail['is_id']]['item_name'] = $detail['item_name'];
+            //     $entries_array[$detail['is_id']]['um'] = $detail['um'];
+            //     $entries_array[$detail['is_id']]['price'] = $detail['price'];
+            //     $entries_array[$detail['is_id']]['acquisition_date'] = $detail['acquisition_date'];
+            // }
 
-            // $entries = Transfer::join('transfer_items', 'transfer_items.transfer_id', '=', 'transfers.id')
-            // ->where('transfers.from_inventory_id', $inventory_id)
-            // ->where('transfers.document_date', '<=', $old_from_date_interval)
-            // ->whereIn('transfer_items.item_id', $subset)
-            // ->select('item_stock_id as is_id', TransferItem::raw('SUM(quantity) as transfered_quantity'))
-            // ->groupby('item_stock_id')
-            // ->get();
+//            dd($entries_array);
+
+            // starting quantities
 
             $entries = Consumption::join('consumption_items', 'consumption_items.consumption_id', '=', 'consumptions.id')
             ->where('consumptions.inventory_id', $inventory_id)
@@ -491,81 +475,24 @@ class BalanceController extends Controller
             ->select('item_stock_id as is_id', ConsumptionItem::raw('SUM(consumption_items.quantity) as starting_quantity'))
             ->groupby('item_stock_id')
             ->get();
-            //dd($entries);
-
-            // foreach($entries as $entry) {
-            //     $entries_array[$entry['is_id']]['item_name'] = $entry['item_name'];
-            //     $entries_array[$entry['is_id']]['um'] = $entry['um'];
-            //     $entries_array[$entry['is_id']]['price'] = $entry['price'];
-            //     $entries_array[$entry['is_id']]['acquisition_date'] = $entry['acquisition_date'];
-            // }
 
             foreach($entries as $entry) {
+
+                if (!isset($entries_array[$entry['is_id']])) {
+                    $entries_array[$entry['is_id']] = array('initial' => 0,
+                    'starting_quantity' => 0,
+                    'ending_quantity' => 0,
+                    'item_name' => '',
+                    'um' => '',
+                    'price' => 0,
+                    'acquisition_date' => '',
+                    'consumption_quantity' => 0);
+                }
+
                 $entries_array[$entry['is_id']]['starting_quantity'] = $entry['starting_quantity'];
-                $entries_array[$entry['is_id']]['item_name'] = $entry['item_name'];
-                $entries_array[$entry['is_id']]['um'] = $entry['um'];
-                $entries_array[$entry['is_id']]['price'] = $entry['price'];
-                $entries_array[$entry['is_id']]['acquisition_date'] = $entry['acquisition_date'];
-                // if(!array_key_exists('item_name', $entries_array[$entry['is_id']])) {
-                //     $item_details = Consumption::leftjoin('consumption_items', 'consumption_items.consumption_id', '=', 'consumptions.id')
-                //     ->leftjoin('items', 'consumption_items.item_id', '=', 'items.id')
-                //     ->leftjoin('item_stocks', 'consumption_items.item_stock_id', '=', 'item_stocks.id')
-                //     ->leftjoin('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
-                //     ->leftjoin('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
-                //     ->leftjoin('measure_units', 'invoice_items.measure_unit_id', '=', 'measure_units.id')
-                //     ->leftjoin('inventories', 'item_stocks.inventory_id', '=', 'inventories.id')
-                //     ->where('consumptions.inventory_id', '=', $inventory_id)
-                //     ->whereIn('consumption_items.item_id', $subset)
-                //     ->where('consumptions.document_date', '<=', $old_until_date)
-                //     ->where('item_stocks.id', $entry['is_id'])
-                //     //->groupby('transfer_items.item_stock_id')
-                //     ->select('items.name as item_name', 'measure_units.name as um', 'consumptions.document_date as acquisition_date',
-                //     'invoice_items.price as price', 'item_stocks.id as is_id')
-                //     ->get(); //QUERY BUN INCOMPLET!!
-                //     //dd($item_details);
-                //     foreach($item_details as $detail) {
-                //         //dd($item_details);
-                //         $entries_array[$entry['is_id']]['item_name'] = $detail['item_name'];
-                //         $entries_array[$entry['is_id']]['um'] = $detail['um'];
-                //         $entries_array[$entry['is_id']]['price'] = $detail['price'];
-                //         $entries_array[$entry['is_id']]['acquisition_date'] = $detail['acquisition_date'];
-                //     }
-
-                //     $item_details = ItemStock::join('transfer_items', 'item_stocks.id', '=', 'transfer_items.item_stock_id')
-                //     ->join('transfers', 'transfers.id', '=', 'transfer_items.transfer_id')
-                //     ->where('transfers.document_date', '<=', $old_until_date)
-                //     //->where('item_stocks.inventory_id', $inventory_id)
-                //     ->where('transfers.to_inventory_id', $inventory_id)
-                //     ->where('item_stocks.id', $entry['is_id'])
-                //     ->whereIn('transfer_items.item_id', $subset)
-                //     ->select(TransferItem::raw('SUM(transfer_items.quantity) as ii_quantity'), 'item_stocks.id as is_id')
-                //     ->groupby('transfer_items.item_stock_id')
-                //     //->groupby('transfer_items.transfer_id')
-                //     ->get();
-
-                //     if($item_details->isEmpty()) {
-                //         $entries_array[$entry['is_id']]['initial'] = 0;
-                //     } else {
-                //         foreach($item_details as $detail) {
-                //             //dd($item_details);
-                //             $entries_array[$entry['is_id']]['initial'] = $detail['ii_quantity'];
-                            
-                //         }
-                //     }      
-                    
-                // }
             }
 
-            //dd($entries_array);
-
-            // $entries = Transfer::join('transfer_items', 'transfer_items.transfer_id', '=', 'transfers.id')
-            // ->where('transfers.from_inventory_id', $inventory_id)
-            // ->where('transfers.document_date', '<=', $old_until_date)
-            // ->whereIn('transfer_items.item_id', $subset)
-            // ->select('item_stock_id as is_id', TransferItem::raw('SUM(quantity) as ending_quantity'))
-            // ->groupby('item_stock_id')
-            // ->get();
-
+            // Ending quantities
             $entries = Consumption::join('consumption_items', 'consumption_items.consumption_id', '=', 'consumptions.id')
             ->where('consumptions.inventory_id', $inventory_id)
             ->where('consumptions.document_date', '<=', $old_until_date)
@@ -576,19 +503,24 @@ class BalanceController extends Controller
             ->get();
 
             foreach($entries as $entry) {
+
+                if (!isset($entries_array[$entry['is_id']])) {
+                    $entries_array[$entry['is_id']] = array('initial' => 0,
+                    'starting_quantity' => 0,
+                    'ending_quantity' => 0,
+                    'item_name' => '',
+                    'um' => '',
+                    'price' => 0,
+                    'acquisition_date' => '',
+                    'consumption_quantity' => 0);
+                }
+
                 $entries_array[$entry['is_id']]['ending_quantity'] = $entry['ending_quantity'];
             }
-            
+
             //dd($entries_array);
-
-            // $entries = Transfer::join('transfer_items', 'transfer_items.transfer_id', '=', 'transfers.id')
-            // ->where('transfers.from_inventory_id', $inventory_id)
-            // ->whereBetween('transfers.document_date', [$old_from_date_interval, $old_until_date])
-            // ->whereIn('transfer_items.item_id', $subset)
-            // ->select('item_stock_id as is_id', TransferItem::raw('SUM(quantity) as transfered_quantity'))
-            // ->groupby('item_stock_id')
-            // ->get();
-
+            
+            // consumed quantities
             $entries = Consumption::join('consumption_items', 'consumption_items.consumption_id', '=', 'consumptions.id')
             ->where('consumptions.inventory_id', $inventory_id)
             ->whereBetween('consumptions.document_date', [$old_from_date_interval, $old_until_date])
@@ -599,10 +531,116 @@ class BalanceController extends Controller
             
 
             foreach($entries as $entry) {
+
+                if (!isset($entries_array[$entry['is_id']])) {
+                    $entries_array[$entry['is_id']] = array('initial' => 0,
+                    'starting_quantity' => 0,
+                    'ending_quantity' => 0,
+                    'item_name' => '',
+                    'um' => '',
+                    'price' => 0,
+                    'acquisition_date' => '',
+                    'consumption_quantity' => 0);
+                }
                 $entries_array[$entry['is_id']]['consumption_quantity'] = $entry['transfered_quantity'];
             }
-            dd($entries_array);
+            //dd($entries_array);
+
+            $details = Transfer::leftjoin('transfer_items', 'transfer_items.transfer_id', '=', 'transfers.id')
+            ->leftjoin('item_stocks', 'transfer_items.item_stock_id', '=', 'item_stocks.id')
+            ->leftjoin('inventories', 'item_stocks.inventory_id', '=', 'inventories.id')
+            ->where('transfers.to_inventory_id', '=', $inventory_id)
+            ->whereIn('transfer_items.item_id', $subset)
+            ->where('transfers.document_date', '<=', $old_until_date)
+            //->groupby('transfer_items.item_stock_id')
+            ->select('transfers.document_date as acquisition_date', 'item_stocks.id as is_id')
+            ->get(); //QUERY BUN INCOMPLET!!!!!!!!!!!!!!!!
+
+            foreach($details as $detail) {
+
+                if (!isset($entries_array[$detail['is_id']])) {
+                    $entries_array[$detail['is_id']] = array('initial' => 0,
+                    'starting_quantity' => 0,
+                    'ending_quantity' => 0,
+                    'item_name' => '',
+                    'um' => '',
+                    'price' => 0,
+                    'acquisition_date' => '',
+                    'consumption_quantity' => 0);
+                }
+                $entries_array[$detail['is_id']]['acquisition_date'] = $detail['acquisition_date'];
+            }
+
+            //dd($entries_array);
+            //dd($subset);
+
+            $details = Item::join('item_stocks', 'item_stocks.item_id', '=', 'items.id')
+            ->join('invoice_items', 'invoice_items.item_id', '=', 'items.id')
+            ->join('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
+            ->join('measure_units', 'measure_units.id', '=', 'invoice_items.measure_unit_id')
+            ->whereIn('item_stocks.id', array_keys($entries_array))
+            ->select('items.name as item_name', 'measure_units.name as um',
+            'invoice_items.price as price', 'item_stocks.id as is_id')
+            ->get();
+
+            foreach($details as $detail) {
+
+                if (!isset($entries_array[$detail['is_id']])) {
+                    $entries_array[$detail['is_id']] = array('initial' => 0,
+                    'starting_quantity' => 0,
+                    'ending_quantity' => 0,
+                    'item_name' => '',
+                    'um' => '',
+                    'price' => 0,
+                    'acquisition_date' => '',
+                    'consumption_quantity' => 0);
+                }
+                $entries_array[$detail['is_id']]['item_name'] = $detail['item_name'];
+                $entries_array[$detail['is_id']]['price'] = $detail['price'];
+                $entries_array[$detail['is_id']]['um'] = $detail['um'];
+            }
+
+            $items_without_transfer = [];
+
+            foreach($entries_array as $key => $value) {
+                if($value['acquisition_date'] == "") {
+                    $items_without_transfer[] = $key;
+                }
+            }
+
+            $details = Invoice::leftjoin('invoice_items', 'invoice_items.invoice_id', '=', 'invoices.id')
+            ->leftjoin('item_stocks', 'item_stocks.invoice_item_id', '=', 'invoice_items.id')
+            ->leftjoin('inventories', 'item_stocks.inventory_id', '=', 'inventories.id')
+            ->where('item_stocks.inventory_id', '=', $inventory_id)
+            ->whereIn('item_stocks.id', $items_without_transfer)
+            ->where('invoices.document_date', '<=', $old_until_date)
+            //->groupby('transfer_items.item_stock_id')
+            ->select('invoices.document_date as acquisition_date', 'item_stocks.id as is_id', 'invoice_items.quantity as initial')
+            ->get(); //QUERY BUN INCOMPLET!!!!!!!!!!!!!!!!
+
+           //dd($details);
+
+            foreach($details as $detail) {
+
+                if (!isset($entries_array[$detail['is_id']])) {
+                    $entries_array[$detail['is_id']] = array('initial' => 0,
+                    'starting_quantity' => 0,
+                    'ending_quantity' => 0,
+                    'item_name' => '',
+                    'um' => '',
+                    'price' => 0,
+                    'acquisition_date' => '',
+                    'consumption_quantity' => 0);
+                }
+                $entries_array[$detail['is_id']]['acquisition_date'] = $detail['acquisition_date'];
+                $entries_array[$detail['is_id']]['initial'] = $detail['initial'];
+            }
+
+            //dd($entries_array);
+
         }
+
+        
 
         //dd($entries[0]->transfer_date);
 
@@ -715,36 +753,74 @@ class BalanceController extends Controller
         $ins = 0;
         $outs = 0;
 
-        foreach($entries_array as $entry) {
-            //dd($entry);
-           $total_sold += $entry['price'] * ($entry['initial'] - $entry['ending_quantity']);
-           $initial_value += $entry['price'] * ($entry['initial'] - $entry['starting_quantity']);
-           $outs += $entry['price'] * $entry['transfered_quantity'];
+        if($inventory_id == 1) {
+            foreach($entries_array as $entry) {
+                //dd($entry);
+               $total_sold += $entry['price'] * ($entry['initial'] - $entry['ending_quantity']);
+               $initial_value += $entry['price'] * ($entry['initial'] - $entry['starting_quantity']);
+               $outs += $entry['price'] * $entry['transfered_quantity'];
+    
+               $startDate = date('Y-m-d', strtotime($old_from_date));
+               $endDate = date('Y-m-d', strtotime($old_until_date));
+               $checkDate = date('Y-m-d', strtotime($entry['acquisition_date']));
+               //dd($entries_array);
+    
+               $html .= '<tr nobr="true">';
+               $html .= '<td style="text-align: center;">'. $entry['item_name'] .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['um'] .'</td>';
+               $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($entry['acquisition_date'])) .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['price'] .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['initial'] - $entry['starting_quantity'].'</td>';
+               if(($checkDate >= $startDate) && ($checkDate <= $endDate)) {
+                    $html .= '<td style="text-align: center;">'. $entry['initial'] .'</td>';
+                    $ins += $entry['price'] * $entry['initial'];
+                } else {
+                    $html .= '<td style="text-align: center;">0</td>';
+                    $ins += $entry['price'] * 0;
+                }
+               
+               $html .= '<td style="text-align: center;">'. $entry['transfered_quantity'] .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['initial'] - $entry['ending_quantity'] .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['price'] * ($entry['initial'] - $entry['ending_quantity']) .'</td>';
+               $html .= '</tr>';
+           }
+        } else {
+            //dd($entries_array);
+            foreach($entries_array as $entry) {
+                //dd($entry);
+               $total_sold += $entry['price'] * ($entry['initial'] - $entry['ending_quantity']);
+               $initial_value += $entry['price'] * ($entry['initial'] - $entry['starting_quantity']);
+               $outs += $entry['price'] * $entry['consumption_quantity'];
+    
+               $startDate = date('Y-m-d', strtotime($old_from_date));
+               $endDate = date('Y-m-d', strtotime($old_until_date));
+               $checkDate = date('Y-m-d', strtotime($entry['acquisition_date']));
+               //dd($entries_array);
+    
+               $html .= '<tr nobr="true">';
+               $html .= '<td style="text-align: center;">'. $entry['item_name'] .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['um'] .'</td>';
+               $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($entry['acquisition_date'])) .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['price'] .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['initial'] - $entry['starting_quantity'].'</td>';
+               //$html .= '<td style="text-align: center;">'. $entry['initial'] .'</td>';
+               $ins += $entry['price'] * $entry['initial'];
+               if(($checkDate >= $startDate) && ($checkDate <= $endDate)) {
+                    $html .= '<td style="text-align: center;">'. $entry['initial'] .'</td>';
+                    $ins += $entry['price'] * $entry['initial'];
+                } else {
+                    $html .= '<td style="text-align: center;">0</td>';
+                    $ins += $entry['price'] * 0;
+                }
+               
+               $html .= '<td style="text-align: center;">'. $entry['consumption_quantity'] .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['initial'] - $entry['ending_quantity'] .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['price'] * ($entry['initial'] - $entry['ending_quantity']) .'</td>';
+               $html .= '</tr>';
+           }
+        }
 
-           $startDate = date('Y-m-d', strtotime($old_from_date));
-           $endDate = date('Y-m-d', strtotime($old_until_date));
-           $checkDate = date('Y-m-d', strtotime($entry['acquisition_date']));
-           //dd($entries_array);
-
-           $html .= '<tr nobr="true">';
-           $html .= '<td style="text-align: center;">'. $entry['item_name'] .'</td>';
-           $html .= '<td style="text-align: center;">'. $entry['um'] .'</td>';
-           $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($entry['acquisition_date'])) .'</td>';
-           $html .= '<td style="text-align: center;">'. $entry['price'] .'</td>';
-           $html .= '<td style="text-align: center;">'. $entry['initial'] - $entry['starting_quantity'].'</td>';
-           if(($checkDate >= $startDate) && ($checkDate <= $endDate)) {
-                $html .= '<td style="text-align: center;">'. $entry['initial'] .'</td>';
-                $ins += $entry['price'] * $entry['initial'];
-            } else {
-                $html .= '<td style="text-align: center;">0</td>';
-                $ins += $entry['price'] * 0;
-            }
-           
-           $html .= '<td style="text-align: center;">'. $entry['transfered_quantity'] .'</td>';
-           $html .= '<td style="text-align: center;">'. $entry['initial'] - $entry['ending_quantity'] .'</td>';
-           $html .= '<td style="text-align: center;">'. $entry['price'] * ($entry['initial'] - $entry['ending_quantity']) .'</td>';
-           $html .= '</tr>';
-       }
+        
 
         // $html .= '<tr>
         //     <td style="height: 25px; border: none;"></td>

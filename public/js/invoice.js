@@ -255,7 +255,6 @@ function deleteRow() {
 });
 }
 
-
 jQuery(document).ready(() => {
     facturaModal();
     addProductToNir();
