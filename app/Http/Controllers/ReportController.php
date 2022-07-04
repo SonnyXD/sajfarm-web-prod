@@ -79,7 +79,7 @@ class ReportController extends Controller
         $new_until_date = date("d-m-Y", strtotime($old_until_date));
 
         if($ambulance == 'Toate ambulantele') {
-            $substation_ambulances = Ambulance::where('substation_id', $inventory_id-1)->get();
+            $substation_ambulances = Ambulance::where('inventory_id', $inventory_id)->get();
             $subset = $substation_ambulances->map(function ($amb) {
                 return collect($amb->toArray())
                     ->only(['id'])

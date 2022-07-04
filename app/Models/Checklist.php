@@ -41,7 +41,13 @@ class Checklist extends Model
     }
 
     public function checklistitems() {
-        return $this->hasMany( ChecklistItem::class);
+        return $this->hasMany( ChecklistItem::class );
+    }
+
+    public function checklistitems_grouped() {
+        return $this->checklistitems()
+            ->select('checklist_items.id', 'checklist_items.checklist_id as c_id',
+            'checklist_items.item_id', 'checklist_items.item_stock_id', ChecklistItem::raw('SUM(checklist_items.quantity) as quantity'));
     }
 
     public function assistent() {

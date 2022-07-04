@@ -281,9 +281,9 @@ class RoutesController extends Controller
 
         $amb_types = AmbulanceType::all();
 
-        $ambulances = Ambulance::leftjoin('substations', 'ambulances.substation_id', '=', 'substations.id')
+        $ambulances = Ambulance::leftjoin('inventories', 'ambulances.inventory_id', '=', 'inventories.id')
         ->leftjoin('ambulance_types', 'ambulances.ambulance_type_id', '=', 'ambulance_types.id')
-        ->select('ambulances.license_plate', 'substations.name as sub_name', 'ambulance_types.name as ambulance_type',
+        ->select('ambulances.license_plate', 'inventories.name as sub_name', 'ambulance_types.name as ambulance_type',
         'ambulances.id')
         ->get();
 
