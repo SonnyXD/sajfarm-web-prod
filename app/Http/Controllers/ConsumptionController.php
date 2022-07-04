@@ -605,6 +605,8 @@ class ConsumptionController extends Controller
         //     // man. tu stergi din checklist si adaugi in consum. o sa le ai pe toate in consum.
         // }
 
+        $total = 0;
+
         if(isset($medic_checklists)) {
             $html .= '</table><br><br>';
             $html .= 'Total valoare: '. $total_value .'';
@@ -612,7 +614,10 @@ class ConsumptionController extends Controller
             foreach($categories as $category) {
                 $html .= '<span>Total Valoare '. $category->name .': '. $total_values[$category->id-1] .'</span>';
                 $html .= '<br>';
+                $total += $total_values[$category->id-1];
             }
+            $html .= '<span>Valoare totala: '. $total .'</span>';
+            $html .= '<br>';
         }
 
         $html .= '<br><br>Asistenti:<br>';
