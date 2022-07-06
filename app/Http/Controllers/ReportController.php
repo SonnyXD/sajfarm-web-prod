@@ -59,6 +59,8 @@ class ReportController extends Controller
             'until-date' => 'required'
         ));
 
+        ini_set('memory_limit', '-1');
+
         $user = Auth::user();
 
         $report_type = $request->input('report-type');
