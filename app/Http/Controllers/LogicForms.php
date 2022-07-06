@@ -43,7 +43,10 @@ class LogicForms extends Controller
 
     public function ambulance_checklists(Request $request) 
     {
-        $checklists = Checklist::with('ambulance')->where('ambulance_id', $request->ambulance)->get();
+        $checklists = Checklist::with('ambulance')
+        ->where('ambulance_id', $request->ambulance)
+        ->where('inventory_id', $request->substation)
+        ->get();
 
 /*
 select ci.checklist_id, i.name, mu.name, ci.quantity

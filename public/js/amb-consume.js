@@ -30,11 +30,13 @@ function getChecklists() {
 
   $('#ambulance-select').on('change', function() {
     let ambulanceId = $(this).val();
+    let subId = $('#substation-select').val();
     
     $.ajax({
         type: "GET",
         data: {
-            ambulance: ambulanceId
+            ambulance: ambulanceId,
+            substation: subId
         },
         url: "/ambulance-checklist",
         success: function(response) {
@@ -45,9 +47,16 @@ function getChecklists() {
 
 });
 
+$('#substation-select').on('change.select2', function() {
+  let substationId = $(this).val();
+  let ambulanceId = $('#ambulance-select').val();
+  loadAmbulance(ambulanceId, substationId);
+});
+
 $('#ambulance-select').on('change.select2', function() {
   let ambulanceId = $(this).val();
-  loadAmbulance(ambulanceId);
+  let substationId = $('#substation-select').val();
+  loadAmbulance(ambulanceId, substationId);
 
 });
 
@@ -56,14 +65,20 @@ if (selectedAmb == undefined) {
   selectedAmb = $('#ambulance-select option:first()').val();
 }
 
-//console.log(selectedSubstation);
-loadAmbulance(selectedAmb);
+let selectedSub = $('#substation-select').val();
+if (selectedSub == undefined) {
+  selectedSub = $('#substation-select option:first()').val();
+}
 
-function loadAmbulance(selectedAmb) {
+//console.log(selectedSubstation);
+loadAmbulance(selectedAmb, selectedSub);
+
+function loadAmbulance(selectedAmb, selectedSub) {
   $.ajax({
     type: "GET",
     data: {
-        ambulance: selectedAmb
+        ambulance: selectedAmb,
+        substation: selectedSub
     },
     url: "/ambulance-checklist",
     success: function(response) {
@@ -74,6 +89,44 @@ function loadAmbulance(selectedAmb) {
 }
 
 }
+
+// function getChecklists() {
+//     $('#substation-select').on('change', function() {
+//     let subId = $(this).val();
+
+//   //   $('#ambulance-select').on('change', function() {
+//   //   let ambulanceId = $(this).val();
+//   //   $.ajax({
+//   //       type: "GET",
+//   //       data: {
+//   //           ambulance: ambulanceId,
+//   //           substation: subId
+//   //       },
+//   //       url: "/ambulance-checklist",
+//   //       success: function(response) {
+//   //           $('#amb-checklists tr:not(:first)').empty();
+//   //           $('#amb-checklists').append(response);
+//   //       }
+//   //   });
+
+//   // });
+
+// });
+
+//   function loadAmbulance(selectedAmb) {
+//     $.ajax({
+//       type: "GET",
+//       data: {
+//           ambulance: selectedAmb
+//       },
+//       url: "/ambulance-checklist",
+//       success: function(response) {
+//         $('#amb-checklists tr:not(:first)').empty();
+//         $('#amb-checklists').append(response);
+//       }
+//   });
+//   }
+// }
 
 function treeviewDisplay() {
   jQuery('#amb-checklists > tbody').on('click', '> tr:not(.treeview)', function() {

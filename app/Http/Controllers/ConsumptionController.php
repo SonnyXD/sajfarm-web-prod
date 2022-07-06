@@ -74,10 +74,12 @@ class ConsumptionController extends Controller
         $span = "";
 
         if( !empty( $amb_id ) ) {
-            $ambulance_checklists = Ambulance::with(['checklist' => function ($query) use($to, $from) {
+            $sub = $request->input('substation-select');
+            $ambulance_checklists = Ambulance::with(['checklist' => function ($query) use($to, $from, $sub) {
                 $query->whereBetween('checklist_date', [$from, $to]);
                 $query->where('used', 0);
                 $query->where('medic_id', null);
+                $query->where('inventory_id', $sub);
             }, 'checklist.checklistitems', 'checklist.inventory',
             'checklist.assistent', 'checklist.ambulancier',
             'checklist.ambulance', 'checklist.checklistitems.item'])
@@ -99,8 +101,6 @@ class ConsumptionController extends Controller
              $from_name = Ambulance::where('id', $request->input('ambulance-select'))->get()->first()->license_plate;
 
             //$checklist_sub = \App\Models\Checklist::with('inventory')->where('ambulance_id', '=', $amb_id)->first()?->inventory->name;
-
-            $sub = $request->input('substation-select');
 
             $checklist_sub = \App\Models\Inventory::where('id', $sub)->first()->name;
 
