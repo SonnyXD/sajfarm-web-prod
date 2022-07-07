@@ -11,6 +11,7 @@ use \App\Models\Category;
 use Session;
 use PDF;
 use Auth;
+use Carbon\Carbon;
 
 class InventoryController extends Controller
 {
@@ -94,13 +95,39 @@ class InventoryController extends Controller
             <tr nobr="true">
             <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
             <th style="font-weight: bold; text-align: center;">UM</th>
-            <th style="font-weight: bold; text-align: center;">Cantitate</th>
             <th style="font-weight: bold; text-align: center;">Pret</th>
             <th style="font-weight: bold; text-align: center;">TVA</th>
             <th style="font-weight: bold; text-align: center;">Pret TVA</th>
             <th style="font-weight: bold; text-align: center;">Valoare</th>
             <th style="font-weight: bold; text-align: center;">Lot</th>
             <th style="font-weight: bold; text-align: center;">Data expirare</th>
+            <th style="font-weight: bold; text-align: center;" colspan="4">Cantitati</th>
+            </tr>
+            <tr nobr="true">
+            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
+            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
+            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
+            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
+            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
+            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
+            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
+            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
+            <th style="font-weight: bold; text-align: center;" colspan="2">Stocuri</th>
+            <th style="font-weight: bold; text-align: center;" colspan="2">Diferente</th>
+            </tr>
+            <tr nobr="true">
+            <th style="font-weight: bold; text-align: center;"></th>
+            <th style="font-weight: bold; text-align: center;"></th>
+            <th style="font-weight: bold; text-align: center;"></th>
+            <th style="font-weight: bold; text-align: center;"></th>
+            <th style="font-weight: bold; text-align: center;"></th>
+            <th style="font-weight: bold; text-align: center;"></th>
+            <th style="font-weight: bold; text-align: center;"></th>
+            <th style="font-weight: bold; text-align: center;"></th>
+            <th style="font-weight: bold; text-align: center;">Scriptice</th>
+            <th style="font-weight: bold; text-align: center;">Faptice</th>
+            <th style="font-weight: bold; text-align: center;">Plus</th>
+            <th style="font-weight: bold; text-align: center;">Minus</th>
             </tr>';
 
             foreach($categories as $category) {
@@ -111,17 +138,66 @@ class InventoryController extends Controller
                         $html .= '<tr nobr="true">
                                         <td style="text-align: center;">'. $item['item_name'] .'</td>
                                         <td style="text-align: center;">'. $item['um'] .'</td>
-                                        <td style="text-align: center;">'. $item['current_quantity'] .'</td>
                                         <td style="text-align: center;">'. $item['price'] .'</td>
                                         <td style="text-align: center;">'. $item['tva'] .'</td>
                                         <td style="text-align: center;">'. $item['tva_price'] .'</td>
                                         <td style="text-align: center;">'. $item['current_quantity'] * $item['tva_price'] .'</td>
                                         <td style="text-align: center;">'. $item['lot'] .'</td>
                                         <td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>
+                                        <td style="text-align: center;">'. $item['current_quantity'] .'</td>
+                                        <td style="text-align: center;"></td>
+                                        <td style="text-align: center;"></td>
+                                        <td style="text-align: center;"></td>
                                     </tr>';
                     }
                 }
-                $html .= '</table><br><br>';
+                $html .= '</table><br><br><br>';
+            }
+
+            $date = date("Y-m-d");
+
+            $date = Carbon::createFromDate($date);
+
+            $startOfYear = $date->copy()->startOfYear();
+            $endOfYear = $date->copy()->endOfYear();
+
+            $items = ItemStock::leftjoin('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
+            ->leftjoin('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
+            ->leftjoin('measure_units', 'measure_units.id', '=', 'invoice_items.measure_unit_id')
+            ->leftjoin('items', 'items.id', '=', 'invoice_items.item_id')
+            ->where('item_stocks.inventory_id', $inventory->id)
+            ->where('item_stocks.quantity', '=', 0)
+            ->whereBetween('invoices.document_date', [$startOfYear, $endOfYear])
+            ->select(ItemStock::raw('SUM(item_stocks.quantity) as current_quantity'), 'items.name as item_name', 'measure_units.name as um',
+            'invoice_items.lot as lot', 'invoice_items.price as price', 'invoice_items.tva as tva',
+            'invoice_items.tva_price as tva_price', 'invoice_items.exp_date as exp_date', 'items.category_id as category_id', 'item_stocks.id as is_id')
+            ->groupBy('item_stocks.invoice_item_id')
+            ->get();
+
+            $html .= '<h4>Produse cu cantitate 0:</h4><br><br>';
+
+            foreach($categories as $category) {
+                $html .= '<span style="font-weight: bold;">'. $category->name .'</span><br><br>';
+                $html .= $table;
+                foreach($items as $item) {
+                    if($item['category_id'] == $category->id) {
+                        $html .= '<tr nobr="true">
+                                        <td style="text-align: center;">'. $item['item_name'] .'</td>
+                                        <td style="text-align: center;">'. $item['um'] .'</td>
+                                        <td style="text-align: center;">'. $item['price'] .'</td>
+                                        <td style="text-align: center;">'. $item['tva'] .'</td>
+                                        <td style="text-align: center;">'. $item['tva_price'] .'</td>
+                                        <td style="text-align: center;">'. $item['current_quantity'] * $item['tva_price'] .'</td>
+                                        <td style="text-align: center;">'. $item['lot'] .'</td>
+                                        <td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>
+                                        <td style="text-align: center;">'. $item['current_quantity'] .'</td>
+                                        <td style="text-align: center;"></td>
+                                        <td style="text-align: center;"></td>
+                                        <td style="text-align: center;"></td>
+                                    </tr>';
+                    }
+                }
+                $html .= '</table><br><br><br>';
             }
     
             PDF::setFooterCallback(function($pdf) {
