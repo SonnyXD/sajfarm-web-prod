@@ -67,7 +67,8 @@ class InventoryController extends Controller
         ->select(ItemStock::raw('SUM(item_stocks.quantity) as current_quantity'), 'items.name as item_name', 'measure_units.name as um',
         'invoice_items.lot as lot', 'invoice_items.price as price', 'invoice_items.tva as tva',
         'invoice_items.tva_price as tva_price', 'invoice_items.exp_date as exp_date', 'items.category_id as category_id')
-        ->groupBy('item_stocks.invoice_item_id')
+        ->groupBy('item_stocks.item_id')
+        ->groupBy('invoice_items.measure_unit_id')
         ->get();
 
         $html = '<html>
@@ -95,21 +96,9 @@ class InventoryController extends Controller
             <tr nobr="true">
             <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
             <th style="font-weight: bold; text-align: center;">UM</th>
-            <th style="font-weight: bold; text-align: center;">Pret</th>
-            <th style="font-weight: bold; text-align: center;">TVA</th>
-            <th style="font-weight: bold; text-align: center;">Pret TVA</th>
-            <th style="font-weight: bold; text-align: center;">Valoare</th>
-            <th style="font-weight: bold; text-align: center;">Lot</th>
-            <th style="font-weight: bold; text-align: center;">Data expirare</th>
             <th style="font-weight: bold; text-align: center;" colspan="4">Cantitati</th>
             </tr>
             <tr nobr="true">
-            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
-            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
-            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
-            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
-            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
-            <th style="font-weight: bold; text-align: center; border-top:none;"></th>
             <th style="font-weight: bold; text-align: center; border-top:none;"></th>
             <th style="font-weight: bold; text-align: center; border-top:none;"></th>
             <th style="font-weight: bold; text-align: center;" colspan="2">Stocuri</th>
@@ -118,32 +107,24 @@ class InventoryController extends Controller
             <tr nobr="true">
             <th style="font-weight: bold; text-align: center;"></th>
             <th style="font-weight: bold; text-align: center;"></th>
-            <th style="font-weight: bold; text-align: center;"></th>
-            <th style="font-weight: bold; text-align: center;"></th>
-            <th style="font-weight: bold; text-align: center;"></th>
-            <th style="font-weight: bold; text-align: center;"></th>
-            <th style="font-weight: bold; text-align: center;"></th>
-            <th style="font-weight: bold; text-align: center;"></th>
             <th style="font-weight: bold; text-align: center;">Scriptice</th>
             <th style="font-weight: bold; text-align: center;">Faptice</th>
             <th style="font-weight: bold; text-align: center;">Plus</th>
             <th style="font-weight: bold; text-align: center;">Minus</th>
             </tr>';
 
+            $total_values = [];
+
             foreach($categories as $category) {
                 $html .= '<span style="font-weight: bold;">'. $category->name .'</span><br><br>';
                 $html .= $table;
+                $total = 0;
                 foreach($items as $item) {
                     if($item['category_id'] == $category->id) {
+                        $total += ($item['price'] * $item['current_quantity']);
                         $html .= '<tr nobr="true">
                                         <td style="text-align: center;">'. $item['item_name'] .'</td>
                                         <td style="text-align: center;">'. $item['um'] .'</td>
-                                        <td style="text-align: center;">'. $item['price'] .'</td>
-                                        <td style="text-align: center;">'. $item['tva'] .'</td>
-                                        <td style="text-align: center;">'. $item['tva_price'] .'</td>
-                                        <td style="text-align: center;">'. $item['current_quantity'] * $item['tva_price'] .'</td>
-                                        <td style="text-align: center;">'. $item['lot'] .'</td>
-                                        <td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>
                                         <td style="text-align: center;">'. $item['current_quantity'] .'</td>
                                         <td style="text-align: center;"></td>
                                         <td style="text-align: center;"></td>
@@ -151,6 +132,7 @@ class InventoryController extends Controller
                                     </tr>';
                     }
                 }
+                $total_values[] = $total;
                 $html .= '</table><br><br><br>';
             }
 
@@ -171,7 +153,8 @@ class InventoryController extends Controller
             ->select(ItemStock::raw('SUM(item_stocks.quantity) as current_quantity'), 'items.name as item_name', 'measure_units.name as um',
             'invoice_items.lot as lot', 'invoice_items.price as price', 'invoice_items.tva as tva',
             'invoice_items.tva_price as tva_price', 'invoice_items.exp_date as exp_date', 'items.category_id as category_id', 'item_stocks.id as is_id')
-            ->groupBy('item_stocks.invoice_item_id')
+            ->groupBy('item_stocks.item_id')
+            ->groupBy('invoice_items.measure_unit_id')
             ->get();
 
             $html .= '<h4>Produse cu cantitate 0:</h4><br><br>';
@@ -184,12 +167,6 @@ class InventoryController extends Controller
                         $html .= '<tr nobr="true">
                                         <td style="text-align: center;">'. $item['item_name'] .'</td>
                                         <td style="text-align: center;">'. $item['um'] .'</td>
-                                        <td style="text-align: center;">'. $item['price'] .'</td>
-                                        <td style="text-align: center;">'. $item['tva'] .'</td>
-                                        <td style="text-align: center;">'. $item['tva_price'] .'</td>
-                                        <td style="text-align: center;">'. $item['current_quantity'] * $item['tva_price'] .'</td>
-                                        <td style="text-align: center;">'. $item['lot'] .'</td>
-                                        <td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>
                                         <td style="text-align: center;">'. $item['current_quantity'] .'</td>
                                         <td style="text-align: center;"></td>
                                         <td style="text-align: center;"></td>
@@ -199,6 +176,39 @@ class InventoryController extends Controller
                 }
                 $html .= '</table><br><br><br>';
             }
+
+            foreach($categories as $category) {
+                $html .= '<span>Total Valoare '. $category->name .': '. $total_values[$category->id-1] .'</span>';
+                $html .= '<br>';
+            }
+
+            $html .= '<br>';
+
+            $html .= '<table>
+            <tr nobr="true">
+            <td style="text-align: center; font-weight: bold;" colspan="2">Comisia de inventariere</td>
+            <td style="text-align: center; font-weight: bold;" colspan="2">Gestionari</td>
+            </tr>
+            <tr nobr="true">
+            <td style="text-align: center; font-weight: bold;">Nume</td>
+            <td style="text-align: center; font-weight: bold;">Semnatura</td>
+            <td style="text-align: center; font-weight: bold;">Nume</td>
+            <td style="text-align: center; font-weight: bold;">Semnatura</td>
+            </tr>
+            <tr nobr="true">
+            <td style="text-align: center;"></td>
+            <td style="text-align: center;"></td>
+            <td style="text-align: center;">Farm. Sef '. $institution[0]->pharmacy_manager .'</td>
+            <td style="text-align: center;"></td>
+            </tr>
+            <tr nobr="true">
+            <td style="text-align: center;"></td>
+            <td style="text-align: center;"></td>
+            <td style="text-align: center;">As. Sef '. $institution[0]->assistent .'</td>
+            <td style="text-align: center;"></td>
+            </tr>';
+
+           $html .= '</table>';
     
             PDF::setFooterCallback(function($pdf) {
     

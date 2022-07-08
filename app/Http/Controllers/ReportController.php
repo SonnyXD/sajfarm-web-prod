@@ -80,6 +80,8 @@ class ReportController extends Controller
         $old_until_date = $request->input('until-date');
         $new_until_date = date("d-m-Y", strtotime($old_until_date));
 
+        $now = date('d-m-Y');
+
         if($ambulance == 'Toate ambulantele') {
             $substation_ambulances = Ambulance::where('inventory_id', $inventory_id)->get();
             $subset = $substation_ambulances->map(function ($amb) {
@@ -261,6 +263,8 @@ class ReportController extends Controller
         }
         
         $html .= '<span style="float: right;">Perioada: '. $new_from_date .' - '. $new_until_date .'</span>
+        <br>
+        <span style="float: right;">Data: '. $now .'</span>
         <br>
         <br>
         <br>';

@@ -77,10 +77,11 @@ class CentralizatorController extends Controller
             $type_name = "TRANSFERURI";
             $document_type = "Transfer";
             $documents = Transfer::whereHas('transfer_item')
-            ->with(['transfer_item', 'transfer_item.item_detail', 'transfer_item.item_stock_detail', 'transfer_item.item_stock_detail.invoice_item'])
+            ->with(['transfer_item', 'transfer_item.item_detail', 'transfer_item.item_stock_detail', 'transfer_item.item_stock_detail.invoice_item', 'inventory_to'])
             ->where('from_inventory_id', '=', $inventory_id)
             ->whereBetween('document_date', [$old_from_date, $old_until_date])
             ->get();
+
         } else if($type_id == 2) {
             $type_name = "CONSUMURI";
             $document_type = "Consum";
@@ -119,6 +120,8 @@ class CentralizatorController extends Controller
         //         ->all();
         // });
 
+        $now = date('d-m-Y');
+
         $html = "<html>
                 <head>
                 <style>
@@ -135,6 +138,8 @@ class CentralizatorController extends Controller
         <br>
         <span style="float: right;">Perioada: '. $new_from_date .' - '. $new_until_date .'</span>
         <br>
+        <span style="float: right;">Data: '. $now .'</span>
+        <br>
         <br>
         <br>';
 
@@ -145,15 +150,15 @@ class CentralizatorController extends Controller
             $total = 0;
             $html .= '<span style="font-weight: bold;">'. $category->name .':</span>';
             $html .= '<br>';
-            $html .= '<table>
-            <tr>
-              <th style="font-weight: bold; text-align: center;">Nr. Crt</th>
-              <th style="font-weight: bold; text-align: center;">Data</th>
-              <th style="font-weight: bold; text-align: center;">Nr. Document</th>
-              <th style="font-weight: bold; text-align: center;">Valoare '. $document_type .'</th>
-            </tr>';
 
             if($type_id == 2) {
+                $html .= '<table>
+                <tr>
+                <th style="font-weight: bold; text-align: center;">Nr. Crt</th>
+                <th style="font-weight: bold; text-align: center;">Data</th>
+                <th style="font-weight: bold; text-align: center;">Nr. Document</th>
+                <th style="font-weight: bold; text-align: center;">Valoare '. $document_type .'</th>
+                </tr>';
                 foreach($documents as $document) {
                     //dd($document);
                     $value = 0;
@@ -178,6 +183,14 @@ class CentralizatorController extends Controller
                     $i++;
                 }
             } else if($type_id == 1) {
+                $html .= '<table>
+                <tr>
+                <th style="font-weight: bold; text-align: center;">Nr. Crt</th>
+                <th style="font-weight: bold; text-align: center;">Data</th>
+                <th style="font-weight: bold; text-align: center;">Nr. Document</th>
+                <th style="font-weight: bold; text-align: center;">In</th>
+                <th style="font-weight: bold; text-align: center;">Valoare '. $document_type .'</th>
+                </tr>';
                 foreach($documents as $document) {
                     //dd($document);
                     $value = 0;
@@ -197,6 +210,7 @@ class CentralizatorController extends Controller
                         $html .= '<td style="text-align: center;">'. $i .'</td>';
                         $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($document->document_date)) .'</td>';
                         $html .= '<td style="text-align: center;">'. $document_type .' '. $document->id .'</td>';
+                        $html .= '<td style="text-align: center;">'. $document->inventory_to->name .'</td>';
                         $html .= '<td style="text-align: center;">'. $value .'</td>';
                         $html .= '</tr>';
                     //}
@@ -215,6 +229,18 @@ class CentralizatorController extends Controller
             $html .= '<span>Total Valoare '. $category->name .': '. $total_values[$category->id-1] .'</span>';
             $html .= '<br>';
         }
+
+        $html .= '<br>';
+
+        $html .= 'Gestionari:';
+
+        $html .= '<br>';
+
+        $html .= '<span style="text-align: left;">Farm. Sef<br>'.$institution[0]->pharmacy_manager.'<br></span>';
+        
+        $html .= '<br>';
+
+        $html .= '<span style="text-align: left;">As. Farm. <br>'.$institution[0]->assistent.'</span>';
 
         // foreach( $categories as $key => $value ) {
         //     // echo '<option value="' . $code . '">' . $names[$index] . '</option>';
