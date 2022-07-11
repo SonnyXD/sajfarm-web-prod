@@ -198,7 +198,7 @@ class BalanceController extends Controller
             ->where('invoices.document_date', '<=', $old_until_date)
             ->groupby('item_stocks.id')
             ->select('items.name as item_name', 'measure_units.name as um', 'document_date as acquisition_date',
-            'invoice_items.price as price', 'item_stocks.id as is_id')
+            'invoice_items.price as price', 'item_stocks.id as is_id', 'invoice_items.tva_price as tva_price')
             ->get(); //QUERY BUN INCOMPLET!!!!!!!!!!!!!!!!
 
             //dd($details);
@@ -224,6 +224,7 @@ class BalanceController extends Controller
                 'item_name' => '',
                 'um' => '',
                 'price' => 0,
+                'tva_price' => 0,
                 'acquisition_date' => '',
                 'transfered_quantity' => 0);
             }
@@ -233,6 +234,7 @@ class BalanceController extends Controller
                 $entries_array[$detail['is_id']]['um'] = $detail['um'];
                 $entries_array[$detail['is_id']]['price'] = $detail['price'];
                 $entries_array[$detail['is_id']]['acquisition_date'] = $detail['acquisition_date'];
+                $entries_array[$detail['is_id']]['tva_price'] = $detail['tva_price'];
             }
             //dd($entries_array);
 
@@ -443,6 +445,7 @@ class BalanceController extends Controller
                     'item_name' => '',
                     'um' => '',
                     'price' => 0,
+                    'tva_price' => 0,
                     'acquisition_date' => '',
                     'consumption_quantity' => 0);
                 }
@@ -485,6 +488,7 @@ class BalanceController extends Controller
                     'item_name' => '',
                     'um' => '',
                     'price' => 0,
+                    'tva_price' => 0,
                     'acquisition_date' => '',
                     'consumption_quantity' => 0);
                 }
@@ -511,6 +515,7 @@ class BalanceController extends Controller
                     'item_name' => '',
                     'um' => '',
                     'price' => 0,
+                    'tva_price' => 0,
                     'acquisition_date' => '',
                     'consumption_quantity' => 0);
                 }
@@ -539,6 +544,7 @@ class BalanceController extends Controller
                     'item_name' => '',
                     'um' => '',
                     'price' => 0,
+                    'tva_price' => 0,
                     'acquisition_date' => '',
                     'consumption_quantity' => 0);
                 }
@@ -565,6 +571,7 @@ class BalanceController extends Controller
                     'item_name' => '',
                     'um' => '',
                     'price' => 0,
+                    'tva_price' => 0,
                     'acquisition_date' => '',
                     'consumption_quantity' => 0);
                 }
@@ -580,7 +587,7 @@ class BalanceController extends Controller
             ->join('measure_units', 'measure_units.id', '=', 'invoice_items.measure_unit_id')
             ->whereIn('item_stocks.id', array_keys($entries_array))
             ->select('items.name as item_name', 'measure_units.name as um',
-            'invoice_items.price as price', 'item_stocks.id as is_id')
+            'invoice_items.price as price', 'item_stocks.id as is_id', 'invoice_items.tva_price as tva_price')
             ->get();
 
             foreach($details as $detail) {
@@ -592,12 +599,14 @@ class BalanceController extends Controller
                     'item_name' => '',
                     'um' => '',
                     'price' => 0,
+                    'tva_price' => 0,
                     'acquisition_date' => '',
                     'consumption_quantity' => 0);
                 }
                 $entries_array[$detail['is_id']]['item_name'] = $detail['item_name'];
                 $entries_array[$detail['is_id']]['price'] = $detail['price'];
                 $entries_array[$detail['is_id']]['um'] = $detail['um'];
+                $entries_array[$detail['is_id']]['tva_price'] = $detail['tva_price'];
             }
 
             $items_without_transfer = [];
@@ -629,6 +638,7 @@ class BalanceController extends Controller
                     'item_name' => '',
                     'um' => '',
                     'price' => 0,
+                    'tva_price' => 0,
                     'acquisition_date' => '',
                     'consumption_quantity' => 0);
                 }
@@ -639,6 +649,7 @@ class BalanceController extends Controller
             //dd($entries_array);
 
         }
+        //dd($entries_array);
 
         
 
@@ -756,9 +767,9 @@ class BalanceController extends Controller
         if($inventory_id == 1) {
             foreach($entries_array as $entry) {
                 //dd($entry);
-               $total_sold += $entry['price'] * ($entry['initial'] - $entry['ending_quantity']);
-               $initial_value += $entry['price'] * ($entry['initial'] - $entry['starting_quantity']);
-               $outs += $entry['price'] * $entry['transfered_quantity'];
+               $total_sold += $entry['tva_price'] * ($entry['initial'] - $entry['ending_quantity']);
+               $initial_value += $entry['tva_price'] * ($entry['initial'] - $entry['starting_quantity']);
+               $outs += $entry['tva_price'] * $entry['transfered_quantity'];
     
                $startDate = date('Y-m-d', strtotime($old_from_date));
                $endDate = date('Y-m-d', strtotime($old_until_date));
@@ -773,24 +784,24 @@ class BalanceController extends Controller
                $html .= '<td style="text-align: center;">'. $entry['initial'] - $entry['starting_quantity'].'</td>';
                if(($checkDate >= $startDate) && ($checkDate <= $endDate)) {
                     $html .= '<td style="text-align: center;">'. $entry['initial'] .'</td>';
-                    $ins += $entry['price'] * $entry['initial'];
+                    $ins += $entry['tva_price'] * $entry['initial'];
                 } else {
                     $html .= '<td style="text-align: center;">0</td>';
-                    $ins += $entry['price'] * 0;
+                    $ins += $entry['tva_price'] * 0;
                 }
                
                $html .= '<td style="text-align: center;">'. $entry['transfered_quantity'] .'</td>';
                $html .= '<td style="text-align: center;">'. $entry['initial'] - $entry['ending_quantity'] .'</td>';
-               $html .= '<td style="text-align: center;">'. $entry['price'] * ($entry['initial'] - $entry['ending_quantity']) .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['tva_price'] * ($entry['initial'] - $entry['ending_quantity']) .'</td>';
                $html .= '</tr>';
            }
         } else {
             //dd($entries_array);
             foreach($entries_array as $entry) {
                 //dd($entry);
-               $total_sold += $entry['price'] * ($entry['initial'] - $entry['ending_quantity']);
-               $initial_value += $entry['price'] * ($entry['initial'] - $entry['starting_quantity']);
-               $outs += $entry['price'] * $entry['consumption_quantity'];
+               $total_sold += $entry['tva_price'] * ($entry['initial'] - $entry['ending_quantity']);
+               $initial_value += $entry['tva_price'] * ($entry['initial'] - $entry['starting_quantity']);
+               $outs += $entry['tva_price'] * $entry['consumption_quantity'];
     
                $startDate = date('Y-m-d', strtotime($old_from_date));
                $endDate = date('Y-m-d', strtotime($old_until_date));
@@ -804,18 +815,18 @@ class BalanceController extends Controller
                $html .= '<td style="text-align: center;">'. $entry['price'] .'</td>';
                $html .= '<td style="text-align: center;">'. $entry['initial'] - $entry['starting_quantity'].'</td>';
                //$html .= '<td style="text-align: center;">'. $entry['initial'] .'</td>';
-               $ins += $entry['price'] * $entry['initial'];
+               $ins += $entry['tva_price'] * $entry['initial'];
                if(($checkDate >= $startDate) && ($checkDate <= $endDate)) {
                     $html .= '<td style="text-align: center;">'. $entry['initial'] .'</td>';
-                    $ins += $entry['price'] * $entry['initial'];
+                    $ins += $entry['tva_price'] * $entry['initial'];
                 } else {
                     $html .= '<td style="text-align: center;">0</td>';
-                    $ins += $entry['price'] * 0;
+                    $ins += $entry['tva_price'] * 0;
                 }
                
                $html .= '<td style="text-align: center;">'. $entry['consumption_quantity'] .'</td>';
                $html .= '<td style="text-align: center;">'. $entry['initial'] - $entry['ending_quantity'] .'</td>';
-               $html .= '<td style="text-align: center;">'. $entry['price'] * ($entry['initial'] - $entry['ending_quantity']) .'</td>';
+               $html .= '<td style="text-align: center;">'. $entry['tva_price'] * ($entry['initial'] - $entry['ending_quantity']) .'</td>';
                $html .= '</tr>';
            }
         }
