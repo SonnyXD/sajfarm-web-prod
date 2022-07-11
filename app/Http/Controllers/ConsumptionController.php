@@ -245,6 +245,7 @@ class ConsumptionController extends Controller
             <th style="font-weight: bold; text-align: center;">UM</th>
             <th style="font-weight: bold; text-align: center;">Cantitate</th>
             <th style="font-weight: bold; text-align: center;">Pret</th>
+            <th style="font-weight: bold; text-align: center;">TVA</th>
             <th style="font-weight: bold; text-align: center;">Valoare</th>
             <th style="font-weight: bold; text-align: center;">Lot</th>
             <th style="font-weight: bold; text-align: center;">Data expirare</th>
@@ -261,6 +262,7 @@ class ConsumptionController extends Controller
             <th style="font-weight: bold; text-align: center;">UM</th>
             <th style="font-weight: bold; text-align: center;">Cantitate</th>
             <th style="font-weight: bold; text-align: center;">Pret</th>
+            <th style="font-weight: bold; text-align: center;">TVA</th>
             <th style="font-weight: bold; text-align: center;">Valoare</th>
             <th style="font-weight: bold; text-align: center;">Lot</th>
             <th style="font-weight: bold; text-align: center;">Data expirare</th>
@@ -380,11 +382,12 @@ class ConsumptionController extends Controller
                             <td style="text-align: center;">'. $item['um'] .'</td>
                             <td style="text-align: center;">'. $item['quantity'] .'</td>
                             <td style="text-align: center;">'. $item['price'] .'</td>
-                            <td style="text-align: center;">'. $item['price'] * $item['quantity'] .'</td>
+                            <td style="text-align: center;">'. $item['tva'] .'</td>
+                            <td style="text-align: center;">'. $item['tva_price'] * $item['quantity'] .'</td>
                             <td style="text-align: center;">'. $item['lot'] .'</td>
                             <td style="text-align: center;">'. date("d-m-Y", strtotime($item['exp_date'])) .'</td>
                         </tr>';
-                    $total += $item['price'] * $item['quantity'];
+                    $total += $item['tva_price'] * $item['quantity'];
                         $consumItem = new \App\Models\ConsumptionItem();
                         $consumItem->consumption_id = $consumption->id;
                         $consumItem->item_id = $item['item_id'];
@@ -422,14 +425,15 @@ class ConsumptionController extends Controller
                         <td style="text-align: center;">'. $detailedItem->invoice_item->measure_unit->name .'</td>
                         <td style="text-align: center;">'. $item->quantity .'</td>
                         <td style="text-align: center;">'. $detailedItem->invoice_item->price .'</td>
-                        <td style="text-align: center;">'. $detailedItem->invoice_item->price * $item->quantity .'</td>
+                        <td style="text-align: center;">'. $detailedItem->invoice_item->tva .'</td>
+                        <td style="text-align: center;">'. $detailedItem->invoice_item->tva_price * $item->quantity .'</td>
                         <td style="text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
                         <td style="text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
                         <td style="text-align: center;">'. $checklist->ambulance->license_plate .'</td>
                         <td style="text-align: center;">'. $checklist->patient_number .'</td>
                         <td style="text-align: center;">'. $substation .'</td>
                     </tr>';
-                    $total_value += $detailedItem->invoice_item->price * $item->quantity;
+                    $total_value += $detailedItem->invoice_item->tva_price * $item->quantity;
                     ChecklistItem::where('id', $item['id'])
                         ->update(['used' => 1]);
                     

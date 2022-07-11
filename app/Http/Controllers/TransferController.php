@@ -98,6 +98,7 @@ class TransferController extends Controller
         <th style="font-weight: bold; text-align: center;">UM</th>
         <th style="font-weight: bold; text-align: center;">Cantitate</th>
         <th style="font-weight: bold; text-align: center;">Pret</th>
+        <th style="font-weight: bold; text-align: center;">TVA</th>
         <th style="font-weight: bold; text-align: center;">Valoare</th>
         <th style="font-weight: bold; text-align: center;">Lot</th>
         <th style="font-weight: bold; text-align: center;">Data expirare</th>
@@ -128,7 +129,8 @@ class TransferController extends Controller
                 <td style="text-align: center;">'. $productPost['productName'] .'</td>
                 <td style="text-align: center;">'. $productPost['productUmText'] .'</td>
                 <td style="text-align: center;">'. $productPost['productQty'] .'</td>
-                <td style="text-align: center;">'. $detailedItem->invoice_item->tva_price .'</td>
+                <td style="text-align: center;">'. $detailedItem->invoice_item->price .'</td>
+                <td style="text-align: center;">'. $detailedItem->invoice_item->tva .'</td>
                 <td style="text-align: center;">'. $detailedItem->invoice_item->tva_price * $productPost['productQty'] .'</td>
                 <td style="text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
                 <td style="text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
