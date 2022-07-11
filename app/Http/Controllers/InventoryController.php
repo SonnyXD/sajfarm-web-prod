@@ -93,6 +93,7 @@ class InventoryController extends Controller
         ';
 
         $table = '<table>
+        <thead>
             <tr nobr="true">
             <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
             <th style="font-weight: bold; text-align: center;">UM</th>
@@ -111,7 +112,8 @@ class InventoryController extends Controller
             <th style="font-weight: bold; text-align: center;">Faptice</th>
             <th style="font-weight: bold; text-align: center;">Plus</th>
             <th style="font-weight: bold; text-align: center;">Minus</th>
-            </tr>';
+            </tr>
+            </thead>';
 
             $total_values = [];
 
@@ -148,13 +150,13 @@ class InventoryController extends Controller
             ->leftjoin('measure_units', 'measure_units.id', '=', 'invoice_items.measure_unit_id')
             ->leftjoin('items', 'items.id', '=', 'invoice_items.item_id')
             ->where('item_stocks.inventory_id', $inventory->id)
-            ->where('item_stocks.quantity', '=', 0)
+            //->where('item_stocks.quantity', '=', 0)
             ->whereBetween('invoices.document_date', [$startOfYear, $endOfYear])
             ->select(ItemStock::raw('SUM(item_stocks.quantity) as current_quantity'), 'items.name as item_name', 'measure_units.name as um',
             'invoice_items.lot as lot', 'invoice_items.price as price', 'invoice_items.tva as tva',
             'invoice_items.tva_price as tva_price', 'invoice_items.exp_date as exp_date', 'items.category_id as category_id', 'item_stocks.id as is_id')
             ->groupBy('item_stocks.item_id')
-            ->groupBy('invoice_items.measure_unit_id')
+            //->groupBy('invoice_items.measure_unit_id')
             ->get();
 
             $html .= '<h4>Produse cu cantitate 0:</h4><br><br>';
@@ -163,7 +165,7 @@ class InventoryController extends Controller
                 $html .= '<span style="font-weight: bold;">'. $category->name .'</span><br><br>';
                 $html .= $table;
                 foreach($items as $item) {
-                    if($item['category_id'] == $category->id) {
+                    if($item['category_id'] == $category->id && $item['current_quantity'] == 0) {
                         $html .= '<tr nobr="true">
                                         <td style="text-align: center;">'. $item['item_name'] .'</td>
                                         <td style="text-align: center;">'. $item['um'] .'</td>
@@ -205,6 +207,12 @@ class InventoryController extends Controller
             <td style="text-align: center;"></td>
             <td style="text-align: center;"></td>
             <td style="text-align: center;">As. Sef '. $institution[0]->assistent .'</td>
+            <td style="text-align: center;"></td>
+            </tr>
+            <tr nobr="true">
+            <td style="text-align: center;"></td>
+            <td style="text-align: center;"></td>
+            <td style="text-align: center;"></td>
             <td style="text-align: center;"></td>
             </tr>';
 

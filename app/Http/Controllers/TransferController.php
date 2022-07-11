@@ -91,9 +91,10 @@ class TransferController extends Controller
         <br>
 ';
 
-        $html .= '
+        $html .= <<<EOD
         <table>
-        <tr>
+        <thead>
+        <tr nobr="true">
         <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
         <th style="font-weight: bold; text-align: center;">UM</th>
         <th style="font-weight: bold; text-align: center;">Cantitate</th>
@@ -103,7 +104,8 @@ class TransferController extends Controller
         <th style="font-weight: bold; text-align: center;">Lot</th>
         <th style="font-weight: bold; text-align: center;">Data expirare</th>
         </tr>
-        ';
+        </thead>
+        EOD;
 
         // $products = collect($request->input('product'));
         // $ids = $products->pluck('item_stock_id');

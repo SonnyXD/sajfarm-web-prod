@@ -272,6 +272,7 @@ class ReportController extends Controller
         $categories = Category::all();
 
         $table_cons = '<table>
+            <thead>
             <tr nobr="true">
             <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
             <th style="font-weight: bold; text-align: center;">UM</th>
@@ -282,9 +283,11 @@ class ReportController extends Controller
             <th style="font-weight: bold; text-align: center;">Valoare</th>
             <th style="font-weight: bold; text-align: center;">Lot</th>
             <th style="font-weight: bold; text-align: center;">Data expirare</th>
-            </tr>';
+            </tr>
+            </thead>';
 
             $table_ret = '<table>
+            <thead>
             <tr nobr="true">
             <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
             <th style="font-weight: bold; text-align: center;">UM</th>
@@ -297,7 +300,8 @@ class ReportController extends Controller
             <th style="font-weight: bold; text-align: center;">Data expirare</th>
             <th style="font-weight: bold; text-align: center;">Motiv</th>
             <th style="font-weight: bold; text-align: center;">Gestiune de iesire</th>
-            </tr>';
+            </tr>
+            </thead>';
 
             $consumption_items_array = [];
 

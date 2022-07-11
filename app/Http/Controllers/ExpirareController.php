@@ -115,6 +115,7 @@ class ExpirareController extends Controller
         ';
 
         $table = '<table>
+            <thead>
             <tr nobr="true">
             <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
             <th style="font-weight: bold; text-align: center;">UM</th>
@@ -125,7 +126,8 @@ class ExpirareController extends Controller
             <th style="font-weight: bold; text-align: center;">Valoare</th>
             <th style="font-weight: bold; text-align: center;">Lot</th>
             <th style="font-weight: bold; text-align: center;">Data expirare</th>
-            </tr>';
+            </tr>
+            </thead>';
 
         foreach($categories as $category) {
             $html .= '<span style="font-weight: bold;">'. $category->name .'</span><br><br>';

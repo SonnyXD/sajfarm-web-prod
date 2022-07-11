@@ -690,12 +690,13 @@ class BalanceController extends Controller
         <br>
         <br>';
 
-        $html .= '
-        <table>
-        <tr>
-        <th style="height: 25px;" colspan="9">Subgestiunea: '. $category_name .' - '. $inventory_name .'</th>
+        $html .= <<<EOD
+        <table style="width: 100%;">
+        <thead>
+        <tr nobr="true">
+        <th style="height: 25px;" colspan="9">Subgestiunea: $category_name  -  $inventory_name </th>
         </tr>
-        <tr>
+        <tr nobr="true">
           <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
           <th style="font-weight: bold; text-align: center;">UM</th>
           <th style="font-weight: bold; text-align: center;">Data Achizitiei</th>
@@ -706,7 +707,27 @@ class BalanceController extends Controller
           <th style="font-weight: bold; text-align: center;">Stoc Final</th>
           <th style="font-weight: bold; text-align: center;">Sold</th>
         </tr>
-        ';
+        </thead>
+        EOD;
+
+        // $html .= '
+        // <table style="width: 100%;">
+        // <thead>
+        // <tr nobr="true">
+        // <th style="height: 25px;" colspan="9">Subgestiunea: '. $category_name .'  -  '. $inventory_name .' </th>
+        // </tr>
+        // <tr nobr="true">
+        //   <th style="font-weight: bold; text-align: center;">Denumire Produs</th>
+        //   <th style="font-weight: bold; text-align: center;">UM</th>
+        //   <th style="font-weight: bold; text-align: center;">Data Achizitiei</th>
+        //   <th style="font-weight: bold; text-align: center;">Pret Unitar</th>
+        //   <th style="font-weight: bold; text-align: center;">Stoc Initial</th>
+        //   <th style="font-weight: bold; text-align: center;">Intrari</th>
+        //   <th style="font-weight: bold; text-align: center;">Iesiri</th>
+        //   <th style="font-weight: bold; text-align: center;">Stoc Final</th>
+        //   <th style="font-weight: bold; text-align: center;">Sold</th>
+        // </tr>
+        // </thead>';
 
         // foreach($entries_array as $entry) {
         //     $html .= '<tr nobr="true">';
