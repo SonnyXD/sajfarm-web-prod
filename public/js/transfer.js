@@ -45,6 +45,12 @@
   }
 
   function transferModal() {
+    $("#product-quantity").keypress(function (e) {
+      if ( (e.which < 48 || e.which > 57)) {
+       return false;
+     }
+    });
+
     let total_value = 0;
       $('#add-in-preview').click(function () {
         let selected_med = $("#meds option:selected").text();

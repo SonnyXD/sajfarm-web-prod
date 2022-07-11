@@ -45,6 +45,12 @@ function getInventoryItems() {
 }
 
 function checklistModal() {
+  $("#product-quantity").keypress(function (e) {
+    if ( (e.which < 48 || e.which > 57)) {
+     return false;
+   }
+  });
+
     $('#add-in-preview').click(function () {
       let selected_med = $("#meds option:selected").text();
       let med_name = selected_med.split("[/]");

@@ -1,4 +1,10 @@
 function facturaModal() {
+  $("#product-quantity").keypress(function (e) {
+    if ( (e.which < 48 || e.which > 57)) {
+     return false;
+   }
+  });
+
     $('#cim-checkbox').click(function(){
       if($(this).prop("checked") == true) {
         $("#cim-input").css( "display", "block" );
