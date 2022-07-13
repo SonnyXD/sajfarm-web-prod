@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use \App\Models\ItemStock;
 use \App\Models\Checklist;
 use \App\Models\ChecklistItem;
+use \App\Models\Ambulance;
+use \App\Models\Medic;
 
 class LogicForms extends Controller
 {
@@ -155,7 +157,10 @@ where ci.used = 0 and a.id = 1
 
     public function medic_checklists(Request $request) 
     {
-        $checklists = Checklist::with('medic', 'ambulance')->where('medic_id', $request->medic)->get();
+        $checklists = Checklist::with('medic', 'ambulance')
+        ->where('medic_id', $request->medic)
+        ->where('inventory_id', $request->substation)
+        ->get();
 
         //dd($checklists);
 
@@ -256,6 +261,50 @@ where ci.used = 0 and a.id = 1
             }
 
         }
+
+        return response($html, 200);
+    }
+
+    public function available_ambulances(Request $request) 
+    {
+        $ambulances = Ambulance::whereHas('checklist', function($query) use($request) {
+            $query->where('used', 0);
+            $query->where('inventory_id', $request->substation);
+            $query->where('medic_id', null);
+        })
+        ->get();
+
+        $html = "";
+
+        foreach($ambulances as $ambulance) {
+            $html .= sprintf(
+                '<option value="%s">%s</option>',
+                $ambulance->id,
+                $ambulance->license_plate
+            );
+    }
+
+        return response($html, 200);
+    }
+
+    public function available_medics(Request $request) 
+    {
+        $medics = Medic::whereHas('checklist', function($query) use($request) {
+            $query->where('used', 0);
+            $query->where('medic_id', '!=', null);
+            $query->where('inventory_id', $request->substation);
+        })
+        ->get();
+
+        $html = "";
+
+        foreach($medics as $medic) {
+            $html .= sprintf(
+                '<option value="%s">%s</option>',
+                $medic->id,
+                $medic->name
+            );
+    }
 
         return response($html, 200);
     }

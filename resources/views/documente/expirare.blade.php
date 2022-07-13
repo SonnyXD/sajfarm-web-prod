@@ -1,6 +1,7 @@
 <x-layout>
     <x-container :title="$title">
         <x-form id="expirare-6-luni" method="GET" action="{{ route('expirare.store') }}" target="_blank">
+        <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
         <div class="form-group">
                     <label>Gestiune:</label>
                     <select class="form-control" id="inventory-select" name="inventory-select">

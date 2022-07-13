@@ -649,9 +649,18 @@ class BalanceController extends Controller
             //dd($entries_array);
 
         }
+
+        $entries_array = collect($entries_array)->sortBy('item_name');
+
         //dd($entries_array);
 
-        
+        //dd($entries_array);
+        // function compareByName($a, $b) {
+        //     return strcmp($a["item_name"], $b["item_name"]);
+        //   }
+
+        //usort($entries_array, 'compareByName');
+        //rsort($entries_array);
 
         //dd($entries[0]->transfer_date);
 

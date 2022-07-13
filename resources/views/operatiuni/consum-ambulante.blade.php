@@ -22,11 +22,6 @@
                     <label>Ambulanta:</label>
                     <div class="the-basics">
                     <select class="meds-single-select w-100" id="ambulance-select" name="ambulance-select">
-                    @if( $ambulances->count() )
-                      @foreach ($ambulances as $ambulance)
-                          <option value="{{ $ambulance->id }}">{{ $ambulance->license_plate }}</option>
-                      @endforeach
-                    @endif
                     </select>
                     </div>
                   </div>

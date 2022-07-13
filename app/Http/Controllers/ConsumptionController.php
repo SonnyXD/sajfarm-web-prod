@@ -75,6 +75,7 @@ class ConsumptionController extends Controller
 
         if( !empty( $amb_id ) ) {
             $sub = $request->input('substation-select');
+            
             $ambulance_checklists = Ambulance::with(['checklist' => function ($query) use($to, $from, $sub) {
                 $query->whereBetween('checklist_date', [$from, $to]);
                 $query->where('used', 0);
@@ -112,13 +113,18 @@ class ConsumptionController extends Controller
         } else {
             // $checklists = \App\Models\Checklist::with('checklistitems', 'inventory', 'medic', 'ambulance', 'assistent', 'ambulancier')
             // ->whereBetween('checklist_date', [$from, $to])->where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
-            $from_name = Medic::where('id', $request->input('medic-select'))->get()->first()->name;
+            $from_name = Medic::where('id', $request->input('medic-select'))->first()->name;
+
+            $sub_name = Inventory::where('id', $request->input('substation-select'))->first()->name;
+
+            $sub_id = Inventory::where('id', $request->input('substation-select'))->first()->id;
             // $checklist_amb = \App\Models\Checklist::with('ambulance')->where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
             // $checklist_patients = \App\Models\Checklist::where('medic_id', '=', $med_id)->where('used', '=', 0)->get();
 
-            $medic_checklists = Medic::with(['checklist' => function ($query) use($to, $from) {
+            $medic_checklists = Medic::with(['checklist' => function ($query) use($to, $from, $sub_id) {
                 $query->whereBetween('checklist_date', [$from, $to]);
                 $query->where('used', 0);
+                $query->where('inventory_id', $sub_id);
             }, 'checklist.checklistitems' => function ($query) {
                 $query->where('used', 0);
             }, 'checklist.inventory',
@@ -126,6 +132,8 @@ class ConsumptionController extends Controller
                 'checklist.ambulance', 'checklist.checklistitems.item'])
             ->where('medics.id', $med_id)
             ->get();
+
+            //dd($medic_checklists);
 
             if($medic_checklists[0]->checklist->isEmpty())
             {   
@@ -144,7 +152,11 @@ class ConsumptionController extends Controller
                 $checklist_sub = "Statie centrala";
             }
 
-            $span = '<span style="float: right;">Medic: '. $from_name .'</span><br>';
+            $span = '<span style="float: right;">Medic: '. $from_name .'</span>';
+
+            $span .= '<br>';
+
+            $span .= '<span>Substatie: '. $sub_name .'</span><br>';
 
             //$span .= '<span style="font-weight: bold; float: right;">Ambulante: ';
 
@@ -252,7 +264,6 @@ class ConsumptionController extends Controller
             <th style="font-weight: bold; text-align: center;">Data expirare</th>
             <th style="font-weight: bold; text-align: center;">Ambulanta</th>
             <th style="font-weight: bold; text-align: center;">Nr fisa pacient</th>
-            <th style="font-weight: bold; text-align: center;">Substatie</th>
             </tr>
             </thead>
             EOD;
@@ -352,6 +363,8 @@ class ConsumptionController extends Controller
                 
             }
 
+            $consumption_items = collect($consumption_items)->sortBy('item_name');
+
             //dd($consumption_items);
             $total_values = [];
             foreach($categories as $category) {
@@ -435,7 +448,6 @@ class ConsumptionController extends Controller
                         <td style="text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)) .'</td>
                         <td style="text-align: center;">'. $checklist->ambulance->license_plate .'</td>
                         <td style="text-align: center;">'. $checklist->patient_number .'</td>
-                        <td style="text-align: center;">'. $substation .'</td>
                     </tr>';
                     $total_value += $detailedItem->invoice_item->tva_price * $item->quantity;
                     ChecklistItem::where('id', $item['id'])

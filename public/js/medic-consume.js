@@ -1,6 +1,6 @@
 function conditions() {
 
-    $('#from-date, #until-date, #document-date').change(function() {
+    $('#from-date, #until-date, #document-date, #medic-select').change(function() {
         testInputs();
     });
     
@@ -13,6 +13,10 @@ function conditions() {
           valid = false;
         }
       });
+
+      if ($('#medic-select').val() == null){
+        valid = false;
+     }
     
       if (!valid)
       $('#print').attr('disabled', 'disabled');
@@ -27,11 +31,13 @@ function conditions() {
     function getChecklists() {
       $('#medic-select').on('change', function() {
         let medicId = $(this).val();
+        let subId = $('#substation-select').val();
         
         $.ajax({
             type: "GET",
             data: {
-                medic: medicId
+                medic: medicId,
+                substation: subId
             },
             url: "/medic-checklist",
             success: function(response) {
@@ -44,23 +50,58 @@ function conditions() {
     
     $('#medic-select').on('change.select2', function() {
       let medicId = $(this).val();
-      loadMedic(medicId);
-    
+      //loadMedic(medicId);
     });
-    
-    let selectedMedic = $('#medic-select').val();
-    if (selectedMedic == undefined) {
-      selectedMedic = $('#medic-select option:first()').val();
+
+    $('#substation-select').on('change.select2', function() {
+      let substationId = $(this).val();
+      $('#medic-select').empty();
+      loadAvailableMedics(substationId);
+      let medicId = $('#medic-select').val();
+      loadMedic(medicId, substationId);
+      conditions();
+    });
+
+    let selectedSub = $('#substation-select').val();
+    if (selectedSub == undefined) {
+      selectedSub = $('#substation-select option:first()').val();
     }
+
+    loadAvailableMedics(selectedSub);
+
+    // let selectedMedic = $('#medic-select').val();
+    // if (selectedMedic == undefined) {
+    //   selectedMedic = $('#medic-select option:first()').val();
+    // }
     
     //console.log(selectedSubstation);
-    loadMedic(selectedMedic);
-    
-    function loadMedic(selectedMedic) {
+    //loadMedic(selectedMedic);
+
+    function loadAvailableMedics(selectedSub) {
       $.ajax({
         type: "GET",
         data: {
-            medic: selectedMedic
+          substation: selectedSub
+      },
+        url: "/available-medics",
+        success: function(response) {
+          $('#medic-select').append(response);
+          let selectedMed = $('#medic-select').val();
+          if (selectedMed == undefined) {
+            selectedMed = $('#medic-select option:first()').val();
+          }
+          loadMedic(selectedMed, selectedSub);
+          conditions();
+              }
+    });
+    }
+    
+    function loadMedic(selectedMedic, selectedSub) {
+      $.ajax({
+        type: "GET",
+        data: {
+            medic: selectedMedic,
+            substation: selectedSub
         },
         url: "/medic-checklist",
         success: function(response) {
@@ -88,7 +129,7 @@ function conditions() {
     }
     
     jQuery(document).ready(() => {
-        conditions();
+        //conditions();
         getChecklists();
         treeviewDisplay();
         $('#from-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);

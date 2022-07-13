@@ -1,6 +1,6 @@
 function conditions() {
 
-$('#from-date, #until-date, #document-date').change(function() {
+$('#from-date, #until-date, #document-date, #ambulance-select').change(function() {
     testInputs();
 });
 
@@ -14,6 +14,10 @@ function testInputs() {
     }
   });
 
+  if ($('#ambulance-select').val() == null){
+    valid = false;
+ }
+
   if (!valid)
   $('#print').attr('disabled', 'disabled');
 else
@@ -25,8 +29,6 @@ testInputs();
 }
 
 function getChecklists() {
-
-
 
   $('#ambulance-select').on('change', function() {
     let ambulanceId = $(this).val();
@@ -49,31 +51,52 @@ function getChecklists() {
 
 $('#substation-select').on('change.select2', function() {
   let substationId = $(this).val();
+  $('#ambulance-select').empty();
+  loadAvailableAmbulances(substationId);
   let ambulanceId = $('#ambulance-select').val();
   loadAmbulance(ambulanceId, substationId);
+  conditions();
 });
 
 $('#ambulance-select').on('change.select2', function() {
   let ambulanceId = $(this).val();
   let substationId = $('#substation-select').val();
-  loadAmbulance(ambulanceId, substationId);
-
+  // $('#ambulance-select').select2('destroy');
+  // $('#ambulance-select').select2();
+  //loadAmbulance(ambulanceId, substationId);
 });
 
-let selectedAmb = $('#ambulance-select').val();
-if (selectedAmb == undefined) {
-  selectedAmb = $('#ambulance-select option:first()').val();
-}
 
 let selectedSub = $('#substation-select').val();
 if (selectedSub == undefined) {
   selectedSub = $('#substation-select option:first()').val();
 }
 
-//console.log(selectedSubstation);
-loadAmbulance(selectedAmb, selectedSub);
+loadAvailableAmbulances(selectedSub);
+
+function loadAvailableAmbulances(selectedSub) {
+  $.ajax({
+    type: "GET",
+    data: {
+        substation: selectedSub
+    },
+    url: "/available-ambulances",
+    success: function(response) {
+      //$('#ambulance-select tr:not(:first)').empty();
+      $('#ambulance-select').append(response);
+      let selectedAmb = $('#ambulance-select').val();
+      if (selectedAmb == undefined) {
+        selectedAmb = $('#ambulance-select option:first()').val();
+      }
+
+      loadAmbulance(selectedAmb, selectedSub);
+      conditions();
+          }
+});
+}
 
 function loadAmbulance(selectedAmb, selectedSub) {
+
   $.ajax({
     type: "GET",
     data: {
@@ -144,7 +167,7 @@ function treeviewDisplay() {
 }
 
 jQuery(document).ready(() => {
-    conditions();
+    //conditions();
     getChecklists();
     treeviewDisplay();
     $('#from-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);

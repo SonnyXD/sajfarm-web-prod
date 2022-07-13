@@ -145,6 +145,11 @@ class ReportController extends Controller
             //->sum('consumption_items.quantity')
             ->get();
 
+            if($consumptions->isEmpty()) {
+                return redirect('/documente/rapoarte')
+                ->with('error', 'Generare raport esuat! Cauze posibile: nu exista raport pentru perioada selectata');
+            }
+
             //dd($consumptions);
 
             $consumption_items = [];
@@ -168,6 +173,9 @@ class ReportController extends Controller
                 }
                 
             }
+            //dd($consumption_items);
+
+            $consumption_items = collect($consumption_items)->sortBy('item_name');
 
            // dd($consumption_items);
         }
@@ -305,6 +313,8 @@ class ReportController extends Controller
 
             $consumption_items_array = [];
 
+            // dd($consumptions);
+
             //dd($consumption_items_array);
 
             if($report_type == 1) {
@@ -366,7 +376,7 @@ class ReportController extends Controller
                         $html .= '<span style="font-weight: bold;">'. $category->name .'</span><br><br>';
                         $html .= $table_cons;
                         $total = 0;
-                        foreach($consumptions as $consumption) {
+                        // foreach($consumptions as $consumption) {
                             // $consumption_items_array[$consumption->id] = array(
                             // 'is_id' => 0,
                             // 'category_id' => 0
@@ -394,7 +404,7 @@ class ReportController extends Controller
                                 
                             }
                             
-                        }
+                        // }
                         $total_values[] = $total;
                         $html .= '</table><br><br>';
                         //dd($consumption_items_array);
@@ -413,11 +423,6 @@ class ReportController extends Controller
                     $total = 0;
                     foreach($returnings as $returning) {
                         foreach($returning->returning_item as $item) {
-                            //dd($returnings);
-                            // if($item->item_stock_belongs == null) {
-                            //     continue;
-                            // }
-                            //dd($item);
                             $item_ambulance = Ambulance::where('id', $item->ambulance_id)->first()->license_plate??'';
                             if($category->id == $item->item_stock->invoice_item->item->category_id) {
                                 $total += ($item->quantity * $item->item_stock->invoice_item->tva_price);
@@ -435,9 +440,6 @@ class ReportController extends Controller
                                 <td style="text-align: center;">'. $station .' - '. $item_ambulance .'</td>
                             </tr>';
                             }
-                            
-                            //$consumption_items_array[$consumption->id][]['is_id'] = $item->item_stock_id;
-                            //$consumption_items_array[$consumption->id][]['category_id'] = $category->id;
                             
                         }
                         

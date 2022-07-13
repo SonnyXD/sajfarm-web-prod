@@ -249,6 +249,10 @@ Route::get('/inventory-products', array('uses' => 'App\Http\Controllers\LogicFor
 
 Route::get('/ambulance-checklist', array('uses' => 'App\Http\Controllers\LogicForms@ambulance_checklists'));
 
+Route::get('/available-ambulances', array('uses' => 'App\Http\Controllers\LogicForms@available_ambulances'));
+
+Route::get('/available-medics', array('uses' => 'App\Http\Controllers\LogicForms@available_medics'));
+
 Route::get('/medic-checklist', array('uses' => 'App\Http\Controllers\LogicForms@medic_checklists'));
 
 Route::get('/operatiuni/intrare-factura', array('uses' => 'App\Http\Controllers\RoutesController@invoice'));

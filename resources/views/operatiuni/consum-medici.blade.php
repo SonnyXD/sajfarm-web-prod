@@ -22,11 +22,7 @@
                     <label>Medic:</label>
                     <div class="the-basics">
                     <select class="meds-single-select w-100" id="medic-select" name="medic-select">
-                    @if( $medics->count() )
-                      @foreach ($medics as $medic)
-                          <option value="{{ $medic->id }}">{{ $medic->name }}</option>
-                      @endforeach
-                    @endif
+          
                     </select>
                     </div>
                   </div>

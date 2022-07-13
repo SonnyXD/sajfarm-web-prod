@@ -71,6 +71,8 @@ class InventoryController extends Controller
         ->groupBy('invoice_items.measure_unit_id')
         ->get();
 
+        $items = collect($items)->sortBy('item_name');
+
         $html = '<html>
                 <head>
                 <style>
@@ -158,6 +160,8 @@ class InventoryController extends Controller
             ->groupBy('item_stocks.item_id')
             //->groupBy('invoice_items.measure_unit_id')
             ->get();
+
+            $items = collect($items)->sortBy('item_name');
 
             $html .= '<h4>Produse cu cantitate 0:</h4><br><br>';
 

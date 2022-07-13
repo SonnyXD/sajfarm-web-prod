@@ -85,6 +85,14 @@ class ExpirareController extends Controller
         'invoice_items.tva_price as tva_price', 'invoice_items.exp_date as exp_date', 'items.category_id as category_id')
         ->groupBy('item_stocks.invoice_item_id')
         ->get();
+        
+        if($items->isEmpty()) {
+            return redirect('/documente/expira-in-6-luni')
+            ->with('error', 'Nu exista produse care expira in urmatoarele 6 luni in aceasta gestiune');
+        }
+
+
+        $items = collect($items)->sortBy('item_name');
 
         // if($items == null) {
         //     return redirect('/documente/expira-in-6-luni')
