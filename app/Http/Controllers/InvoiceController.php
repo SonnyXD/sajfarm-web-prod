@@ -169,7 +169,7 @@ class InvoiceController extends Controller
             $invoice_item->invoice_id = Invoice::all()->last()->id;
             $invoice_item->item_id = $productPost['productId'];
             $invoice_item->cim_code = $productPost['productCim'];
-            $invoice_item->product_code = $productPost['productCode'];
+            $invoice_item->product_code = null;
             $invoice_item->quantity = $productPost['productQty'];
             $invoice_item->exp_date = $productPost['productExp'];
             $invoice_item->lot = $productPost['productLot'];

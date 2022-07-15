@@ -129,7 +129,6 @@ class AvizEntryController extends Controller
         <table>
         <tr>
           <th style="font-weight: bold; text-align: center;">Cod CIM</th>
-          <th style="font-weight: bold; text-align: center;">Cod Produs</th>
           <th style="font-weight: bold; text-align: center;">Nume</th>
           <th style="font-weight: bold; text-align: center;">Lot</th>
           <th style="font-weight: bold; text-align: center;">Data Exp.</th>
@@ -152,7 +151,7 @@ class AvizEntryController extends Controller
             $aviz_item->aviz_entry_id = AvizEntry::all()->last()->id;
             $aviz_item->item_id = $productPost['productId'];
             $aviz_item->cim_code = $productPost['productCim'];
-            $aviz_item->product_code = $productPost['productCode'];
+            $aviz_item->product_code = null;
             $aviz_item->quantity = $productPost['productQty'];
             $aviz_item->exp_date = $productPost['productExp'];
             $aviz_item->lot = $productPost['productLot'];
@@ -167,7 +166,7 @@ class AvizEntryController extends Controller
             $invoice_item->invoice_id = $last_invoice_id;
             $invoice_item->item_id = $productPost['productId'];
             $invoice_item->cim_code = $productPost['productCim'];
-            $invoice_item->product_code = $productPost['productCode'];
+            $invoice_item->product_code = null;
             $invoice_item->quantity = $productPost['productQty'];
             $invoice_item->exp_date = $productPost['productExp'];
             $invoice_item->lot = $productPost['productLot'];
@@ -182,7 +181,6 @@ class AvizEntryController extends Controller
 
             $html.= '<tr>
                 <td style="text-align: center;">'. $productPost['productCim'] .'</td>
-                <td style="text-align: center;">'. $productPost['productCode'] .'</td>
                 <td style="text-align: center;">'. $productPost['productName'] .'</td>
                 <td style="text-align: center;">'. $productPost['productLot'] .'</td>
                 <td style="text-align: center;">'. date("d-m-Y", strtotime($productPost['productExp'])) .'</td>

@@ -33,7 +33,13 @@ class RoutesController extends Controller
 
     public function home()
     {
-        return view('home');
+        $consumptions = Consumption::orderBy('id', 'desc')->first()->id??0;
+        $transfers = Transfer::orderBy('id', 'desc')->first()->id??0;
+        $nirs = Invoice::orderBy('id', 'desc')->first()->id??0;
+        $aviz = AvizEntry::orderBy('id', 'desc')->first()->id??0;
+        $returnings = Returning::orderBy('id', 'desc')->first()->id??0;
+
+        return view('home', ['consumptions' => $consumptions, 'transfers' => $transfers, 'nirs' => $nirs, 'aviz' => $aviz, 'returnings' => $returnings]);
     }
 
     public function inventory($inventory_slug, $category)
@@ -94,15 +100,21 @@ class RoutesController extends Controller
 
         //dd($all_items);
 
-        $minimum_quantities_farm = MinimumQuantity::with('item')->where('inventory_id', '=', 1)->get();
-        $minimum_quantities_stoc3 = MinimumQuantity::where('inventory_id', '=', 2)->get();
+        // //$minimum_quantities_farm = MinimumQuantity::with('item')->where('inventory_id', '=', 1)->get();
+        // $minimum_quantities_farm = MinimumQuantity::leftjoin('items', 'items.id', '=', 'minimum_quantities.item_id')
+        // ->leftjoin('inventories', 'inventories.id', '=', 'minimum_quantities.inventory_id')
+        // ->where('minimum_quantities.inventory_id', $inventory->id)
+        // ->select('minimum_quantities.item_id', 'minimum_quantities.inventory_id', 'minimum_quantities.quantity',
+        // 'minimum_quantities.id')
+        // ->get();
+        // $minimum_quantities_stoc3 = MinimumQuantity::where('inventory_id', '=', 2)->get();
 
         //$item_sum = ItemStock::where()->sum('quantity'); //join cu inventory_id si item_id -> dupa astea te iei ca sa faci suma
 
         //dd($item_sum);
         
 
-        return view('gestiune.gestiune-view', ['inventory_slug' => $inventory, 'category' => $category, 'categories' => $all_categories, 'current_category' => $current_category, 'all_items' => $all_items, 'items' => $grouped, 'inventory_name' => $inventory_name, 'inventory_id' => $inventory_id, 'minimum_quantities_farm' => $minimum_quantities_farm, 'minimum_quantities_stoc3' => $minimum_quantities_stoc3]);
+        return view('gestiune.gestiune-view', ['inventory_slug' => $inventory, 'category' => $category, 'categories' => $all_categories, 'current_category' => $current_category, 'all_items' => $all_items, 'items' => $grouped, 'inventory_name' => $inventory_name, 'inventory_id' => $inventory_id]);
     }
 
     public function invoice() 

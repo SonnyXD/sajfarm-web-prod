@@ -81,11 +81,6 @@ console.log( {valid, rowCount});
 
   $('#add-product').on('click', function() {
 
-    if(!$('#product-code').val()) {
-      $('#modal-alert').css('display','block');
-      return;
-    }
-
     if(!$('#product-quantity').val()) {
       $('#modal-alert').css('display','block');
       return;

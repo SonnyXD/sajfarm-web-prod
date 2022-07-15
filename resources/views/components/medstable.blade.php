@@ -29,7 +29,11 @@
                             @if ($inventory_id == 1)
                               @php
                                 $item_sum = \App\Models\ItemStock::with('inventory', 'item')->where('inventory_id', '=', 1)->where('item_id', '=', $item->id)->sum('quantity');
-                                $min_cant = $minimum_quantities_farm[$i]->quantity ?? 0;
+                                $min_cant = \App\Models\MinimumQuantity::with('item')
+                                ->where('item_id', '=', $item->id)
+                                ->where('inventory_id', '=', 1)
+                                ->first()
+                                ->quantity??0;
                               @endphp 
                                 @if($item_sum < $min_cant || $item_sum == 0)
                                   <td style="color: red; font-weight: bold;">{{$item_sum}} / {{$min_cant}}</td>
@@ -52,7 +56,11 @@
                             @if ($inventory_id == 2)
                               @php
                                 $item_sum = \App\Models\ItemStock::with('inventory', 'item')->where('inventory_id', '=', 2)->where('item_id', '=', $item->id)->sum('quantity');
-                                $min_cant = $minimum_quantities_stoc3[$i]->quantity ?? 0;
+                                $min_cant = \App\Models\MinimumQuantity::with('item')
+                                ->where('item_id', '=', $item->id)
+                                ->where('inventory_id', '=', 2)
+                                ->first()
+                                ->quantity??0;
                               @endphp 
                                 @if($item_sum < $min_cant || $item_sum == 0)
                                   <td style="color: red; font-weight: bold;">{{$item_sum}} / {{$min_cant}}</td>
@@ -72,7 +80,6 @@
                                   @if ($item->category_id == 1) 
                                     <th>Cod CIM</th>
                                   @endif
-                                  <th>Cod Produs</th>
                                   <th>Cantitate</th>
                                   <th>Termen Valab</th>
                                   <th>Lot</th>
@@ -91,7 +98,6 @@
                                       @if ( $inItem['category_id'] == 1)
                                         <td>{{$inItem['cim_code']}}</td>
                                       @endif
-                                      <td>{{$inItem['product_code']}}</td>
                                       <td>{{$inItem['quantity']}}</td>
                                       @if ((new \DateTime($inItem['exp_date']))->format('Y-m-d') > (new \DateTime())->format('Y-m-d'))
                                         

@@ -117,9 +117,6 @@
                             Cod CIM 
                           </th>
                           <th>
-                            Cod Produs
-                          </th>
-                          <th>
                             Cantitate
                           </th>
                           <th>
@@ -174,10 +171,6 @@
                 <div class="form-group" style="display:none;" id="cim-input">
                   <label for="recipient-name" class="col-form-label" id="cim-label">Cod CIM:</label>
                   <x-input class="form-control" id="cim-code" name="cim-code"/>
-                </div>
-                <div class="form-group">
-                  <label for="recipient-name" class="col-form-label">Cod Produs:</label>
-                  <x-input class="form-control" id="product-code" name="product-code"/>
                 </div>
                 <div class="form-group">
                   <label for="recipient-name" class="col-form-label">Cantitate:</label>
