@@ -44,6 +44,7 @@
             <li class="nav-item"><a class="nav-link" href="/operatiuni/bon-consum-ambulante">Bon Consum Ambulante</a></li>
             <li class="nav-item"><a class="nav-link" href="/operatiuni/bon-consum-medici">Bon Consum Medici</a></li>
             <li class="nav-item"><a class="nav-link" href="/operatiuni/aviz-intrare">Aviz Intrare</a></li>
+            <li class="nav-item"><a class="nav-link" href="/operatiuni/checklist-retur">Checklist Retur</a></li>
             <li class="nav-item"><a class="nav-link" href="/operatiuni/retur">Retur</a></li>
             <li class="nav-item"><a class="nav-link" href="/operatiuni/modificare-cant-min">Modificare Cantitati Minime</a></li>
             </ul>

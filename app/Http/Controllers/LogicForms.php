@@ -7,6 +7,8 @@ use \App\Models\ItemStock;
 use \App\Models\Checklist;
 use \App\Models\ChecklistItem;
 use \App\Models\Ambulance;
+use \App\Models\ReturningChecklist;
+use \App\Models\ReturningChecklistItem;
 use \App\Models\Medic;
 
 class LogicForms extends Controller
@@ -305,6 +307,131 @@ where ci.used = 0 and a.id = 1
                 $medic->name
             );
     }
+
+        return response($html, 200);
+    }
+
+    public function returning_checklists(Request $request) 
+    {
+        $checklists = ReturningChecklist::with('inventory')
+        ->where('inventory_id', $request->substation)
+        ->where('used', 0)
+        ->get();
+
+        //dd($checklists);
+
+        $checklist_items = ReturningChecklistItem::join('item_stocks', 'item_stocks.id', '=', 'returning_checklist_items.item_stock_id')
+        ->join('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
+        ->join('items', 'invoice_items.item_id', '=', 'items.id')
+        ->join('measure_units', 'invoice_items.measure_unit_id', '=', 'measure_units.id')
+        ->join('returning_checklists', 'returning_checklist_items.checklist_id', '=', 'returning_checklists.id')
+        ->leftjoin('ambulances', 'returning_checklist_items.ambulance_id', '=', 'ambulances.id')
+        ->select('returning_checklists.id as checklist_id', 'items.name', 'measure_units.name as measure_unit', 'returning_checklist_items.quantity',
+        'returning_checklist_items.reason as reason', 'ambulances.license_plate')
+        ->get();
+
+        //dd($checklist_items);
+
+        // $checklistItemsArray = array();
+        // foreach($checklist_items as $item) {
+        //     if (!isset($checklistItemsArray[$item->checklist_id])) {
+        //         $checklistItemsArray[$item->checklist_id] = array();
+        //     }
+
+        //     $checklistItemsArray[$item->checklist_id][] = array(
+        //         'name' => $item->name,
+        //         'quantity' => $item->quantity,
+        //         'measure_unit' => $item->measure_unit,
+        //         'license_plate' => $item->license_plate
+        //     );
+        // }
+
+        //dd($checklistItemsArray);
+
+        $html = "";
+
+        $i = 0;
+
+        foreach($checklists as $checklist) {
+            if($checklist->used == 0) {
+                $html .= "<tr data-count=". $i .">";
+                $html .= sprintf(
+                    '<td>%s</td>
+                    <td>%s</td>',
+                    $checklist->inventory->name,
+                    date("d-m-Y", strtotime($checklist->checklist_date))
+                );
+
+                $html .= "</tr>";
+
+                $html .= "</tr>";
+
+                $html .= '<tr class="treeview tr-'. $i .'">';
+
+                $html .= '<td colspan="100%">';
+                
+                $html .= '<table>';
+
+                $html .= '<thead>';
+
+                $html .= '<tr>';
+
+                $html .= '<th>Nume</th>';
+
+                $html .= '<th>Cantitate</th>';
+
+                $html .= '<th>UM</th>';
+
+                $html .= '<th>Ambulanta</th>';
+
+                $html .= '<th>Motiv</th>';
+
+                $html .= '</tr>';
+
+                $html .= '</thead>';
+
+                $html .= '<tbody>';
+
+                // if(isset($checklistItemsArray[$checklist->id])) {
+                //     foreach($checklistItemsArray[$checklist->id] as $item) {
+
+                //         $html .= '<tr>';
+                //         $html .= '<td>'. $item['name'] .'</td>';   
+                //         $html .= '<td>'. $item['quantity'] .'</td>';  
+                //         $html .= '<td>'. $item['measure_unit'] .'</td>';
+                //         $html .= '<td>'. $item['license_plate']??'' .'</td>';      
+                //         $html .= '</tr>';
+    
+                //     }
+                // }
+
+                foreach($checklist_items as $item) {
+                    if($item['checklist_id'] == $checklist->id) {
+                        $html .= '<tr>';
+                        $html .= '<td>'. $item['name'] .'</td>';   
+                        $html .= '<td>'. $item['quantity'] .'</td>';  
+                        $html .= '<td>'. $item['measure_unit'] .'</td>';
+                        $html .= '<td>'. $item['license_plate'] .'</td>';   
+                        $html .= '<td>'. $item['reason'] .'</td>';   
+                        $html .= '</tr>';
+                    }
+                    
+                }
+
+                
+
+                $html .= '</tbody>';
+
+                $html .= '</table>';
+
+                $html .= '</td>';
+
+                $html .= '</tr>';
+
+                $i++;
+            }
+
+        }
 
         return response($html, 200);
     }

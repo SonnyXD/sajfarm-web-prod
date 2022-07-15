@@ -191,7 +191,18 @@ class RoutesController extends Controller
         return view('operatiuni.aviz', ['providers' => $providers, 'items' => $items, 'units' => $units, 'invoices' => $invoices, 'aviz' => $aviz, 'title' => $title, 'donation_category' => $donation, 'sponsor_category' => $sponsor]);
     }
 
-    public function retur()
+    public function returning_checklist()
+    {
+        $inventories = Inventory::all();
+        $returnings = Returning::all();
+        $ambulances = Ambulance::all();
+
+        $title = 'Checklist Retur';
+
+        return view('operatiuni.retur-checklist', ['inventories' => $inventories, 'returnings' => $returnings, 'title' => $title, 'ambulances' => $ambulances]);
+    }
+    
+    public function returning()
     {
         $inventories = Inventory::all();
         $returnings = Returning::all();

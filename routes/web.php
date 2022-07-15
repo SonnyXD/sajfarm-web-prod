@@ -255,6 +255,8 @@ Route::get('/available-medics', array('uses' => 'App\Http\Controllers\LogicForms
 
 Route::get('/medic-checklist', array('uses' => 'App\Http\Controllers\LogicForms@medic_checklists'));
 
+Route::get('/returning-checklist', array('uses' => 'App\Http\Controllers\LogicForms@returning_checklists'));
+
 Route::get('/operatiuni/intrare-factura', array('uses' => 'App\Http\Controllers\RoutesController@invoice'));
 
 Route::get('/operatiuni/checklist-statii', array('uses' => 'App\Http\Controllers\RoutesController@station_checklist'));
@@ -269,7 +271,9 @@ Route::get('/operatiuni/bon-consum-medici', array('uses' => 'App\Http\Controller
 
 Route::get('/operatiuni/aviz-intrare', array('uses' => 'App\Http\Controllers\RoutesController@aviz_intrare'));
 
-Route::get('/operatiuni/retur', array('uses' => 'App\Http\Controllers\RoutesController@retur'));
+Route::get('/operatiuni/checklist-retur', array('uses' => 'App\Http\Controllers\RoutesController@returning_checklist'));
+
+Route::get('/operatiuni/retur', array('uses' => 'App\Http\Controllers\RoutesController@returning'));
 
 Route::get('/operatiuni/modificare-cant-min', array('uses' => 'App\Http\Controllers\RoutesController@min_cant'));
 
@@ -305,11 +309,13 @@ Route::post('bon-transfer', 'App\Http\Controllers\TransferController@store')->na
 
 Route::post('bon-consum-ambulante', 'App\Http\Controllers\ConsumptionController@store')->name('consumptionsamb.store');
 
+Route::post('retur', 'App\Http\Controllers\ReturningController@store')->name('returning.store');
+
 Route::post('bon-consum-medici', 'App\Http\Controllers\ConsumptionController@store')->name('consumptionsmedic.store');
 
 Route::post('aviz-intrare', 'App\Http\Controllers\AvizEntryController@store')->name('avizentries.store');
 
-Route::post('retur', 'App\Http\Controllers\ReturningController@store')->name('returnings.store');
+Route::post('checklist-retur', 'App\Http\Controllers\ReturningChecklistController@store')->name('returningchecklist.store');
 
 Route::post('inserare-proprietati', 'App\Http\Controllers\ProviderController@store')->name('provider.store');
 
