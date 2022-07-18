@@ -8,6 +8,7 @@ use \App\Models\Provider;
 use \App\Models\InvoiceItem;
 use Illuminate\Http\Request;
 //use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 use Session;
 use PDF;
 use Auth;
@@ -76,6 +77,8 @@ class InvoiceController extends Controller
             'nir-number' => 'nullable',
             'insertion-date' => 'required'
         ));
+
+        $uid = Str::random(30);
     
         $invoice = new \App\Models\Invoice();
         $invoice->provider_id = $request->input('furnizor-select');
@@ -87,6 +90,7 @@ class InvoiceController extends Controller
         $invoice->total = $request->input('total-value');
         $invoice->insertion_date = $request->input('insertion-date');
         $invoice->aviz = 0;
+        $invoice->uid = $uid;
         $invoice->save();
 
         // $medicament = new \App\Models\ItemStock();
@@ -115,7 +119,7 @@ class InvoiceController extends Controller
 
         $institution = Institution::all();
 
-        $filename = 'pdfs/nir'.$invoice_id.'.pdf';
+        $filename = 'pdfs/'.$uid.'.pdf';
 
         $html = '<html>
                 <head>

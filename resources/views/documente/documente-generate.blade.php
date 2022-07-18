@@ -27,7 +27,7 @@
           @if($nir->aviz == 0)
         <tr>
             <td>{{$nir->id}}</td>
-        <td><a target="_blank" href="/pdfs/nir{{$nir->id}}.pdf">NIR {{$nir->id}}</a></td>
+        <td><a target="_blank" href="/pdfs/{{$nir->uid}}.pdf">NIR {{$nir->id}}</a></td>
             <td>{{date("d-m-Y", strtotime($nir->document_date))}}</td>
         </tr>
           @endif
@@ -55,7 +55,7 @@
         @foreach($transfers as $index => $value)
         <tr>
             <td>{{$transfers[$index]->id}}</td>
-        <td><a target="_blank" href="/pdfs/transfer{{$transfers[$index]->id}}.pdf">Transfer {{$transfers[$index]->id}}</a></td>
+        <td><a target="_blank" href="/pdfs/{{$transfers[$index]->uid}}.pdf">Transfer {{$transfers[$index]->id}}</a></td>
             <td>{{$transfers[$index]->inventory_from->name}}</td>
             <td>{{$transfers[$index]->inventory_to->name}}</td>
             <td>{{date("d-m-Y", strtotime($transfers[$index]->document_date))}}</td>
@@ -84,7 +84,7 @@
         @foreach($consumptions as $consumption)
         <tr>
             <td>{{$consumption->id}}</td>
-        <td><a target="_blank" href="/pdfs/consum{{$consumption->id}}.pdf">Consum {{$consumption->id}}</a></td>
+        <td><a target="_blank" href="/pdfs/{{$consumption->uid}}.pdf">Consum {{$consumption->id}}</a></td>
             <td>{{$consumption->inventory->name}}</td>
             <td>{{$consumption->ambulance->license_plate}} / {{$consumption->medic->name ?? ''}}</td>
             <td>{{date("d-m-Y", strtotime($consumption->document_date))}}</td>
@@ -111,7 +111,7 @@
         @foreach($returnings as $returning)
         <tr>
             <td>{{$returning->id}}</td>
-        <td><a target="_blank" href="/pdfs/retur{{$returning->id}}.pdf">Retur {{$returning->id}}</a></td>
+        <td><a target="_blank" href="/pdfs/{{$returning->uid}}.pdf">Retur {{$returning->id}}</a></td>
             <td>{{$returning->inventory->name}}</td>
             <td>{{date("d-m-Y", strtotime($returning->document_date))}}</td>
         </tr>
@@ -135,7 +135,7 @@
         @foreach($entries as $entry)
         <tr>
             <td>{{$entry->id}}</td>
-        <td><a target="_blank" href="/pdfs/aviz{{$entry->id}}.pdf">Aviz {{$entry->id}}</a></td>
+        <td><a target="_blank" href="/pdfs/{{$entry->uid}}.pdf">Aviz {{$entry->id}}</a></td>
             <td>{{date("d-m-Y", strtotime($entry->document_date))}}</td>
         </tr>
         @endforeach

@@ -8,6 +8,7 @@ use App\Models\Inventory;
 use App\Models\ItemStock;
 use App\Models\Institution;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Session;
 use PDF;
 use Auth;
@@ -47,11 +48,14 @@ class TransferController extends Controller
             'to-location-id' => 'required',
             'document-date' => 'required'
         ));
+
+        $uid = Str::random(30);
     
         $transfer = new \App\Models\Transfer();
         $transfer->from_inventory_id = $request->input('from-location-id');
         $transfer->to_inventory_id = $request->input('to-location-id');
         $transfer->document_date = $request->input('document-date');
+        $transfer->uid = $uid;
         $transfer->save();
 
         $old_date = $request->input('document-date');
@@ -65,7 +69,7 @@ class TransferController extends Controller
         $transfer_id = $transfers->last()->id;
         $institution = Institution::all();
 
-        $filename = 'pdfs/transfer'.$transfer_id.'.pdf';
+        $filename = 'pdfs/'.$uid.'.pdf';
 
         $html = '<html>
                 <head>

@@ -10,6 +10,7 @@ use \App\Models\Provider;
 use \App\Models\InvoiceItem;
 use \App\Models\Inventory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Auth;
 use PDF;
 use Session;
@@ -56,6 +57,8 @@ class AvizEntryController extends Controller
             'total-value' => 'required',
             'nir-number' => 'nullable'
         ));
+
+        $uid = Str::random(30);
     
         $aviz = new \App\Models\AvizEntry();
         $aviz->type = $request->input('type');
@@ -66,6 +69,7 @@ class AvizEntryController extends Controller
         $aviz->discount_procent = $request->input('discount-procent');
         $aviz->discount_value = $request->input('discount-value');
         $aviz->total = $request->input('total-value');
+        $aviz->uid = $uid;
         $aviz->save();
 
         $invoice = new \App\Models\Invoice();
@@ -78,6 +82,7 @@ class AvizEntryController extends Controller
         $invoice->discount_value = $request->input('discount-value');
         $invoice->total = $request->input('total-value');
         $invoice->aviz = 1;
+        $invoice->uid = $uid;
         $invoice->save();
 
         $last_invoice_id = Invoice::orderBy('id', 'desc')->first()->id;
@@ -96,7 +101,7 @@ class AvizEntryController extends Controller
 
         $institution = Institution::all();
 
-        $filename = 'pdfs/aviz'.$aviz_id.'.pdf';
+        $filename = 'pdfs/'.$uid.'.pdf';
 
         $html = '<html>
                 <head>

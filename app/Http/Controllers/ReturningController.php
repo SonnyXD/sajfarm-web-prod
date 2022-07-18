@@ -13,6 +13,7 @@ use App\Models\ReturningChecklist;
 use App\Models\ReturningChecklistItem; 
 use App\Models\Category; 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Session;
 use PDF;
 use Auth;
@@ -53,6 +54,8 @@ class ReturningController extends Controller
             'from-date' => 'required',
             'until-date' => 'required'
             ));
+
+        $uid = Str::random(30);
         
         $old_from_date = $request->input('from-date');
         $old_until_date = $request->input('until-date');
@@ -76,6 +79,7 @@ class ReturningController extends Controller
         $returning = new \App\Models\Returning();
         $returning->inventory_id = $request->input('substation-select');
         $returning->document_date = $request->input('document-date');
+        $returning->uid = $uid;
 
         //$ambulance_id = $request->input('ambulance-select');
    
@@ -98,7 +102,7 @@ class ReturningController extends Controller
 
         $new_date = date("d-m-Y", strtotime($request->input('document-date')));  
 
-        $filename = 'pdfs/retur'.$returning->id.'.pdf';
+        $filename = 'pdfs/'.$uid.'.pdf';
 
         $html = '<html>
                 <head>

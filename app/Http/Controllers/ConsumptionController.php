@@ -15,6 +15,7 @@ use App\Models\Staff;
 use App\Models\Category;
 use App\Models\Checklist;
 use App\Models\ChecklistItem;
+use Illuminate\Support\Str;
 use Session;
 use PDF;
 use Auth;
@@ -58,6 +59,8 @@ class ConsumptionController extends Controller
             'from-date' => 'required',
             'until-date' => 'required'
         ));
+
+        $uid = Str::random(30);
 
         $staff = Staff::all();
 
@@ -225,7 +228,7 @@ class ConsumptionController extends Controller
             $consumption_id++;
         }
 
-        $filename = 'pdfs/consum'.$consumption_id .'.pdf';
+        $filename = 'pdfs/'. $uid .'.pdf';
 
         $html = '<html>
                 <head>
@@ -334,6 +337,7 @@ class ConsumptionController extends Controller
                     $consumption->patient_number = $checklist->patient_number ?? null;
                     $consumption->tour = $checklist->tour;
                     $consumption->document_date = $request->input('document-date');
+                    $consumption->uid = $uid;
                     $consumption->save();
                 }
 

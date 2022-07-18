@@ -295,6 +295,8 @@ Route::get('/documente/documente-generate', array('uses' => 'App\Http\Controller
 
 Route::get('/documente/centralizator', array('uses' => 'App\Http\Controllers\RoutesController@centralizator'));
 
+Route::get('/diverse/documentatie', array('uses' => 'App\Http\Controllers\RoutesController@documentatie'));
+
 //Route::get('/fun', [App\Http\Controllers\GeneratePDFController::class, 'invoice']);
 
 Route::get('intrare-factura', 'App\Http\Controllers\InvoiceController@store')->name('invoices.store');
