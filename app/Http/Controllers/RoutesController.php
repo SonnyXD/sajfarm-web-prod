@@ -33,13 +33,16 @@ class RoutesController extends Controller
 
     public function home()
     {
-        $consumptions = Consumption::orderBy('id', 'desc')->first()->id??0;
-        $transfers = Transfer::orderBy('id', 'desc')->first()->id??0;
-        $nirs = Invoice::orderBy('id', 'desc')->first()->id??0;
-        $aviz = AvizEntry::orderBy('id', 'desc')->first()->id??0;
-        $returnings = Returning::orderBy('id', 'desc')->first()->id??0;
+        $consumptions = Consumption::all();
+        $consumptions = count($consumptions);
+        $transfers = Transfer::all();
+        $transfers = count($transfers);
+        $nirs = Invoice::all();
+        $nirs = count($nirs);
+        $returnings = Returning::all();
+        $returnings = count($returnings);
 
-        return view('home', ['consumptions' => $consumptions, 'transfers' => $transfers, 'nirs' => $nirs, 'aviz' => $aviz, 'returnings' => $returnings]);
+        return view('home', ['consumptions' => $consumptions, 'transfers' => $transfers, 'nirs' => $nirs, 'returnings' => $returnings]);
     }
 
     public function inventory($inventory_slug, $category)
@@ -346,6 +349,11 @@ class RoutesController extends Controller
         $inventories = Inventory::all();
 
         return view('documente.centralizator', ['title' => $title, 'inventories' => $inventories]);
+    }
+
+    public function documentatie()
+    {
+        return view('diverse.documentatie');
     }
 
 }
