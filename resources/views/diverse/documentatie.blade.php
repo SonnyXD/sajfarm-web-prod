@@ -241,6 +241,56 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-12 grid-margin" id="documente">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="mb-4">Documente</h3>
+                            <p>Sectiunea <b>Documente</b> consta in operatiunile de generare a diverse documente, precum rapoarte sau balanta.
+                            </p>
+                            <hr>
+                            <h3 class="mb-4">Raporate</h3>
+                            <p>Rapoartele sunt de 2 feluri si anume:
+                              <ul>
+                                <li>Consum</li>
+                                <li>Retur</li>
+                              </ul>
+                            </p>
+                            <p>Raportul de tip "Consum" este un document PDF care contine toate produsele consumate pe o anumita ambulanta sau pe toate ambulantele, depinzand
+                              de substatia aleasa si de perioada selectata.
+                          </p>
+                          <p>Raportul de tip "Retur" este un document PDF care contine toate produsele scoase din uz pe o anumita substatie, depinzand
+                              de substatia aleasa si de perioada selectata.
+                          </p>
+                          <hr>
+                          <h3 class="mb-4">Centralizator</h3>
+                          <p>Centralizatorul poate fi de 2 feluri:
+                          <ul>
+                             <li>Transferuri</li>
+                             <li>Consumuri</li>
+                          </ul>
+                        </p>
+                        <p>Centralizatorul de tip "Consumuri" este un document PDF care contine toate consumurile din perioada selectata, afisand valorile (in RON) pentru fiecare
+                             subgestiune.
+                          </p>
+                          <p>Centralizatorul de tip "Transferuri" este un document PDF care contine toate transferurile din perioada selectata, afisand valorile (in RON) pentru fiecare
+                             subgestiune.
+                          </p>
+                          <hr>
+                          <h3 class="mb-4">Expira In 6 Luni</h3>
+                          <p>In acest document PDF, putem vizualiza toate produsele ce urmeaza sa expire in urmatoarele 6 luni, din gestiunea aleasa
+                        </p>
+                        <hr>
+                        <h3 class="mb-4">Fisa Produs</h3>
+                        <p>Fisa Produs este un concept in teste momentan, insa reprezinta toate operatiunile efectuate asupra unui anume produs selectat de catre user, dintr-o anumita 
+                          perioada.
+                        </p>
+                        <hr>
+                        <h3 class="mb-4">Inventar</h3>
+                        <p>Operatiunea <b>Inventar</b> genereaza un document PDF, cantitativ, cu toate produsele din gestiunea aleasa, din ziua respectiva.
+                        </p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
       </div>
