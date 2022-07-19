@@ -288,6 +288,18 @@
                         <h3 class="mb-4">Inventar</h3>
                         <p>Operatiunea <b>Inventar</b> genereaza un document PDF, cantitativ, cu toate produsele din gestiunea aleasa, din ziua respectiva.
                         </p>
+                        <hr>
+                        <h3 class="mb-4">Balanta</h3>
+                        <p><b>Balanta</b> este de la sine inteles ce reprezinta aceasta functionalitate.
+                        </p>
+                        <hr>
+                        <h3 class="mb-4">Baza de Date</h3>
+                        <p>In sectiunea <b>Baza de Date</b> putem regasi toate datele institutiei, cum ar fi autosanitarele, substatiile, nomenclatorul samd.
+                        </p>
+                        <hr>
+                        <h3 class="mb-4">Documente Generate</h3>
+                        <p>Aici putem vizualiza toate documentele generate de cand user-ul a inceput sa foloseasca aplicatia; documente precum NIR-uri, bonuri de consum etc.
+                        </p>
                         </div>
                     </div>
                 </div>
