@@ -286,7 +286,35 @@ function deleteRow() {
 });
 }
 
+function sure() {
+  $('#print').on('click',function(e){
+  e.preventDefault();
+  let form = $(this).parents('form');
+  swal({
+    title: "Esti sigur ca ai finalizat?",
+    text: "Odata apasat butonul de confirmare, nu mai poti modifica nimic. Recomandam verificarea multipla a datelor inainte de inserarea acestora",
+    icon: "warning",
+    buttons: true,
+    dangerMode: false,
+  })
+  .then((ok) => {
+    if (ok) {
+      swal("Documentul urmeaza sa fie inserat..", {
+        icon: "success",
+        timer: 1000
+      })
+      .then(()=>  {
+        form.submit();
+      })
+    } else {
+      swal("Ai anulat inserarea documentului!");
+    }
+  });
+});
+}
+
 jQuery(document).ready(() => {
+  sure();
   getInventoryItems();
   returnModal();
   deleteRow();

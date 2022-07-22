@@ -127,9 +127,37 @@ function conditions() {
           
       });
     }
+
+    function sure() {
+      $('#print').on('click',function(e){
+      e.preventDefault();
+      let form = $(this).parents('form');
+      swal({
+        title: "Esti sigur ca ai finalizat?",
+        text: "Odata apasat butonul de confirmare, nu mai poti modifica nimic. Recomandam verificarea multipla a datelor inainte de inserarea acestora",
+        icon: "warning",
+        buttons: true,
+        dangerMode: false,
+      })
+      .then((ok) => {
+        if (ok) {
+          swal("Documentul urmeaza sa fie generat..", {
+            icon: "success",
+            timer: 1000
+          })
+          .then(()=>  {
+            form.submit();
+          })
+        } else {
+          swal("Ai anulat inserarea documentului!");
+        }
+      });
+    });
+    }
     
     jQuery(document).ready(() => {
         //conditions();
+        sure();
         getChecklists();
         treeviewDisplay();
         $('#from-date').attr('max', new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]);
