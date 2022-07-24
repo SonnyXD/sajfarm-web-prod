@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\Provider;
+use \App\Models\InvoiceItem;
 
 class Invoice extends Model
 {
@@ -25,6 +26,10 @@ class Invoice extends Model
     public $timestamps = false;
 
     public function provider() {
-        return $this->hasOne( Provider::class );
+        return $this->belongsTo( Provider::class );
+    }
+
+    public function invoice_item() {
+        return $this->hasMany( InvoiceItem::class );
     }
 }
