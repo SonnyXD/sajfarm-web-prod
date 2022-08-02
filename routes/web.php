@@ -37,6 +37,7 @@ use \App\Http\Controllers\ReturningController;
 use \App\Http\Controllers\ReturningItemController;
 use \App\Http\Controllers\SubstationController;
 use \App\Http\Controllers\RoutesController;
+use \App\Http\Controllers\CancelInvoiceController;
 use \App\Http\Controllers\AuthController;
 
 
@@ -279,6 +280,8 @@ Route::get('/operatiuni/modificare-cant-min', array('uses' => 'App\Http\Controll
 
 Route::get('/operatiuni/inserare-proprietati', array('uses' => 'App\Http\Controllers\RoutesController@proprietati'));
 
+Route::get('/operatiuni/anulare-factura', array('uses' => 'App\Http\Controllers\RoutesController@cancel_invoice'));
+
 Route::get('/documente/rapoarte', array('uses' => 'App\Http\Controllers\RoutesController@rapoarte'));
 
 Route::get('/documente/expira-in-6-luni', array('uses' => 'App\Http\Controllers\RoutesController@expirare'));
@@ -322,6 +325,14 @@ Route::post('checklist-retur', 'App\Http\Controllers\ReturningChecklistControlle
 Route::post('inserare-proprietati', 'App\Http\Controllers\ProviderController@store')->name('provider.store');
 
 Route::post('modificare-cant-min', 'App\Http\Controllers\MinimumQuantityController@store')->name('modify.store');
+
+Route::post('anulare-factura/{nir}', 'App\Http\Controllers\InvoiceController@destroy')->name('invoice.destroy');
+
+Route::post('task', 'App\Http\Controllers\TaskController@store')->name('task.store');
+
+Route::post('delete-task/{task}', 'App\Http\Controllers\TaskController@destroy')->name('task.destroy');
+
+//Route::delete('/anulare-factura/{nir}', [InvoiceController::class, 'destroy'])->name('invoice.destroy');
 
 Route::get('fisa-produs', 'App\Http\Controllers\ProductFileController@store')->name('productfile.store');
 
