@@ -16,12 +16,18 @@ use \App\Models\Transfer;
 use \App\Models\AvizEntry;
 use \App\Models\Returning;
 use \App\Models\AmbulanceType;
+use \App\Models\TransferItem;
+use \App\Models\ConsumptionItem;
+use \App\Models\ChecklistItem;
+use \App\Models\ReturningItem;
 use \App\Models\ItemStock;
 use \App\Models\Assistent;
 use \App\Models\Ambulancier;
 use \App\Models\Consumption;
 use \App\Models\Checklist;
+use \App\Models\ReturningChecklistItem;
 use \App\Models\MinimumQuantity;
+use \App\Models\Task;
 use DB;
 
 class RoutesController extends Controller
@@ -41,8 +47,10 @@ class RoutesController extends Controller
         $nirs = count($nirs);
         $returnings = Returning::all();
         $returnings = count($returnings);
+        $tasks = Task::where('done', 0)
+        ->get();
 
-        return view('home', ['consumptions' => $consumptions, 'transfers' => $transfers, 'nirs' => $nirs, 'returnings' => $returnings]);
+        return view('home', ['consumptions' => $consumptions, 'transfers' => $transfers, 'nirs' => $nirs, 'returnings' => $returnings, 'tasks' => $tasks]);
     }
 
     public function inventory($inventory_slug, $category)
@@ -162,10 +170,11 @@ class RoutesController extends Controller
     {
         $inventories = Inventory::all();
         $transfers = Transfer::all();
+        $assistents = Assistent::all();
 
         $title = 'Bon de Transfer';
 
-        return view('operatiuni.transfer', ['inventories' => $inventories, 'transfers' => $transfers, 'title' => $title]);
+        return view('operatiuni.transfer', ['inventories' => $inventories, 'transfers' => $transfers, 'title' => $title, 'assistents' => $assistents]);
     }
 
     public function bon_consum_ambulante()
@@ -354,6 +363,86 @@ class RoutesController extends Controller
     public function documentatie()
     {
         return view('diverse.documentatie');
+    }
+
+    public function cancel_invoice()
+    {
+
+        //dd($invoices->last());
+
+        $invoices_ids = [];
+
+        $invoices = Invoice::where('aviz', 0)
+        ->where('canceled', 0)
+        ->get();
+
+        foreach($invoices as $invoice) {
+            $invoices_ids[] = $invoice->id;
+        }
+
+        array_unshift($invoices_ids, "");
+
+        unset($invoices_ids[0]);
+
+        //dd($invoices_ids);
+
+        $items = ItemStock::with('invoice_item', 'invoice_item.invoice', 'checklist_item', 'transfer_item', 'consumption_item',
+        'returning_checklist_item')
+        ->chunk(200, function($items) use(&$invoices_ids) {
+            foreach($items as $item) {
+                if($item->transfer_item || $item->checklist_item || $item->consumption_item || $item->returning_checklist_item) {
+                    //unset($invoices_ids[$item->invoice_item->invoice->id]);
+                    foreach (array_keys($invoices_ids, $item->invoice_item->invoice->id, true) as $key) {
+                        unset($invoices_ids[$key]);
+                    }
+                }
+            }
+        });
+
+        
+        //dd($invoices_ids);
+        
+
+        // foreach($items as $item) {
+        //     $checklist = ChecklistItem::where('item_stock_id', $item->id)->first();
+        //     if($checklist == null) {
+        //         $r_checklist = ReturningChecklistItem::where('item_stock_id', $item->id)->first();
+        //         if($r_checklist == null) {
+        //             $transfer = TransferItem::where('item_stock_id', $item->id)->first();    
+        //             if($transfer == null) {
+        //                 $consumption = ConsumptionItem::where('item_stock_id', $item->id)->first();
+        //                 if($consumption == null) {
+        //                     if(!in_array($item->invoice_item->invoice->id, $invoices_ids))
+        //                     {
+        //                         $invoices_ids[] = $item->invoice_item->invoice->id;
+        //                     }
+        //                 }     
+        //             }
+        //         }
+        //     } 
+        // }
+
+        //dd($invoices_ids);
+
+        $invoices = Invoice::whereHas('invoice_item')
+        ->with(['invoice_item', 'invoice_item.itemstock'])
+        ->whereIn('id', $invoices_ids)
+        ->get();
+
+        // foreach($invoices as $invoice) {
+        //     foreach($invoice->invoice_item as $invoice_item) {
+        //         foreach($invoice_item->itemstock as $item) {
+        //             //dd($item);
+        //            $transfer = TransferItem::find($item->id);
+        //            $consumption = ConsumptionItem::find($item->id);
+        //            $returning = ReturningItem::find($item->id);
+        //            $checklist = ChecklistItem::find($item->id);
+        //            $r_checklist = ReturningChecklist::find($item->id);
+        //         }
+        //     }
+        // }
+
+        return view('operatiuni.cancel-invoice', ['nirs' => $invoices]);
     }
 
 }
