@@ -85,6 +85,9 @@
                           <th>
                             Tura
                           </th>
+                          <th>
+                            Nr. fisa pacient
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -95,3 +98,23 @@
                 </div>
 </x-layout>
 <script src="/js/medic-consume.js"></script>
+
+@if(Session::has('success'))
+<script>
+swal("Succes", "Bon consum generat cu succes!", "success");
+</script>
+@endif
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Generare bon consum esuata! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif
+
+@if(Session::has('error'))
+<script>
+swal("Eroare", "Generare bon de consum esuata! Cauze posibile: nu exista checklist pentru medicul respectiv", "error");
+</script>
+@endif

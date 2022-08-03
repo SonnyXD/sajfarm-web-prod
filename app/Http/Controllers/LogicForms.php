@@ -204,11 +204,13 @@ where ci.used = 0 and a.id = 1
                     '<td>%s</td>
                     <td>%s</td>
                     <td>%s</td>
+                    <td>%s</td>
                     <td>%s</td>',
                     $checklist->medic->name,
                     $checklist->ambulance->license_plate,
                     date("d-m-Y", strtotime($checklist->checklist_date)),
-                    $checklist->tour
+                    $checklist->tour,
+                    $checklist->patient_number
                 );
 
                 $html .= "</tr>";
@@ -357,9 +359,11 @@ where ci.used = 0 and a.id = 1
                 $html .= "<tr data-count=". $i .">";
                 $html .= sprintf(
                     '<td>%s</td>
+                    <td>%s</td>
                     <td>%s</td>',
                     $checklist->inventory->name,
-                    date("d-m-Y", strtotime($checklist->checklist_date))
+                    date("d-m-Y", strtotime($checklist->checklist_date)),
+                    $checklist->user
                 );
 
                 $html .= "</tr>";

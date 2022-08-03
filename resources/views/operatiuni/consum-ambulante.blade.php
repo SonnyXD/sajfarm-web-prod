@@ -1,8 +1,8 @@
 <x-layout>
     <x-container :title="$title">
     <x-form id="checklist" method="POST" action="{{ route('consumptionsamb.store') }}">
-    <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
-    <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
+    <!-- <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
+    <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p> -->
         <div class="form-group row">
         <div class="col">
                     <label>Substatie:</label>
@@ -82,6 +82,7 @@
                           <th>
                             Tura
                           </th>
+                          
                         </tr>
                       </thead>
                       <tbody>
@@ -92,3 +93,24 @@
                 </div>
 </x-layout>
 <script src="/js/amb-consume.js"></script>
+
+@if(Session::has('success'))
+<script>
+swal("Succes", "Bon consum generat cu succes!", "success");
+</script>
+@endif
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Generare bon consum esuata! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif
+
+@if(Session::has('error'))
+<script>
+swal("Eroare", "Generare bon de consum esuata! Cauze posibile: nu exista checklist pentru ambulanta respectiva", "error");
+</script>
+@endif
+
