@@ -91,7 +91,8 @@ class ConsumptionController extends Controller
             ->get();
 
             if($ambulance_checklists[0]->checklist->isEmpty())
-            {   
+            {
+                Session::flash('error', '');   
                     return redirect('/operatiuni/bon-consum-ambulante')
                 ->with('error', 'Generare bon de consum esuat! Cauze posibile: nu exista checklist pentru ambulanta respectiva');
                 
@@ -140,6 +141,7 @@ class ConsumptionController extends Controller
 
             if($medic_checklists[0]->checklist->isEmpty())
             {   
+                Session::flash('error', '');
                     return redirect('/operatiuni/bon-consum-medici')
                 ->with('error', 'Generare bon de consum esuat! Cauze posibile: nu exista checklist pentru medicul respectiv');
                 
@@ -433,6 +435,7 @@ class ConsumptionController extends Controller
                         $consumption->patient_number = $checklist->patient_number ?? null;
                         $consumption->tour = $checklist->tour;
                         $consumption->document_date = $request->input('document-date');
+                        $consumption->uid = $uid;
                         $consumption->save();
                     }
     
@@ -881,13 +884,14 @@ class ConsumptionController extends Controller
         PDF::Output(public_path($filename), 'F');
 
         Session::flash('fileToDownload', url($filename));
+        Session::flash('success', 'Checklist generat cu succes!');
 
         if(!empty( $amb_id )) {
             return redirect('/operatiuni/bon-consum-ambulante')
-        ->with('success', 'Consum generat cu succes!')->with('download',);
+                ->with('download',);
         } else {
             return redirect('/operatiuni/bon-consum-medici')
-        ->with('success', 'Consum generat cu succes!')->with('download',);
+                ->with('download',);
         }
 
         // return redirect('/operatiuni/bon-transfer')
