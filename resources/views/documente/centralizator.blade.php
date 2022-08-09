@@ -1,11 +1,13 @@
 <x-layout>
     <x-container :title="$title">
     <x-form id="centralizator" method="GET" action="{{ route('centralizator.store') }}" target="_blank">
+    <!-- <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p> -->
     <div class="form-group">
                     <label>Tip:</label>
                     <select class="form-control" id="type-select" name="type-select">
                         <option value="1">Transferuri</option>
                         <option value="2">Consumuri</option>
+                        <option value="3">Intrari</option>
                     </select>
                   </div>
         <div class="form-group">
@@ -39,3 +41,23 @@
     </x-container>
 </x-layout>
 <script src="/js/centralizator.js"></script>
+
+@if(Session::has('success'))
+<script>
+swal("Succes", "Centralizator generat cu succes!", "success");
+</script>
+@endif
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Generare centralizator esuata! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif
+
+@if(Session::has('error'))
+<script>
+swal("Eroare", "Nu exista centralizator pentru datele introduse", "error");
+</script>
+@endif
