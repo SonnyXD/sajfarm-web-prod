@@ -15,6 +15,8 @@ use \App\Models\Returning;
 use \App\Models\ReturningItem;
 use \App\Models\ItemStock;
 use \App\Models\Inventory;
+use \App\Models\ChecklistItem;
+use \App\Models\ReturningChecklistItem;
 use Session;
 use PDF;
 use Auth;
@@ -118,11 +120,14 @@ class ProductFileController extends Controller
         $consumptions = Consumption::with(['consumption_items_pf' => function($query) use($med_id) {
             $query->where('item_id', $med_id);
         }
-        ])
+        ,'medic', 'ambulance'])
         ->whereBetween('document_date', [$old_from_date, $old_until_date])
         ->get();
 
-        // dd($consumptions->first());
+         //dd($consumptions->first());
+
+        //stocul curent sa fie in ultima zi pe care am ales-o din perioada
+        //la consumuri sa apara fisa pacientului unde exista si medicul si ambulanta
 
         $returnings = Returning::with(['returning_item' => function($query) use($med_id) {
             $query->where('item_id', $med_id);
@@ -270,8 +275,93 @@ class ProductFileController extends Controller
             $current = ItemStock::where('inventory_id', $inventory->id)
             ->where('item_id', $med_id)
             ->sum('quantity');
+
+            // $entries = Consumption::join('consumption_items', 'consumption_items.consumption_id', '=', 'consumptions.id')
+            // ->where('consumptions.inventory_id', $inventory_id)
+            // ->where('consumptions.document_date', '<=', $old_from_date_interval)
+            // ->whereIn('consumption_items.item_id', $subset)
+            // ->leftjoin('item_stocks', 'consumption_items.item_stock_id', '=', 'item_stocks.id')
+            // ->leftjoin('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
+            // ->leftjoin('measure_units', 'invoice_items.measure_unit_id', '=', 'measure_units.id')
+            // ->select('item_stock_id as is_id', ConsumptionItem::raw('SUM(consumption_items.quantity) as starting_quantity'))
+            // ->groupby('item_stock_id')
+            // ->get();
+
+            // $consumptions = Consumption::with('consumption')
+            // ->get();
+
+            // $c_items = ConsumptionItem::whereHas('consumption', function ($query) use($old_until_date, $inventory) {
+            //     $query->where('document_date', '>=', $old_until_date);
+            //     $query->where('inventory_id', $inventory->id);
+            // })
+            // ->with(['consumption' => function($query) use($old_until_date, $inventory) {
+            //     $query->where('document_date', '>=', $old_until_date);
+            //     $query->where('inventory_id', $inventory->id);
+            // }
+            // ])
+            // ->where('item_id', $med_id)
+            // ->sum('quantity');
+
+            $ch_items = ChecklistItem::whereHas('checklist_pf', function ($query) use($old_until_date, $inventory) {
+                $query->where('checklist_date', '>=', $old_until_date);
+                $query->where('inventory_id', $inventory->id);
+                //$query->where('used', 0);
+            })
+            ->with(['checklist_pf' => function($query) use($old_until_date, $inventory) {
+                $query->where('checklist_date', '>=', $old_until_date);
+                $query->where('inventory_id', $inventory->id);
+                //$query->where('used', 0);
+            }
+            ])
+            ->where('item_id', $med_id)
+            ->sum('quantity');
+
+            $t_items = TransferItem::whereHas('transfer', function ($query) use($old_until_date, $inventory) {
+                $query->where('document_date', '>=', $old_until_date);
+                $query->where('from_inventory_id', $inventory->id);
+            })
+            ->with(['transfer' => function($query) use($old_until_date, $inventory) {
+                $query->where('document_date', '>=', $old_until_date);
+                $query->where('from_inventory_id', $inventory->id);
+            }
+            ])
+            ->where('item_id', $med_id)
+            ->sum('quantity');
+
+            $r_items = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $inventory) {
+                $query->where('document_date', '>=', $old_until_date);
+                $query->where('inventory_id', $inventory->id);
+            })
+            ->with(['returning' => function($query) use($old_until_date, $inventory) {
+                $query->where('document_date', '>=', $old_until_date);
+                $query->where('inventory_id', $inventory->id);
+            }
+            ])
+            ->where('item_id', $med_id)
+            ->sum('quantity');
+
+            // $rc_items = ReturningChecklistItem::whereHas('returning_checklist', function ($query) use($old_until_date, $inventory) {
+            //     $query->where('document_date', '>=', $old_until_date);
+            //     $query->where('inventory_id', $inventory->id);
+            // })
+            // ->with(['returning_checklist' => function($query) use($old_until_date, $inventory) {
+            //     $query->where('document_date', '>=', $old_until_date);
+            //     $query->where('inventory_id', $inventory->id);
+            // }
+            // ])
+            // ->where('item_id', $med_id)
+            // ->sum('quantity');
+
+            // if($inventory->id == 2) {
+            //     //dd($r_items + $c_items + $ch_items + $t_items + $current);
+            //     dd($t_items);
+            //     dd( $current + $ch_items + $c_items + $r_items + $t_items);
+            //     dd($c_items);
+            // }
             
-            $html .= '<span style="float: right;">Stoc curent '. $inventory->name .': '. $current .'</span>
+            $total = $current + $ch_items + $r_items + $t_items;
+            
+            $html .= '<span style="float: right;">Stoc curent '. $inventory->name .': '. $total .'</span>
             <br>';
         }
 
@@ -487,10 +577,16 @@ class ProductFileController extends Controller
                 } else {
                     $provider = $item->item_stock->invoice_item->provider->name;
                 }
+
+                // if($consumption->medic == null) {
+                //     $from = $consumption->id .' - '. $consumption->inventory->name;
+                // } else {
+                //     $from = $consumption->id .' - '. $consumption->inventory->name .' - '. $consumption->medic->name;
+                // }
                 $html .= '<tr nobr="true">';
                 $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($consumption->document_date)) .'</td>';
                 $html .= '<td style="text-align: center;">Bon consum</td>';
-                $html .= '<td style="text-align: center;">Consum '. $consumption->id .' - '. $consumption->inventory->name .'</td>';
+                $html .= '<td style="text-align: center;">Consum '. $consumption->id .' - '. $consumption->inventory->name .' - '. $consumption->medic?->name .' - '. $consumption->ambulance->license_plate .'</td>';
                 $html .= '<td style="text-align: center;">'. $item->quantity .'</td>';
                 $html .= '<td style="text-align: center;">'. $item->item_stock->invoice_item->lot .'</td>';
                 $html .= '<td style="text-align: center;">'. $provider .'</td>';

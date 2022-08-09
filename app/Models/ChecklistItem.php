@@ -29,6 +29,10 @@ class ChecklistItem extends Model
         return $this->hasMany( Checklist::class );
     }
 
+    public function checklist_pf() {
+        return $this->belongsTo( Checklist::class, 'checklist_id' );
+    }
+
     public function checklist_item() {
         return $this->belongsTo( ChecklistItem::class);
     }

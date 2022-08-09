@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\Item;
 use \App\Models\ItemStock;
+use \App\Models\Returning;
 use \App\Models\Ambulance;
 
 class ReturningItem extends Model
@@ -30,5 +31,9 @@ class ReturningItem extends Model
 
     public function ambulance() {
         return $this->belongsTo( Ambulance::class );
+    }
+
+    public function returning() {
+        return $this->belongsTo( Returning::class );
     }
 }
