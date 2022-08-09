@@ -115,12 +115,14 @@ class ProductFileController extends Controller
         ->whereBetween('document_date', [$old_from_date, $old_until_date])
         ->get();
 
-        $consumptions = Consumption::with(['consumption_items_grouped' => function($query) use($med_id) {
+        $consumptions = Consumption::with(['consumption_items_pf' => function($query) use($med_id) {
             $query->where('item_id', $med_id);
         }
         ])
         ->whereBetween('document_date', [$old_from_date, $old_until_date])
         ->get();
+
+        // dd($consumptions->first());
 
         $returnings = Returning::with(['returning_item' => function($query) use($med_id) {
             $query->where('item_id', $med_id);
@@ -128,6 +130,11 @@ class ProductFileController extends Controller
         ])
         ->whereBetween('document_date', [$old_from_date, $old_until_date])
         ->get();
+
+        if($invoices->isEmpty() && $transfers->isEmpty() && $consumptions->isEmpty() && $returnings->isEmpty()) {
+            Session::flash('error');
+            return redirect('/documente/fisa-produs');
+        }
 
         //dd($invoices);
 
@@ -471,10 +478,10 @@ class ProductFileController extends Controller
         EOD;
 
         foreach($consumptions as $consumption) {
-            if($consumption->consumption_items_grouped->isEmpty()) {
+            if($consumption->consumption_items_pf->isEmpty()) {
                 continue;
             }
-            foreach($consumption->consumption_items_grouped as $item) {
+            foreach($consumption->consumption_items_pf as $item) {
                 if($item->item_stock->invoice_item->provider == null) {
                     $provider = "";
                 } else {

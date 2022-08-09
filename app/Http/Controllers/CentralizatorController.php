@@ -76,6 +76,7 @@ class CentralizatorController extends Controller
         if($type_id == 1) {
             $type_name = "TRANSFERURI";
             $document_type = "Transfer";
+
             $documents = Transfer::whereHas('transfer_item')
             ->with(['transfer_item', 'transfer_item.item_detail', 'transfer_item.item_stock_detail', 'transfer_item.item_stock_detail.invoice_item', 'inventory_to'])
             ->where('from_inventory_id', '=', $inventory_id)
@@ -103,9 +104,23 @@ class CentralizatorController extends Controller
             // ->where('consumptions.inventory_id', '=', $inventory_id)
             // ->whereBetween('consumptions.document_date', [$old_from_date, $old_until_date])
             // ->get();
+        } else if($type_id == 3) {
+            $type_name = "INTRARI";
+            $document_type = "NIR";
+
+            $documents = Invoice::whereHas('invoice_item')
+            ->with(['invoice_item', 'invoice_item.item'])
+            ->whereBetween('document_date', [$old_from_date, $old_until_date])
+            ->get();
+        }
+
+        if($documents->isEmpty()) {
+            Session::flash('error');
+            return redirect('/documente/centralizator')
+            ->with('error', 'Nu exista centralizator pentru perioada selectata!');
         }
         
-
+        // dd($documents->first());
         //dd($documents[0]);
 
          //dd($documents[0]->consumption_item[0]->item_stock->invoice_item->tva_price * $documents[0]->consumption_item[0]->quantity);
@@ -153,7 +168,7 @@ class CentralizatorController extends Controller
 
             if($type_id == 2) {
                 $html .= '<table>
-                <tr>
+                <tr nobr="true">
                 <th style="font-weight: bold; text-align: center;">Nr. Crt</th>
                 <th style="font-weight: bold; text-align: center;">Data</th>
                 <th style="font-weight: bold; text-align: center;">Nr. Document</th>
@@ -184,7 +199,7 @@ class CentralizatorController extends Controller
                 }
             } else if($type_id == 1) {
                 $html .= '<table>
-                <tr>
+                <tr nobr="true">
                 <th style="font-weight: bold; text-align: center;">Nr. Crt</th>
                 <th style="font-weight: bold; text-align: center;">Data</th>
                 <th style="font-weight: bold; text-align: center;">Nr. Document</th>
@@ -216,7 +231,34 @@ class CentralizatorController extends Controller
                     //}
                     $i++;
                 }
+            } else if($type_id == 3) {
+                $html .= '<table>
+                <tr nobr="true">
+                <th style="font-weight: bold; text-align: center;">Nr. Crt</th>
+                <th style="font-weight: bold; text-align: center;">Data</th>
+                <th style="font-weight: bold; text-align: center;">Nr. Document</th>
+                <th style="font-weight: bold; text-align: center;">Valoare '. $document_type .'</th>
+                </tr>';
+
+                foreach($documents as $document) {
+                    $value = 0;
+
+                    foreach($document->invoice_item as $item) {
+                        if($item->item->category_id == $category->id) {
+                            $value = $value + $item->tva_price * $item->quantity;
+                    }
+                }
+                $total += $value;
+                $html .= '<tr nobr="true">';
+                $html .= '<td style="text-align: center;">'. $i .'</td>';
+                $html .= '<td style="text-align: center;">'. date("d-m-Y", strtotime($document->document_date)) .'</td>';
+                $html .= '<td style="text-align: center;">'. $document_type .' '. $document->id .'</td>';
+                $html .= '<td style="text-align: center;">'. $value .'</td>';
+                $html .= '</tr>';
+                    //}
+                $i++;
             }
+        }
             
             $total_values[] = $total;
             $html .= '</table>';
@@ -270,6 +312,7 @@ class CentralizatorController extends Controller
         //PDF::Output(public_path($filename), 'D');
 
         PDF::Output('name.pdf', 'I');
+
     }
 
     /**

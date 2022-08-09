@@ -42,10 +42,19 @@ class Consumption extends Model
         return $this->hasMany( ConsumptionItem::class );
     }
 
+    public function consumption_items_pf() {
+        return $this->consumption_item()
+        ->select('consumption_items.id', 'consumption_items.consumption_id',
+        'consumption_items.item_id', 'consumption_items.item_stock_id', ConsumptionItem::raw('SUM(consumption_items.quantity) as quantity'))
+             ->groupBy('consumption_items.item_stock_id')
+             ->groupBy('consumption_items.consumption_id');
+    }
+
     public function consumption_items_grouped() {
         return $this->consumption_item()
             ->select('consumption_items.id', 'consumption_items.consumption_id',
             'consumption_items.item_id', 'consumption_items.item_stock_id', ConsumptionItem::raw('SUM(consumption_items.quantity) as quantity'))
             ->groupBy('consumption_items.item_stock_id');
     }
+
 }
