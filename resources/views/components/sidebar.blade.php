@@ -47,6 +47,7 @@
             <li class="nav-item"><a class="nav-link" href="/operatiuni/checklist-retur">Checklist Retur</a></li>
             <li class="nav-item"><a class="nav-link" href="/operatiuni/retur">Retur</a></li>
             <li class="nav-item"><a class="nav-link" href="/operatiuni/modificare-cant-min">Modificare Cantitati Minime</a></li>
+            <li class="nav-item"><a class="nav-link" href="/operatiuni/anulare-factura">Anulare Factura</a></li>
             </ul>
         </div>
         </li>
@@ -87,12 +88,12 @@
             <span class="menu-title">Inventar</span>
         </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
         <a class="nav-link" href="/documente/balanta">
             <i class="menu-icon mdi mdi-scale-balance"></i>
             <span class="menu-title">Balanta</span>
         </a>
-        </li>
+        </li> -->
         <li class="nav-item">
         <a class="nav-link" href="/documente/baza-de-date">
             <i class="menu-icon mdi mdi-table-large"></i>
