@@ -128,6 +128,11 @@ class ReportController extends Controller
             ->with('consumptions', 'consumptions.consumption_items_grouped', 'consumptions.consumption_items_grouped.item')
             ->get();
 
+            if($ambulances->isEmpty()) {
+                Session::flash('error');
+                return redirect('/documente/rapoarte');
+            }
+
             //dd($ambulances);
             //dd($consumptions);
             
@@ -177,7 +182,12 @@ class ReportController extends Controller
 
             $consumption_items = collect($consumption_items)->sortBy('item_name');
 
-           // dd($consumption_items);
+            //dd($consumption_items);
+
+           if(empty($consumption_items)) {
+            Session::flash('error');
+            return redirect('/documente/rapoarte');
+        }
         }
 
         $returnings = "";
@@ -241,6 +251,11 @@ class ReportController extends Controller
                     }
                 }
                 
+            }
+
+            if(empty($returning_items)) {
+                Session::flash('error');
+                return redirect('/documente/rapoarte');
             }
 
             //dd($returning_items);

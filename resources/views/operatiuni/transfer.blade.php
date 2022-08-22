@@ -1,8 +1,8 @@
 <x-layout>
     <x-container :title="$title">
         <x-form id="bon-transfer" method="POST" action="{{ route('transfers.store') }}">
-        <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
-        <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
+        <!-- <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
+        <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p> -->
         <input type="hidden" id="from-location-id" name="from-location-id" value=""/>
         <input type="hidden" id="to-location-id" name="to-location-id" value=""/>
             <div class="form-group">
@@ -36,6 +36,18 @@
                       <x-input type="date" id="document-date" name="document-date"/>
                       </div>
                     </div>
+                    <!-- <div class="col">
+                    <label>Asistent:</label>
+                    <div class="the-basics">
+                    <select class="meds-single-select w-100" id="assistent-select" name="assistent-select">
+                    @if( $assistents->count() )
+                      @foreach ($assistents as $assistent)
+                          <option value="{{ $assistent->id }}">{{ $assistent->name }}</option>
+                      @endforeach
+                    @endif
+                    </select>
+                    </div>
+                  </div> -->
                     <div class="col">
                       <label>Numar</label>
                       <div id="bloodhound">
@@ -131,3 +143,23 @@
           </x-modal>
 </x-layout>
 <script src="/js/transfer.js"></script>
+
+@if(Session::has('success'))
+<script>
+swal("Succes", "Bon transfer generat cu succes!", "success");
+</script>
+@endif
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Generare bon transfer esuata! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif
+
+@if(Session::has('error'))
+<script>
+swal("Eroare", "Generare bon transfer esuata! Incearca din nou!", "error");
+</script>
+@endif

@@ -6,6 +6,7 @@ use \App\Models\Invoice;
 use \App\Models\Institution;
 use \App\Models\Provider;
 use \App\Models\InvoiceItem;
+use \App\Models\ItemStock;
 use Illuminate\Http\Request;
 //use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
@@ -75,8 +76,25 @@ class InvoiceController extends Controller
             'discount-value' => 'required',
             'total-value' => 'required',
             'nir-number' => 'nullable',
-            'insertion-date' => 'required'
+            'insertion-date' => 'required',
+            'product' => 'required'
         ));
+
+        $user = Auth::user();
+
+        if($user == null) {
+            return redirect('/login');
+        }
+
+        foreach($request->input('product') as $productPost) {
+            if($productPost['productId'] == null || $productPost['productQty'] == null || $productPost['productExp'] == null
+            || $productPost['productUm'] == null || $productPost['productPrice'] == null || $productPost['productTva'] == null
+            || $productPost['productTvaPrice'] == null || $productPost['productValue'] == null || $productPost['productUmText'] == null
+            || $productPost['productName'] == null) {
+                Session::flash('error');
+                return redirect('/operatiuni/intrare-factura');
+            }
+        }
 
         $uid = Str::random(30);
     
@@ -91,6 +109,7 @@ class InvoiceController extends Controller
         $invoice->insertion_date = $request->input('insertion-date');
         $invoice->aviz = 0;
         $invoice->uid = $uid;
+        //$invoice->canceled = 0;
         $invoice->save();
 
         // $medicament = new \App\Models\ItemStock();
@@ -105,7 +124,6 @@ class InvoiceController extends Controller
 
         $invoices = Invoice::all();
         $invoice_id = $invoices->last()->id;
-        $user = Auth::user();
 
         $old_date = $request->input('document-date');
         $new_date = date("d-m-Y", strtotime($old_date));  
@@ -274,9 +292,12 @@ class InvoiceController extends Controller
         PDF::Output(public_path($filename), 'F');
 
         Session::flash('fileToDownload', url($filename));
+        Session::flash('success', 'Factura inregistrata cu succes!');
 
+        // return redirect('/operatiuni/intrare-factura')
+        //     ->with('success', 'Factura inregistrata cu succes!')->with('download',);
         return redirect('/operatiuni/intrare-factura')
-            ->with('success', 'Factura inregistrata cu succes!')->with('download',);
+           ->with('download',);
     
         // return redirect('/operatiuni/intrare-factura')
         //    ->with('success', 'Factura inregistrata cu succes!');
@@ -452,8 +473,29 @@ class InvoiceController extends Controller
      * @param  \App\Models\Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Invoice $invoice)
+    public function destroy(Invoice $nir)
     {
-        //
+        $nir->canceled = 1;
+        $nir->save();
+
+        // $items = ItemStock::with(['invoice_item' => function($query) use($nir){
+        //     $query->where('invoice_id', $nir->id);
+        // }])
+        // ->get();
+
+        $items = InvoiceItem::with('itemstock')
+        ->where('invoice_id', $nir->id)
+        ->get();
+
+        foreach($items as $item) {
+            foreach($item->itemstock as $i_stock) {
+                $i_stock->delete();
+            }
+            $item->delete();
+        }
+
+        Session::flash('success', '');
+
+        return redirect('/operatiuni/anulare-factura');
     }
 }

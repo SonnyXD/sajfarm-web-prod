@@ -28,3 +28,17 @@
     </x-container>
 </x-layout>
 <script src="/js/modify.js"></script>
+
+@if(Session::has('success'))
+<script>
+swal("Succes", "Modificarile au fost efectuate cu succes!", "success");
+</script>
+@endif
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Modificarile au esuat! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif

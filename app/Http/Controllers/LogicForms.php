@@ -16,9 +16,9 @@ class LogicForms extends Controller
     public function inventory_products(Request $request) 
     {
 
-        $items = ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit')->where('inventory_id', $request->inventory)->get();
+        $items = ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit', 'invoice_item.invoice')->where('inventory_id', $request->inventory)->get();
 
-        //dd($items);
+        //dd($items->first());
 
         $html = "";
 

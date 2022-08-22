@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Checklist;
 use App\Models\ChecklistItem;
+use App\Models\ItemStock;
 use Illuminate\Http\Request;
+use Auth;
+use Session;
 
 class ChecklistController extends Controller
 {
@@ -44,8 +47,40 @@ class ChecklistController extends Controller
             'patient-number' => 'nullable',
             'tura' => 'required',
             'assistent-select' => 'nullable',
-            'ambulancier-select' => 'nullable'
+            'ambulancier-select' => 'nullable',
+            'product' => 'required'
         ));
+
+        $user = Auth::user();
+
+        if($user == null) {
+            return redirect('/login');
+        }
+
+        $products = $request->input('product');
+        
+        foreach($products as $product) {
+            
+            if($product['productId'] == null || $product['productName'] == null || $product['productUmText'] == null 
+            || $product['productQty'] == null) {
+                Session::flash('error');
+                if($request->input('patient-number') == null) {
+                    return redirect('/operatiuni/checklist-statii');
+                } else {
+                    return redirect('/operatiuni/checklist-medici');
+                }
+            }
+
+            $stock = ItemStock::where('id', $product['productId'])->first()->quantity;
+            if($stock < $product['productQty']) {
+                Session::flash('error');
+                if($request->input('patient-number') == null) {
+                    return redirect('/operatiuni/checklist-statii');
+                } else {
+                    return redirect('/operatiuni/checklist-medici');
+                }
+            }
+        }
     
         $checklist = new \App\Models\Checklist();
         $checklist->inventory_id = $request->input('from-location-id');
@@ -57,6 +92,7 @@ class ChecklistController extends Controller
         $checklist->ambulancier_id = $request->input('ambulancier-select') ?? null;
         $checklist->tour = $request->input('tura');
         $checklist->used = 0;
+        // $checklist->user = $user->name;
         $checklist->save();
 
 
@@ -122,13 +158,15 @@ class ChecklistController extends Controller
             // $checklist_product->save();
         }
 
+        Session::flash('success', 'Checklist generat cu succes!');
+
         if($checklist->medic_id) {
-            return redirect('/operatiuni/checklist-medici')
-                ->with('success', 'Checklist generat cu succes!');
+            return redirect('/operatiuni/checklist-medici');
+                
         }
 
-        return redirect('/operatiuni/checklist-statii')
-            ->with('success', 'Checklist generat cu succes!');
+        return redirect('/operatiuni/checklist-statii');
+          
     
         
     }

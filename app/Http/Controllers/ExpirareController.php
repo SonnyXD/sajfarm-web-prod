@@ -87,6 +87,7 @@ class ExpirareController extends Controller
         ->get();
         
         if($items->isEmpty()) {
+            Session::flash('error');
             return redirect('/documente/expira-in-6-luni')
             ->with('error', 'Nu exista produse care expira in urmatoarele 6 luni in aceasta gestiune');
         }

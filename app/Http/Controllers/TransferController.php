@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\Inventory;
 use App\Models\ItemStock;
 use App\Models\Institution;
+use App\Models\Assistent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Session;
@@ -46,10 +47,40 @@ class TransferController extends Controller
         $this->validate($request, array(
             'from-location-id' => 'required',
             'to-location-id' => 'required',
-            'document-date' => 'required'
+            'document-date' => 'required',
+            'product' => 'required'
         ));
 
+        $user = Auth::user();
+
+        if($user == null) {
+            return redirect('/login');
+        }
+
         $uid = Str::random(30);
+
+        if($request->input('from-location-id') == $request->input('to-location-id')) {
+            Session::flash('error');
+            return redirect('/operatiuni/bon-transfer');
+        }
+
+        foreach($request->input('product') as $productPost) {
+            if($productPost['productId'] == null || $productPost['productName'] == null || $productPost['productUmText'] == null 
+            || $productPost['productQty'] == null) {
+                Session::flash('error');
+                return redirect('/operatiuni/bon-transfer');
+            }
+
+            $stock = ItemStock::where('id', $productPost['productId'])->first()->quantity;
+            if($stock < $productPost['productQty']) {
+                Session::flash('error');
+                return redirect('/operatiuni/bon-transfer');
+            }
+        }
+
+        // $assistent_id = $request->input('assistent-select');
+
+        // $assistent = Assistent::where('id', $assistent_id)->first()->name;
     
         $transfer = new \App\Models\Transfer();
         $transfer->from_inventory_id = $request->input('from-location-id');
@@ -64,7 +95,6 @@ class TransferController extends Controller
         $from_location = Inventory::where('id', $request->input('from-location-id'))->get();
         $to_location = Inventory::where('id', $request->input('to-location-id'))->get();
 
-        $user = Auth::user();
         $transfers = Transfer::all();
         $transfer_id = $transfers->last()->id;
         $institution = Institution::all();
@@ -245,9 +275,10 @@ class TransferController extends Controller
         PDF::Output(public_path($filename), 'F');
 
         Session::flash('fileToDownload', url($filename));
+        Session::flash('success', 'Bon transfer generat cu succes!');
 
         return redirect('/operatiuni/bon-transfer')
-            ->with('success', 'Transfer efectuat cu succes!')->with('download',);
+            ->with('download',);
 
         // $medicament = new \App\Models\ItemStock();
         // $medicament->id = 1;

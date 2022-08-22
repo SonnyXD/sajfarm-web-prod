@@ -1,7 +1,7 @@
 <x-layout>
     <x-container :title="$title">
         <x-form id="fisa-produs" method="GET" action="{{ route('productfile.store') }}" target="_blank">
-        <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
+        <!-- <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p> -->
         <div class="form-group">
                     <label>Medicament/Material Sanitar:</label>
                     <select class="meds-single-select w-100" id="meds" name="meds">
@@ -33,3 +33,17 @@
     </x-container>
 </x-layout>
 <script src="/js/product-file.js"></script>
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Generare document esuata! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif
+
+@if(Session::has('error'))
+<script>
+swal("Eroare", "Nu exista istoric pentru produsul respectiv in perioada selectata", "error");
+</script>
+@endif

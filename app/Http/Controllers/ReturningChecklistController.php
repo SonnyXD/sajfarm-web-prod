@@ -47,13 +47,35 @@ class ReturningChecklistController extends Controller
     {
         $this->validate($request, array(
             'from-location-id' => 'required',
-            'document-date' => 'required'
+            'document-date' => 'required',
+            'product' => 'required'
         ));
+
+        $user = Auth::user();
+
+        if($user == null) {
+            return redirect('/login');
+        }
+
+        foreach($request->input('product') as $product) {
+            if($product['productId'] == null || $product['productName'] == null || $product['productUmText'] == null 
+            || $product['productQty'] == null || $product['productReason'] == null || $product['productAmb'] == null) {
+                Session::flash('error');
+                return redirect('/operatiuni/checklist-retur');
+            }
+
+            $stock = ItemStock::where('id', $product['productId'])->first()->quantity;
+            if($stock < $product['productQty']) {
+                Session::flash('error');
+                return redirect('/operatiuni/checklist-retur');
+            }
+        }
 
         $returning_checklist = new \App\Models\ReturningChecklist();
         $returning_checklist->inventory_id = $request->input('from-location-id');
         $returning_checklist->checklist_date = $request->input('document-date');
         $returning_checklist->used = 0;
+        // $returning_checklist->user = $user->name;
         $returning_checklist->save();
 
         $products = $request->input('product');
@@ -77,8 +99,9 @@ class ReturningChecklistController extends Controller
             $returning_checklist_item->save();
         }
 
-        return redirect('/operatiuni/checklist-retur')
-            ->with('success', 'Checklist retur generat cu succes!');
+        Session::flash('success', 'Checklist retur generat cu succes!');
+
+        return redirect('/operatiuni/checklist-retur');
         
     }
 

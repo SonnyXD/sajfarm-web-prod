@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Provider;
 use Illuminate\Http\Request;
+use Session;
 
 class ProviderController extends Controller
 {
@@ -52,8 +53,9 @@ class ProviderController extends Controller
 
         $provider->save();
 
-        return redirect('/operatiuni/inserare-proprietati')
-            ->with('success', 'Furnizor adaugat cu succes!');
+        Session::flash('success', '');
+
+        return redirect('/operatiuni/inserare-proprietati');
     }
 
     /**

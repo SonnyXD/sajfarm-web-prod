@@ -55,6 +55,12 @@ class ReturningController extends Controller
             'until-date' => 'required'
             ));
 
+        $user = Auth::user();
+
+        if($user == null) {
+            return redirect('/login');
+        }
+
         $uid = Str::random(30);
         
         $old_from_date = $request->input('from-date');
@@ -72,6 +78,7 @@ class ReturningController extends Controller
         // dd($checklists);
 
         if($checklists->isEmpty()) {
+            Session::flash('error', '');
             return redirect('/operatiuni/retur')
                 ->with('error', 'Generare proces verbal retur esuat! Cauze posibile: nu exista checklist-uri in perioada selectata');
         }
@@ -287,9 +294,10 @@ class ReturningController extends Controller
         PDF::Output(public_path($filename), 'F');
 
         Session::flash('fileToDownload', url($filename));
+        Session::flash('success', 'Retur generat cu succes!');
 
         return redirect('/operatiuni/retur')
-            ->with('success', 'Proces verbal retur efectuat cu succes!')->with('download',);
+            ->with('download',);
 
     }
 

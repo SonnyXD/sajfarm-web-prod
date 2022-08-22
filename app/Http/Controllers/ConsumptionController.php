@@ -60,6 +60,12 @@ class ConsumptionController extends Controller
             'until-date' => 'required'
         ));
 
+        $user = Auth::user();
+
+        if($user == null) {
+            return redirect('/login');
+        }
+
         $uid = Str::random(30);
 
         $staff = Staff::all();
@@ -213,8 +219,6 @@ class ConsumptionController extends Controller
 
         $old_date = $request->input('document-date');
         $new_date = date("d-m-Y", strtotime($old_date));  
-
-        $user = Auth::user();
 
         //dd($ambulance_checklists->first());
        

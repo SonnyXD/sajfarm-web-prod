@@ -281,7 +281,7 @@ function sure() {
 }
 
 jQuery(document).ready(() => {
-    aviz();
+    sure();
     facturaModal();
     addProductToNir();
     deleteRow();

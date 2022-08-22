@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MinimumQuantity;
 use Illuminate\Http\Request;
 use \App\Models\Inventory;
+use Session;
 
 class MinimumQuantityController extends Controller
 {
@@ -105,8 +106,9 @@ class MinimumQuantityController extends Controller
 
         // $modify2->save();
 
-        return redirect('/operatiuni/modificare-cant-min')
-            ->with('success', 'Cantitati minime modificate cu succes!');
+        Session::flash('success', '');
+
+        return redirect('/operatiuni/modificare-cant-min');
     }
 
     /**

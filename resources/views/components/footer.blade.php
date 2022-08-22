@@ -21,6 +21,7 @@
 <!-- End custom js for this page-->
 <script src="/js/typeahead.js/typeahead.bundle.min.js"></script>
 <script src="/js/select2/select2.min.js"></script>
+<script src="/js/js-inactivity/inactivityplugin.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

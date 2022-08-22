@@ -18,7 +18,7 @@ class TransferItem extends Model
     public $timestamps = false;
 
     public function item() {
-        return $this->hasMany( Item::class );
+        return $this->belongsTo( Item::class );
     }
 
     public function item_stock() {

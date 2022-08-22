@@ -1,8 +1,8 @@
 <x-layout>
     <x-container :title="$title">
     <x-form id="intrare-factura" method="POST" action="{{ route('avizentries.store') }}">
-      <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
-      <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
+      <!-- <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
+      <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p> -->
     <div class="form-group">
                 <label>Tip:</label>
                 <select class="form-control" id="type" name="type">
@@ -217,3 +217,23 @@
           </x-modal>
 </x-layout>
 <script src="/js/aviz.js"></script>
+
+@if(Session::has('success'))
+<script>
+swal("Succes", "NIR generat cu succes!", "success");
+</script>
+@endif
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Generare NIR esuata! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif
+
+@if(Session::has('error'))
+<script>
+swal("Eroare", "Generare NIR esuata! Incearca din nou!", "error");
+</script>
+@endif

@@ -405,10 +405,10 @@ class ProductFileController extends Controller
             ->where('item_id', $med_id)
             ->sum('quantity');
             
-            $total = $current + $ch_items + $r_items + $t_items;
+            $total = $current + $ch_items + $t_items;
             $initial = $current + $ch_items_today + $t_items_today + $r_items_today;
             if($inventory->id == 2) {
-                //dd($ch_items_today);
+                //dd($r_items_today);
             }
             
             $html .= '<span style="float: right;">Stoc final '. $inventory->name .': '. $total .' [/] Stoc initial '. $inventory->name .': '. $initial .'</span>

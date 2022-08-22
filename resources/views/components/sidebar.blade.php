@@ -47,7 +47,7 @@
             <li class="nav-item"><a class="nav-link" href="/operatiuni/checklist-retur">Checklist Retur</a></li>
             <li class="nav-item"><a class="nav-link" href="/operatiuni/retur">Retur</a></li>
             <li class="nav-item"><a class="nav-link" href="/operatiuni/modificare-cant-min">Modificare Cantitati Minime</a></li>
-            <li class="nav-item"><a class="nav-link" href="/operatiuni/anulare-factura">Anulare Factura</a></li>
+            <!--<li class="nav-item"><a class="nav-link" href="/operatiuni/anulare-factura">Anulare Factura</a></li> -->
             </ul>
         </div>
         </li>

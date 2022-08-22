@@ -1,8 +1,8 @@
 <x-layout>
     <x-container :title="$title">
         <x-form id="return-items" method="POST" action="{{ route('returningchecklist.store') }}">
-          <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
-          <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
+          <!-- <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
+          <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p> -->
           <input type="hidden" id="from-location-id" name="from-location-id" value=""/>
         <div class="form-group row">
                 <div class="col">
@@ -142,3 +142,23 @@
           </x-modal>
 </x-layout>
 <script src="/js/returning-checklist.js"></script>
+
+@if(Session::has('success'))
+<script>
+swal("Succes", "Checklist retur generat cu succes!", "success");
+</script>
+@endif
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Generare checklist retur esuata! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif
+
+@if(Session::has('error'))
+<script>
+swal("Eroare", "Generare NIR esuata! Incearca din nou!", "error");
+</script>
+@endif

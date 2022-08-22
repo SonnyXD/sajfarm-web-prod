@@ -55,10 +55,27 @@ class AvizEntryController extends Controller
             'discount-procent' => 'required',
             'discount-value' => 'required',
             'total-value' => 'required',
-            'nir-number' => 'nullable'
+            'nir-number' => 'nullable',
+            'product' => 'required'
         ));
 
+        $user = Auth::user();
+
+        if($user == null) {
+            return redirect('/login');
+        }
+
         $uid = Str::random(30);
+
+        foreach($request->input('product') as $productPost) {
+            if($productPost['productId'] == null || $productPost['productQty'] == null || $productPost['productExp'] == null
+            || $productPost['productUm'] == null || $productPost['productPrice'] == null || $productPost['productTva'] == null
+            || $productPost['productTvaPrice'] == null || $productPost['productValue'] == null || $productPost['productUmText'] == null
+            || $productPost['productName'] == null) {
+                Session::flash('error');
+                return redirect('/operatiuni/aviz-intrare');
+            }
+        }
     
         $aviz = new \App\Models\AvizEntry();
         $aviz->type = $request->input('type');
@@ -89,7 +106,6 @@ class AvizEntryController extends Controller
     
         $avize = AvizEntry::all();
         $aviz_id = $avize->last()->id;
-        $user = Auth::user();
 
         $old_date = $request->input('document-date');
         $new_date = date("d-m-Y", strtotime($old_date));  
@@ -333,9 +349,10 @@ class AvizEntryController extends Controller
         PDF::Output(public_path($filename), 'F');
 
         Session::flash('fileToDownload', url($filename));
+        Session::flash('success', 'NIR generat cu succes!');
 
         return redirect('/operatiuni/aviz-intrare')
-            ->with('success', 'Aviz Intrare inregistrat cu succes!')->with('download');
+            ->with('download');
     }
 
     /**

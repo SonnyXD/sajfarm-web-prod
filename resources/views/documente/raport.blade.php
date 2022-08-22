@@ -1,7 +1,7 @@
 <x-layout>
     <x-container :title="$title">
       <x-form id="raport" method="GET" action="{{ route('report.store') }}" target="_blank">
-      <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
+      <!-- <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p> -->
         <div class="form-group row">
                 <div class="col">
             <label>Tip raport:</label>
@@ -59,3 +59,23 @@
     </x-container>
 </x-layout>
 <script src="/js/reports.js"></script>
+
+@if(Session::has('success'))
+<script>
+swal("Succes", "Raport generat cu succes!", "success");
+</script>
+@endif
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Generare raport esuata! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif
+
+@if(Session::has('error'))
+<script>
+swal("Eroare", "Nu exista raport pentru datele introduse", "error");
+</script>
+@endif

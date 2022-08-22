@@ -11,6 +11,7 @@ use \App\Models\InvoiceItem;
 use \App\Models\ChecklistItem;
 use \App\Models\ConsumptionItem;
 use \App\Models\TransferItem;
+use \App\Models\ReturningChecklistItem;
 use \App\Models\Transfer;
 
 class ItemStock extends Model
@@ -38,14 +39,18 @@ class ItemStock extends Model
     }
 
     public function checklist_item() {
-        return $this->belongsTo( ChecklistItem::class );
+        return $this->hasOne( ChecklistItem::class );
     }
 
     public function transfer_item() {
-        return $this->hasMany( TransferItem::class );
+        return $this->hasOne( TransferItem::class );
     }
 
     public function consumption_item() {
-        return $this->hasMany( ConsumptionItem::class );
+        return $this->hasOne( ConsumptionItem::class );
+    }
+
+    public function returning_checklist_item() {
+        return $this->hasOne( ReturningChecklistItem::class );
     }
 }

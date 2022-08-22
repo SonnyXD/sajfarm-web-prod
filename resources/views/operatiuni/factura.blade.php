@@ -6,8 +6,8 @@
     </script>
     <x-container :title="$title">
     <x-form id="intrare-factura" method="GET" action="{{ route('invoices.store') }}">
-      <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
-      <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
+      <!-- <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
+      <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p> -->
         <div class="form-group">
         <label for="furnizor-select">Furnizor</label>
         <select class="form-control" id="furnizor-select" name="furnizor-select">
@@ -241,3 +241,23 @@
        
 </x-layout>
 <script src="/js/invoice.js"></script>
+
+@if(Session::has('success'))
+<script>
+swal("Succes", "Factura inregistrata cu succes!", "success");
+</script>
+@endif
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Inregistrarea facturii a esuat! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif
+
+@if(Session::has('error'))
+<script>
+swal("Eroare", "Inregistrarea facturii a esuat! Incearca din nou!", "error");
+</script>
+@endif

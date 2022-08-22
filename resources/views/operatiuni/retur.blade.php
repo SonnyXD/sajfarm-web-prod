@@ -1,8 +1,8 @@
 <x-layout>
     <x-container :title="$title">
     <x-form id="returning" method="POST" action="{{ route('returning.store') }}">
-    <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
-    <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p>
+    <!-- <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
+    <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p> -->
     <div class="form-group">
         <label>Substatie:</label>
         <div class="the-basics">
@@ -68,6 +68,9 @@
                           <th>
                             Data 
                           </th>
+                          <th>
+                            Utilizator 
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -78,3 +81,23 @@
                 </div>
 </x-layout>
 <script src="/js/return.js"></script>
+
+@if(Session::has('success'))
+<script>
+swal("Succes", "Proces verbal retur generat cu succes!", "success");
+</script>
+@endif
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Generare proces verbal retur esuata! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif
+
+@if(Session::has('error'))
+<script>
+swal("Eroare", "Generare proces verbal retur esuat! Cauze posibile: nu exista checklist-uri in perioada selectata", "error");
+</script>
+@endif
