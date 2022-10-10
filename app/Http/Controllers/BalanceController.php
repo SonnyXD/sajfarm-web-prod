@@ -257,6 +257,18 @@ class BalanceController extends Controller
                 ->where('item_stock_id', $item->item_stock_id)
                 ->sum('quantity');
 
+                $returned_initial = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $old_from_date_interval, $inventory_id, $subset) {
+                    $query->where('document_date', '<=', $old_from_date);
+                    $query->where('inventory_id', $inventory_id);
+                })
+                ->with(['returning' => function($query) use($old_until_date, $inventory_id, $old_from_date_interval) {
+                    $query->where('document_date', '<=', $old_from_date);
+                    $query->where('inventory_id', $inventory_id);
+                }
+                ])
+                ->where('item_stock_id', $item->item_stock_id)
+                ->sum('quantity');
+
                 //dd($item);
 
                 //initial (calculating it -> invoice_item_quantity - transfered_quantity of the item_stock_id)
@@ -304,7 +316,7 @@ class BalanceController extends Controller
                         'um' => $detailed_item->invoice_item->measure_unit->name,
                         'date' => $detailed_item->invoice_item->invoice->document_date,
                         'price' => $detailed_item->invoice_item->price,
-                        'initial' => $invoice_item_quantity->quantity - $transfered_quantity,
+                        'initial' => $invoice_item_quantity->quantity - $transfered_quantity - $returned_initial,
                         'ins' => 0,
                         'outs' => $item->total_quantity + $returned_quantity,
                         'final' => ($invoice_item_quantity->quantity - $transfered_quantity + 0) - $item->total_quantity - $returned_quantity,
