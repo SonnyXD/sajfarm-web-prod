@@ -335,37 +335,21 @@ class ReportController extends Controller
             if($report_type == 1) {
                 if($ambulance == 'Toate ambulantele') {
                     $total_values = [];
-                    // foreach($consumptions as $consumption) {
-                    //     $html .= '<span style="font-weight: bold;">'. $consumption->ambulance->license_plate .'</span><br><br>';
-                    //     foreach($categories as $category) {
-                    //         $html .= '<span style="font-weight: bold;">'. $category->name .'</span><br><br>';
-                    //         $html .= $table_cons;
-                    //         foreach($consumption->consumption_items_grouped as $item) {
-                    //             if($category->id == $item->item_stock->invoice_item->item->category_id) {
-                    //                 $html .= '<tr nobr="true">
-                    //                 <td style="text-align: center;">'. $item->item_stock->invoice_item->item->name .'</td>
-                    //                 <td style="text-align: center;">'. $item->item_stock->invoice_item->measure_unit->name .'</td>
-                    //                 <td style="text-align: center;">'. $item->quantity .'</td>
-                    //                 <td style="text-align: center;">'. $item->item_stock->invoice_item->price .'</td>
-                    //                 <td style="text-align: center;">'. $item->item_stock->invoice_item->tva .'</td>
-                    //                 <td style="text-align: center;">'. $item->item_stock->invoice_item->tva_price .'</td>
-                    //                 <td style="text-align: center;">'. $item->quantity * $item->item_stock->invoice_item->tva_price .'</td>
-                    //                 <td style="text-align: center;">'. $item->item_stock->invoice_item->lot .'</td>
-                    //                 <td style="text-align: center;">'. date("d-m-Y", strtotime($item->item_stock->invoice_item->exp_date)) .'</td>
-                    //             </tr>';
-                    //             }
-                    //         }
-                    //         $html .= '</table><br><br>';
-                    //     }
-                    // }
+                    foreach($categories as $category) {
+                        $total_values[$category->name] = 0;
+                    }
+                    //dd($total_values);
+                    
                     foreach($ambulances as $ambulance) {
                          $html .= '<span style="font-weight: bold;">'. $ambulance->license_plate .'</span><br><br>';
                          foreach($categories as $category) {
+                            $total = 0;
                             $html .= '<span style="font-weight: bold;">'. $category->name .'</span><br><br>';
                             $html .= $table_cons;
                             foreach($ambulance->consumptions as $consumption) {
                                 foreach($consumption->consumption_items_grouped as $item) {
                                     if($category->id == $item->item->category_id) {
+                                        $total += ($item->quantity * $item->item_stock->invoice_item->tva_price);
                                         $html .= '<tr nobr="true">
                                         <td style="text-align: center;">'. $item->item_stock->invoice_item->item->name .'</td>
                                         <td style="text-align: center;">'. $item->item_stock->invoice_item->measure_unit->name .'</td>
@@ -382,9 +366,14 @@ class ReportController extends Controller
                                 
                             }
                             $html .= '</table><br><br>';
+                            //dd($total);
+                            $total_values[$category->name] += $total;
                          }
                     }
-                    //dd($total_values);
+                    foreach($categories as $category) {
+                        $html .= '<span>Total Valoare '. $category->name .': '. $total_values[$category->name] .'</span>';
+                        $html .= '<br>';
+                    }
                 } else {
                     $total_values = [];
                     foreach($categories as $category) {

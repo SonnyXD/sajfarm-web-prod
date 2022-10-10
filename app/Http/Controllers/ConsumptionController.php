@@ -846,27 +846,49 @@ class ConsumptionController extends Controller
 
         $html .= '<br>'; 
 
-        $html .= '<br>'; 
+        $html .= '<br>';
 
-        $html .= '<span>Responsabili Stoc 3</span><br>';
+        if($substation_id == 2) {
+            $html .= '<span>Responsabili Stoc 3</span><br>';
 
-        $html .= '<table>';
+            $html .= '<table>';
 
-        $html .= '<tr nobr="true">
-            <th style="font-weight: bold; text-align: center;">Nume</th>
-            <th style="font-weight: bold; text-align: center;">Semnatura</th>
-        </tr>';
+            $html .= '<tr nobr="true">
+                <th style="font-weight: bold; text-align: center;">Nume</th>
+                <th style="font-weight: bold; text-align: center;">Semnatura</th>
+            </tr>';
 
-        foreach($staff as $person) {
-            if($person['inventory_id'] == 2) {
-                $html .= '<tr nobr="true">
-                            <td style="text-align: center;">'. $person['name'] .'</td>
-                            <td style="text-align: center;"></td>
-                    </tr>';
+            foreach($staff as $person) {
+                if($person['inventory_id'] == 2) {
+                    $html .= '<tr nobr="true">
+                                <td style="text-align: center;">'. $person['name'] .'</td>
+                                <td style="text-align: center;"></td>
+                        </tr>';
+                }
             }
-        }
 
-        $html .= '</table>';
+            $html .= '</table>';
+        } else if($substation_id > 2) {
+            $html .= '<span>Coordonatori Substatie</span><br>';
+
+            $html .= '<table>';
+
+            $html .= '<tr nobr="true">
+                <th style="font-weight: bold; text-align: center;">Nume</th>
+                <th style="font-weight: bold; text-align: center;">Semnatura</th>
+            </tr>';
+
+            foreach($staff as $person) {
+                if($person['inventory_id'] > 2) {
+                    $html .= '<tr nobr="true">
+                                <td style="text-align: center;">'. $person['name'] .'</td>
+                                <td style="text-align: center;"></td>
+                        </tr>';
+                }
+            }
+
+            $html .= '</table>';
+        }
 
         $html .= '</html>';
 

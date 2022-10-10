@@ -88,12 +88,12 @@
             <span class="menu-title">Inventar</span>
         </a>
         </li>
-        <!-- <li class="nav-item">
+        <li class="nav-item">
         <a class="nav-link" href="/documente/balanta">
             <i class="menu-icon mdi mdi-scale-balance"></i>
             <span class="menu-title">Balanta</span>
         </a>
-        </li> -->
+        </li>
         <li class="nav-item">
         <a class="nav-link" href="/documente/baza-de-date">
             <i class="menu-icon mdi mdi-table-large"></i>

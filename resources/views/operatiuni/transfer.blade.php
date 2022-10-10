@@ -5,12 +5,13 @@
         <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p> -->
         <input type="hidden" id="from-location-id" name="from-location-id" value=""/>
         <input type="hidden" id="to-location-id" name="to-location-id" value=""/>
+        <input type="hidden" id="final-document-date" name="final-document-date" value=""/>
             <div class="form-group">
                 <label>Din:</label>
                 <select class="form-control" id="from-location" name="from-location">
                     @if( $inventories->count() )
                       @foreach ($inventories as $inventory)
-                        @if($inventory->name != 'Statie centrala')
+                        @if($inventory->id < 2)
                           <option value="{{ $inventory->id }}">{{ $inventory->name }}</option>
                         @endif
                       @endforeach

@@ -43,7 +43,7 @@ class ChecklistController extends Controller
             'from-location-id' => 'nullable',
             'medic-select' => 'nullable',
             'ambulance-select' => 'nullable',
-            'document-date' => 'required',
+            'final-document-date' => 'nullable',
             'patient-number' => 'nullable',
             'tura' => 'required',
             'assistent-select' => 'nullable',
@@ -58,6 +58,15 @@ class ChecklistController extends Controller
         }
 
         $products = $request->input('product');
+
+        if($request->input('final-document-date') == null) {
+            Session::flash('error');
+            if($request->input('patient-number') == null) {
+                return redirect('/operatiuni/checklist-statii');
+            } else {
+                return redirect('/operatiuni/checklist-medici');
+            }
+        }
         
         foreach($products as $product) {
             
@@ -86,7 +95,7 @@ class ChecklistController extends Controller
         $checklist->inventory_id = $request->input('from-location-id');
         $checklist->medic_id = $request->input('medic-select');
         $checklist->ambulance_id = $request->input('ambulance-select');
-        $checklist->checklist_date = $request->input('document-date');
+        $checklist->checklist_date = $request->input('final-document-date');
         $checklist->patient_number = $request->input('patient-number');
         $checklist->assistent_id = $request->input('assistent-select') ?? null;
         $checklist->ambulancier_id = $request->input('ambulancier-select') ?? null;

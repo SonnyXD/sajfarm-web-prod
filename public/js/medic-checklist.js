@@ -180,20 +180,51 @@ else
   }
 
   function getInventoryItems() {
-    $('#substation-select').on('change', function() {
-      let inventoryId = $(this).val();
+    $('#document-date').on('change', function() {
+      let inventoryId = $('#substation-select').val();
+      let date = $(this).val();
       
       $.ajax({
           type: "GET",
           data: {
-              inventory: inventoryId
+              inventory: inventoryId,
+              date: date
           },
           url: "/inventory-products",
           success: function(response) {
               $('#meds').empty().append(response).select2();
           }
       });
+
+      let from = $("#document-date").val();
+
+      $('#final-document-date').attr('value', from);
+
+      $("#document-date").prop('disabled', true);
   
+  });
+
+  $('#substation-select').on('change', function() {
+    $("#document-date").prop('disabled', false);
+    let inventoryId = $(this).val();
+    let date = $('#document-date').val();
+
+    $.ajax({
+      type: "GET",
+      data: {
+          inventory: inventoryId,
+          date: date
+      },
+      url: "/inventory-products",
+      success: function(response) {
+          $('#meds').empty().append(response).select2();
+      }
+  });
+
+  let from = $("#document-date").val();
+
+  $('#final-document-date').attr('value', from);
+
   });
   
   $('#substation-select').on('change.select2', function() {

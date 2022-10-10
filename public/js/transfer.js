@@ -1,17 +1,25 @@
   function getInventoryItems() {
-        $('#from-location').on('change', function() {
-          let inventoryId = $(this).val();
+        $('#document-date').on('change', function() {
+          let inventoryId = $('#from-location').val();
+          let date = $(this).val();
           
           $.ajax({
               type: "GET",
               data: {
-                  inventory: inventoryId
+                  inventory: inventoryId,
+                  date: date
               },
               url: "/inventory-products",
               success: function(response) {
                   $('#meds').empty().append(response).select2();
               }
           });
+
+          let from = $("#document-date").val();
+
+          $('#final-document-date').attr('value', from);
+
+          $("#document-date").prop('disabled', true);
       
       });
       

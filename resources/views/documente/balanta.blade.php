@@ -6,7 +6,9 @@
                     <select class="form-control" id="inventory-select" name="inventory-select">
                       @if( $inventories->count() )
                         @foreach ($inventories as $inventory)
+                          @if($inventory->id < 2)
                             <option value="{{ $inventory->id }}">{{ $inventory->name }}</option>
+                          @endif
                         @endforeach
                     @endif
                     </select>
@@ -42,3 +44,11 @@
     </x-container>
 </x-layout>
 <script src="/js/balance.js"></script>
+
+@if ($errors->any())
+@foreach($errors->all() as $error)
+<script>
+swal("Eroare", "Generare balanta esuata! Incearca din nou!", "error");
+</script>
+@endforeach
+@endif

@@ -11,6 +11,7 @@
             <option value="medic">Medic</option>
             <option value="asistent">Asistent</option>
             <option value="unitate">Unitate Masura</option>
+            <option value="ambulantier">Ambulantier</option>
         </select>
     </div>
 
@@ -190,6 +191,26 @@
         <tr>
             <td>{{$m_unit->id}}</td>
             <td>{{$m_unit->name}}</td>
+        </tr>
+        @endforeach
+      @endif
+</table>
+
+<table id="ambulantier" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+  <thead>
+    <tr>
+      <th class="th-sm">Nr.
+      </th>
+      <th class="th-sm">Nume
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+      @if($ambulanciers->count())
+        @foreach($ambulanciers as $ambulancier)
+        <tr>
+            <td>{{$ambulancier->id}}</td>
+            <td>{{$ambulancier->name}}</td>
         </tr>
         @endforeach
       @endif

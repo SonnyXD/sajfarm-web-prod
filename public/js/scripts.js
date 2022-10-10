@@ -32,107 +32,61 @@ function tabSwitchTitle() {
 }
 
 function hideProprietatiForms() {
-    $('#add-nomenclator').css('display', 'none');
-    $('#add-substatie').css('display', 'none');
-    $('#add-tip-ambulanta').css('display', 'none');
-    $('#add-ambulanta').css('display', 'none');
-    $('#add-furnizor').css('display', 'none');
-    $('#add-medic').css('display', 'none');
-    $('#add-asistent').css('display', 'none');
-    $('#add-unitate').css('display', 'none');
+    $('#item').css('display', 'none');
+    $('#medic').css('display', 'none');
+    $('#assistent').css('display', 'none');
+    $('#ambulancier').css('display', 'none');
 }
 
 function showProprietatiForms() {
   $("#form-select").change(function () {
     var selected_option = $('#form-select').val();
   
-    if (selected_option === 'nomenclator') {
-      $('#add-nomenclator').css('display', 'block');
-      $('#add-substatie').css('display', 'none');
-      $('#add-tip-ambulanta').css('display', 'none');
-      $('#add-ambulanta').css('display', 'none');
-      $('#add-furnizor').css('display', 'none');
-      $('#add-medic').css('display', 'none');
-      $('#add-asistent').css('display', 'none');
-      $('#add-unitate').css('display', 'none');
-    }
-  
-    if (selected_option === 'substatie') {
-      $('#add-nomenclator').css('display', 'none');
-      $('#add-substatie').css('display', 'block');
-      $('#add-tip-ambulanta').css('display', 'none');
-      $('#add-ambulanta').css('display', 'none');
-      $('#add-furnizor').css('display', 'none');
-      $('#add-medic').css('display', 'none');
-      $('#add-asistent').css('display', 'none');
-      $('#add-unitate').css('display', 'none');
-    }
-  
-    if (selected_option === 'tip-ambulanta') {
-      $('#add-nomenclator').css('display', 'none');
-      $('#add-substatie').css('display', 'none');
-      $('#add-tip-ambulanta').css('display', 'block');
-      $('#add-ambulanta').css('display', 'none');
-      $('#add-furnizor').css('display', 'none');
-      $('#add-medic').css('display', 'none');
-      $('#add-asistent').css('display', 'none');
-      $('#add-unitate').css('display', 'none');
-    }
-  
-    if (selected_option === 'ambulanta') {
-      $('#add-nomenclator').css('display', 'none');
-      $('#add-substatie').css('display', 'none');
-      $('#add-tip-ambulanta').css('display', 'none');
-      $('#add-ambulanta').css('display', 'block');
-      $('#add-furnizor').css('display', 'none');
-      $('#add-medic').css('display', 'none');
-      $('#add-asistent').css('display', 'none');
-      $('#add-unitate').css('display', 'none');
-    }
-  
-    if (selected_option === 'furnizor') {
-      $('#add-nomenclator').css('display', 'none');
-      $('#add-substatie').css('display', 'none');
-      $('#add-tip-ambulanta').css('display', 'none');
-      $('#add-ambulanta').css('display', 'none');
+    if (selected_option === 'item') {
       $('#add-furnizor').css('display', 'block');
-      $('#add-medic').css('display', 'none');
-      $('#add-asistent').css('display', 'none');
-      $('#add-unitate').css('display', 'none');
+      $('#provider').css('display', 'none');
+      $('#item').css('display', 'block');
+      $('#medic').css('display', 'none');
+      $('#ambulancier').css('display', 'none');
+      $('#assistent').css('display', 'none');
     }
   
     if (selected_option === 'medic') {
-      $('#add-nomenclator').css('display', 'none');
-      $('#add-substatie').css('display', 'none');
-      $('#add-tip-ambulanta').css('display', 'none');
-      $('#add-ambulanta').css('display', 'none');
-      $('#add-furnizor').css('display', 'none');
-      $('#add-medic').css('display', 'block');
-      $('#add-asistent').css('display', 'none');
-      $('#add-unitate').css('display', 'none');
+      $('#add-furnizor').css('display', 'block');
+      $('#provider').css('display', 'none');
+      $('#item').css('display', 'none');
+      $('#medic').css('display', 'block');
+      $('#ambulancier').css('display', 'none');
+      $('#assistent').css('display', 'none');
     }
   
-    if (selected_option === 'asistent') {
-      $('#add-nomenclator').css('display', 'none');
-      $('#add-substatie').css('display', 'none');
-      $('#add-tip-ambulanta').css('display', 'none');
-      $('#add-ambulanta').css('display', 'none');
-      $('#add-furnizor').css('display', 'none');
-      $('#add-medic').css('display', 'none');
-      $('#add-asistent').css('display', 'block');
-      $('#add-unitate').css('display', 'none');
+    if (selected_option === 'assistent') {
+      $('#add-furnizor').css('display', 'block');
+      $('#provider').css('display', 'none');
+      $('#item').css('display', 'none');
+      $('#medic').css('display', 'none');
+      $('#ambulancier').css('display', 'none');
+      $('#assistent').css('display', 'block');
     }
   
-    if (selected_option === 'unitate') {
-      $('#add-nomenclator').css('display', 'none');
-      $('#add-substatie').css('display', 'none');
-      $('#add-tip-ambulanta').css('display', 'none');
-      $('#add-ambulanta').css('display', 'none');
-      $('#add-furnizor').css('display', 'none');
-      $('#add-medic').css('display', 'none');
-      $('#add-asistent').css('display', 'none');
-      $('#add-unitate').css('display', 'block');
+    if (selected_option === 'ambulancier') {
+      $('#add-furnizor').css('display', 'block');
+      $('#provider').css('display', 'none');
+      $('#item').css('display', 'none');
+      $('#medic').css('display', 'none');
+      $('#ambulancier').css('display', 'block');
+      $('#assistent').css('display', 'none');
     }
+  
+    if (selected_option === 'furnizor') {
+      $('#add-furnizor').css('display', 'block');
+      $('#provider').css('display', 'block');
+      $('#item').css('display', 'none');
+      $('#medic').css('display', 'none');
+      $('#ambulancier').css('display', 'none');
+      $('#assistent').css('display', 'none');
+    }
+  
   });
 }
 

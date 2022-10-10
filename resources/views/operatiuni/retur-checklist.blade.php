@@ -4,6 +4,7 @@
           <!-- <p class="text-dark bg-gradient-success">{{Session::get('success');}}</p>
           <p class="text-dark bg-gradient-danger">{{Session::get('error');}}</p> -->
           <input type="hidden" id="from-location-id" name="from-location-id" value=""/>
+          <input type="hidden" id="final-document-date" name="final-document-date" value=""/>
         <div class="form-group row">
                 <div class="col">
                 <label>Din:</label>

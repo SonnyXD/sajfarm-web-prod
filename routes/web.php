@@ -266,6 +266,10 @@ Route::get('/operatiuni/checklist-medici', array('uses' => 'App\Http\Controllers
 
 Route::get('/operatiuni/bon-transfer', array('uses' => 'App\Http\Controllers\RoutesController@bon_transfer'));
 
+//Route::get('/pdfs/facturi/{uid}', ['as'=>'facturi','uses'=>'App\Http\Controllers\RoutesController@pdfs_facturi']);
+
+Route::get('/pdfs/facturi/{uid}', array('uses' => 'App\Http\Controllers\RoutesController@pdfs_facturi'));
+
 Route::get('/operatiuni/bon-consum-ambulante', array('uses' => 'App\Http\Controllers\RoutesController@bon_consum_ambulante'));
 
 Route::get('/operatiuni/bon-consum-medici', array('uses' => 'App\Http\Controllers\RoutesController@bon_consum_medici'));
@@ -322,7 +326,7 @@ Route::post('aviz-intrare', 'App\Http\Controllers\AvizEntryController@store')->n
 
 Route::post('checklist-retur', 'App\Http\Controllers\ReturningChecklistController@store')->name('returningchecklist.store');
 
-Route::post('inserare-proprietati', 'App\Http\Controllers\ProviderController@store')->name('provider.store');
+Route::post('inserare-proprietati', 'App\Http\Controllers\PropertyController@store')->name('property.store');
 
 Route::post('modificare-cant-min', 'App\Http\Controllers\MinimumQuantityController@store')->name('modify.store');
 

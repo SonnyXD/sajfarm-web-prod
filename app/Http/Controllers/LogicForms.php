@@ -16,7 +16,11 @@ class LogicForms extends Controller
     public function inventory_products(Request $request) 
     {
 
-        $items = ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit', 'invoice_item.invoice')->where('inventory_id', $request->inventory)->get();
+        $items = ItemStock::with('item', 'invoice_item', 'invoice_item.measure_unit', 'invoice_item.invoice')
+        ->where('inventory_id', $request->inventory)
+        ->get();
+
+        //dd($items);
 
         //dd($items->first());
 
@@ -28,7 +32,7 @@ class LogicForms extends Controller
             //     dd($item);
             // }
            // dd($item);
-            if ($item->quantity > 0) {
+            if ($item->quantity > 0 && $item->invoice_item->invoice->document_date <= $request->date) {
                 //dd($item->invoice_item->measure_unit->name);
                 $html .= sprintf(
                     '<option value="%s">%s [/] %s [/] %s [/] %s [/] %s</option>',
@@ -162,6 +166,7 @@ where ci.used = 0 and a.id = 1
         $checklists = Checklist::with('medic', 'ambulance')
         ->where('medic_id', $request->medic)
         ->where('inventory_id', $request->substation)
+        ->where('medic_id', '!=', null)
         ->get();
 
         //dd($checklists);
@@ -199,6 +204,9 @@ where ci.used = 0 and a.id = 1
 
         foreach($checklists as $checklist) {
             if($checklist->used == 0) {
+                // if($checklist->medic == null) {
+                //     dd($checklist);
+                // }
                 $html .= "<tr data-count=". $i .">";
                 $html .= sprintf(
                     '<td>%s</td>

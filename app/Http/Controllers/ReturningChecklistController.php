@@ -47,11 +47,16 @@ class ReturningChecklistController extends Controller
     {
         $this->validate($request, array(
             'from-location-id' => 'required',
-            'document-date' => 'required',
+            'final-document-date' => 'nullable',
             'product' => 'required'
         ));
 
         $user = Auth::user();
+
+        if($request->input('final-document-date') == null) {
+            Session::flash('error');
+            return redirect('/operatiuni/checklist-retur');
+        }
 
         if($user == null) {
             return redirect('/login');
@@ -73,7 +78,7 @@ class ReturningChecklistController extends Controller
 
         $returning_checklist = new \App\Models\ReturningChecklist();
         $returning_checklist->inventory_id = $request->input('from-location-id');
-        $returning_checklist->checklist_date = $request->input('document-date');
+        $returning_checklist->checklist_date = $request->input('final-document-date');
         $returning_checklist->used = 0;
         // $returning_checklist->user = $user->name;
         $returning_checklist->save();

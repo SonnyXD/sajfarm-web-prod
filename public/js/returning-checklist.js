@@ -1,19 +1,50 @@
 function getInventoryItems() {
-    $('#from-location').on('change', function() {
-      let inventoryId = $(this).val();
-      
-      $.ajax({
-          type: "GET",
-          data: {
-              inventory: inventoryId
-          },
-          url: "/inventory-products",
-          success: function(response) {
-              $('#meds').empty().append(response).select2();
-          }
-      });
-  
-  });
+  $('#document-date').on('change', function() {
+    let inventoryId = $('#from-location').val();
+    let date = $(this).val();
+    
+    $.ajax({
+        type: "GET",
+        data: {
+            inventory: inventoryId,
+            date: date
+        },
+        url: "/inventory-products",
+        success: function(response) {
+            $('#meds').empty().append(response).select2();
+        }
+    });
+
+    let from = $("#document-date").val();
+
+    $('#final-document-date').attr('value', from);
+
+    $("#document-date").prop('disabled', true);
+
+});
+
+$('#from-location').on('change', function() {
+  $("#document-date").prop('disabled', false);
+  let inventoryId = $(this).val();
+  let date = $('#document-date').val();
+
+  $.ajax({
+    type: "GET",
+    data: {
+        inventory: inventoryId,
+        date: date
+    },
+    url: "/inventory-products",
+    success: function(response) {
+        $('#meds').empty().append(response).select2();
+    }
+});
+
+let from = $("#document-date").val();
+
+$('#final-document-date').attr('value', from);
+
+});
   
   $('#from-location').on('change.select2', function() {
     let inventoryId = $(this).val();

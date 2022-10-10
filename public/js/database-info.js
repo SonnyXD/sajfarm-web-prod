@@ -7,6 +7,7 @@ function hideProprietatiForms() {
     $('#medic').css('display', 'none');
     $('#asistent').css('display', 'none');
     $('#unitate').css('display', 'none');
+    $('#ambulantier').css('display', 'none');
 }
 
 function showProprietatiForms() {
@@ -38,6 +39,7 @@ function showProprietatiForms() {
         $('#medic').DataTable().destroy();
         $('#asistent').DataTable().destroy();
         $('#unitate').DataTable().destroy();
+        $('#ambulantier').DataTable().destroy();
         $('#nomenclator').css('display', 'inline-table');
         $('#tip-ambulanta').css('display', 'none');
         $('#ambulanta').css('display', 'none');
@@ -46,6 +48,7 @@ function showProprietatiForms() {
         $('#medic').css('display', 'none');
         $('#asistent').css('display', 'none');
         $('#unitate').css('display', 'none');
+        $('#ambulantier').css('display', 'none');
     }
   
     if (selected_option === 'substatie') {
@@ -72,6 +75,7 @@ function showProprietatiForms() {
         $('#furnizor').DataTable().destroy();
         $('#medic').DataTable().destroy();
         $('#asistent').DataTable().destroy();
+        $('#ambulantier').DataTable().destroy();
         $('#unitate').DataTable().destroy();
         $('#nomenclator').css('display', 'none');
         $('#tip-ambulanta').css('display', 'none');
@@ -81,6 +85,7 @@ function showProprietatiForms() {
         $('#medic').css('display', 'none');
         $('#asistent').css('display', 'none');
         $('#unitate').css('display', 'none');
+        $('#ambulantier').css('display', 'none');
     }
   
     if (selected_option === 'tip-ambulanta') {
@@ -104,6 +109,7 @@ function showProprietatiForms() {
         $('#nomenclator').DataTable().destroy();
         $('#ambulanta').DataTable().destroy();
         $('#substatie').DataTable().destroy();
+        $('#ambulantier').DataTable().destroy();
         $('#furnizor').DataTable().destroy();
         $('#medic').DataTable().destroy();
         $('#asistent').DataTable().destroy();
@@ -116,6 +122,7 @@ function showProprietatiForms() {
         $('#medic').css('display', 'none');
         $('#asistent').css('display', 'none');
         $('#unitate').css('display', 'none');
+        $('#ambulantier').css('display', 'none');
     }
   
     if (selected_option === 'ambulanta') {
@@ -141,6 +148,7 @@ function showProprietatiForms() {
         $('#substatie').DataTable().destroy();
         $('#furnizor').DataTable().destroy();
         $('#medic').DataTable().destroy();
+        $('#ambulantier').DataTable().destroy();
         $('#asistent').DataTable().destroy();
         $('#unitate').DataTable().destroy();
         $('#nomenclator').css('display', 'none');
@@ -151,6 +159,7 @@ function showProprietatiForms() {
         $('#medic').css('display', 'none');
         $('#asistent').css('display', 'none');
         $('#unitate').css('display', 'none');
+        $('#ambulantier').css('display', 'none');
     }
   
     if (selected_option === 'furnizor') {
@@ -176,6 +185,7 @@ function showProprietatiForms() {
         $('#substatie').DataTable().destroy();
         $('#tip-ambulanta').DataTable().destroy();
         $('#medic').DataTable().destroy();
+        $('#ambulantier').DataTable().destroy();
         $('#asistent').DataTable().destroy();
         $('#unitate').DataTable().destroy();
         $('#nomenclator').css('display', 'none');
@@ -186,6 +196,7 @@ function showProprietatiForms() {
         $('#medic').css('display', 'none');
         $('#asistent').css('display', 'none');
         $('#unitate').css('display', 'none');
+        $('#ambulantier').css('display', 'none');
     }
 
     if (selected_option === 'medic') {
@@ -212,6 +223,7 @@ function showProprietatiForms() {
         $('#tip-ambulanta').DataTable().destroy();
         $('#asistent').DataTable().destroy();
         $('#unitate').DataTable().destroy();
+        $('#ambulantier').DataTable().destroy();
         $('#furnizor').DataTable().destroy();
         $('#nomenclator').css('display', 'none');
         $('#tip-ambulanta').css('display', 'none');
@@ -221,6 +233,7 @@ function showProprietatiForms() {
         $('#medic').css('display', 'inline-table');
         $('#asistent').css('display', 'none');
         $('#unitate').css('display', 'none');
+        $('#ambulantier').css('display', 'none');
     }
 
     if (selected_option === 'asistent') {
@@ -245,6 +258,7 @@ function showProprietatiForms() {
         $('#ambulanta').DataTable().destroy();
         $('#substatie').DataTable().destroy();
         $('#tip-ambulanta').DataTable().destroy();
+        $('#ambulantier').DataTable().destroy();
         $('#unitate').DataTable().destroy();
         $('#furnizor').DataTable().destroy();
         $('#medic').DataTable().destroy();
@@ -256,6 +270,7 @@ function showProprietatiForms() {
         $('#medic').css('display', 'none');
         $('#asistent').css('display', 'inline-table');
         $('#unitate').css('display', 'none');
+        $('#ambulantier').css('display', 'none');
     }
 
     if (selected_option === 'unitate') {
@@ -282,6 +297,7 @@ function showProprietatiForms() {
         $('#tip-ambulanta').DataTable().destroy();
         $('#medic').DataTable().destroy();
         $('#asistent').DataTable().destroy();
+        $('#ambulantier').DataTable().destroy();
         $('#furnizor').DataTable().destroy();
         $('#nomenclator').css('display', 'none');
         $('#tip-ambulanta').css('display', 'none');
@@ -291,6 +307,44 @@ function showProprietatiForms() {
         $('#medic').css('display', 'none');
         $('#asistent').css('display', 'none');
         $('#unitate').css('display', 'inline-table');
+        $('#ambulantier').css('display', 'none');
+    }
+
+    if (selected_option === 'ambulantier') {
+        $('#ambulantier').dataTable({
+            "bPaginate": true,
+            "bLengthChange": true,
+            "bFilter": true,
+            "bInfo": true,
+            "bAutoWidth": true,
+            retrieve: true,
+            "oLanguage": {
+                "sLengthMenu": "Arata _MENU_ pozitii",
+                "sSearch": "Cauta:",
+                "sInfo": "Am afisat _END_ pozitii din _TOTAL_",
+                "oPaginate": {
+                    "sNext": "Inainte",
+                    "sPrevious": "Inapoi"
+                  }
+              }
+        });
+        $('#nomenclator').DataTable().destroy();
+        $('#tip-ambulanta').DataTable().destroy();
+        $('#substatie').DataTable().destroy();
+        $('#ambulanta').DataTable().destroy();
+        $('#furnizor').DataTable().destroy();
+        $('#medic').DataTable().destroy();
+        $('#asistent').DataTable().destroy();
+        $('#unitate').DataTable().destroy();
+        $('#nomenclator').css('display', 'none');
+        $('#tip-ambulanta').css('display', 'none');
+        $('#ambulanta').css('display', 'none');
+        $('#substatie').css('display', 'none');
+        $('#ambulantier').css('display', 'inline-table');
+        $('#furnizor').css('display', 'none');
+        $('#medic').css('display', 'none');
+        $('#asistent').css('display', 'none');
+        $('#unitate').css('display', 'none');
     }
   });
 }

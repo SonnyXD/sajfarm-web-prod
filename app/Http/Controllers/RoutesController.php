@@ -10,6 +10,8 @@ use \App\Models\Provider;
 use \App\Models\MeasureUnit;
 use \App\Models\Invoice;
 use \App\Models\Substation;
+use \App\Models\Institution;
+use \App\Models\InvoiceItem;
 use \App\Models\Ambulance;
 use \App\Models\Medic;
 use \App\Models\Transfer;
@@ -29,6 +31,9 @@ use \App\Models\ReturningChecklistItem;
 use \App\Models\MinimumQuantity;
 use \App\Models\Task;
 use DB;
+use PDF;
+use Session;
+use Auth;
 
 class RoutesController extends Controller
 {
@@ -330,7 +335,9 @@ class RoutesController extends Controller
 
         $m_units = MeasureUnit::all();
 
-        return view('documente.database', ['title' => $title, 'items' => $items, 'substations' => $substations, 'amb_types' => $amb_types, 'ambulances' => $ambulances, 'providers' => $providers, 'medics' => $medics, 'assistents' => $assistents, 'm_units' => $m_units]);
+        $ambulanciers = Ambulancier::all();
+
+        return view('documente.database', ['title' => $title, 'items' => $items, 'substations' => $substations, 'amb_types' => $amb_types, 'ambulances' => $ambulances, 'providers' => $providers, 'medics' => $medics, 'assistents' => $assistents, 'm_units' => $m_units, 'ambulanciers' => $ambulanciers]);
     }
 
     public function documente_generate() 
@@ -443,6 +450,28 @@ class RoutesController extends Controller
         // }
 
         return view('operatiuni.cancel-invoice', ['nirs' => $invoices]);
+    }
+
+    public function pdfs_facturi($uid = null) 
+    {
+        $invoice = Invoice::where('uid', $uid)->first();
+
+        $data = [
+            'invoice' => $invoice,
+            'user' => Auth::user(),
+            'institution' => Institution::first(),
+            'provider' => Provider::where('id', $invoice->provider_id)->first(),
+            'items' => InvoiceItem::where('invoice_id', $invoice->id)->get()
+        ];
+
+        $html = \View::make('documente.facturi', $data);
+        $html_content = $html->render();
+        
+        PDF::SetTitle('Hello World');
+        PDF::AddPage();
+        PDF::writeHTML($html_content, true, false, true, false, '');
+
+        PDF::Output('nir.pdf');
     }
 
 }

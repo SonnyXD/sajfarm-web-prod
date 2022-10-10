@@ -47,8 +47,8 @@ class TransferController extends Controller
         $this->validate($request, array(
             'from-location-id' => 'required',
             'to-location-id' => 'required',
-            'document-date' => 'required',
-            'product' => 'required'
+            'product' => 'required',
+            'final-document-date' => 'nullable'
         ));
 
         $user = Auth::user();
@@ -60,6 +60,11 @@ class TransferController extends Controller
         $uid = Str::random(30);
 
         if($request->input('from-location-id') == $request->input('to-location-id')) {
+            Session::flash('error');
+            return redirect('/operatiuni/bon-transfer');
+        }
+
+        if($request->input('final-document-date') == null) {
             Session::flash('error');
             return redirect('/operatiuni/bon-transfer');
         }
@@ -85,11 +90,11 @@ class TransferController extends Controller
         $transfer = new \App\Models\Transfer();
         $transfer->from_inventory_id = $request->input('from-location-id');
         $transfer->to_inventory_id = $request->input('to-location-id');
-        $transfer->document_date = $request->input('document-date');
+        $transfer->document_date = $request->input('final-document-date');
         $transfer->uid = $uid;
         $transfer->save();
 
-        $old_date = $request->input('document-date');
+        $old_date = $request->input('final-document-date');
         $new_date = date("d-m-Y", strtotime($old_date));
 
         $from_location = Inventory::where('id', $request->input('from-location-id'))->get();
