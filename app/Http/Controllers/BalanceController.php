@@ -257,11 +257,11 @@ class BalanceController extends Controller
                 ->where('item_stock_id', $item->item_stock_id)
                 ->sum('quantity');
 
-                $returned_initial = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $old_from_date_interval, $inventory_id, $subset) {
+                $returned_initial = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $old_from_date_interval, $inventory_id, $subset, $old_from_date) {
                     $query->where('document_date', '<=', $old_from_date);
                     $query->where('inventory_id', $inventory_id);
                 })
-                ->with(['returning' => function($query) use($old_until_date, $inventory_id, $old_from_date_interval) {
+                ->with(['returning' => function($query) use($old_until_date, $inventory_id, $old_from_date_interval, $old_from_date) {
                     $query->where('document_date', '<=', $old_from_date);
                     $query->where('inventory_id', $inventory_id);
                 }
@@ -324,7 +324,7 @@ class BalanceController extends Controller
                     
                 }
 
-                $total_initial += (($invoice_item_quantity->quantity - $transfered_quantity) * $detailed_item->invoice_item->tva_price);
+                $total_initial += (($invoice_item_quantity->quantity - $transfered_quantity - $returned_initial) * $detailed_item->invoice_item->tva_price);
                 $total_ins += 0 * $detailed_item->invoice_item->tva_price;
                 $total_outs += (($item->total_quantity + $returned_quantity) * $detailed_item->invoice_item->tva_price);
                 $total_sold += ($detailed_item->invoice_item->tva_price * (($invoice_item_quantity->quantity - $transfered_quantity + 0) - $item->total_quantity));
