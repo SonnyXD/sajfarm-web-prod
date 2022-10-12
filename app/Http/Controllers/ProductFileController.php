@@ -392,10 +392,12 @@ class ProductFileController extends Controller
                 $returning_items_between = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $inventory, $old_from_date) {
                     $query->where('document_date', '<=', $old_until_date);
                     $query->where('document_date', '>', $old_from_date);
+                    $query->where('inventory_id', $inventory->id);
                 })
                 ->with(['returning' => function($query) use($old_until_date, $inventory, $old_from_date) {
                     $query->where('document_date', '<=', $old_until_date);
                     $query->where('document_date', '>', $old_from_date);
+                    $query->where('inventory_id', $inventory->id);
                 }
                 ])
                 ->where('item_id', $med_id)
