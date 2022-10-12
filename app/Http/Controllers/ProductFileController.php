@@ -272,73 +272,174 @@ class ProductFileController extends Controller
         <br>';
         
         foreach($inventories as $inventory) {
-            $current = ItemStock::where('inventory_id', $inventory->id)
-            ->where('item_id', $med_id)
-            ->sum('quantity');
+            if($inventory->id == 1) {
 
-            // $entries = Consumption::join('consumption_items', 'consumption_items.consumption_id', '=', 'consumptions.id')
-            // ->where('consumptions.inventory_id', $inventory_id)
-            // ->where('consumptions.document_date', '<=', $old_from_date_interval)
-            // ->whereIn('consumption_items.item_id', $subset)
-            // ->leftjoin('item_stocks', 'consumption_items.item_stock_id', '=', 'item_stocks.id')
-            // ->leftjoin('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
-            // ->leftjoin('measure_units', 'invoice_items.measure_unit_id', '=', 'measure_units.id')
-            // ->select('item_stock_id as is_id', ConsumptionItem::raw('SUM(consumption_items.quantity) as starting_quantity'))
-            // ->groupby('item_stock_id')
-            // ->get();
+                $invoice_items_initial = InvoiceItem::whereHas('invoice', function ($query) use($old_from_date, $inventory) {
+                    $query->where('document_date', '<=', $old_from_date);
+                })
+                ->whereHas('itemstock', function ($query) use($old_from_date, $inventory, $med_id) {
+                    $query->where('inventory_id', $inventory->id);
+                    $query->where('item_id', $med_id);
+                })
+                ->with(['invoice' => function($query) use($old_from_date, $inventory) {
+                    $query->where('document_date', '<=', $old_from_date);
+                    
+                }
+                ])
+                ->with(['itemstock' => function($query) use($old_from_date, $inventory, $med_id) {
+                    $query->where('inventory_id', $inventory->id);
+                    $query->where('item_id', $med_id);
+                }
+                ])
+                ->where('item_id', $med_id)
+                ->sum('quantity');
 
-            // $consumptions = Consumption::with('consumption')
-            // ->get();
+                //dd($invoice_items_initial);
 
-            // $c_items = ConsumptionItem::whereHas('consumption', function ($query) use($old_until_date, $inventory) {
-            //     $query->where('document_date', '>=', $old_until_date);
+                $transfer_items_initial = TransferItem::whereHas('transfer', function ($query) use($old_from_date, $inventory) {
+                    $query->where('document_date', '<', $old_from_date);
+                    $query->where('from_inventory_id', $inventory->id);
+                })
+                ->with(['transfer' => function($query) use($old_from_date, $inventory) {
+                    $query->where('document_date', '<', $old_from_date);
+                    $query->where('from_inventory_id', $inventory->id);
+                }
+                ])
+                ->where('item_id', $med_id)
+                ->sum('quantity');
+
+                $returning_items_initial = ReturningItem::whereHas('returning', function ($query) use($old_from_date, $inventory) {
+                    $query->where('document_date', '<=', $old_from_date);
+                    $query->where('inventory_id', $inventory->id);
+                })
+                ->with(['returning' => function($query) use($old_from_date, $inventory) {
+                    $query->where('document_date', '<=', $old_from_date);
+                    $query->where('inventory_id', $inventory->id);
+                }
+                ])
+                ->where('item_id', $med_id)
+                ->sum('quantity');
+
+                $invoice_items_final = InvoiceItem::whereHas('invoice', function ($query) use($old_until_date, $inventory) {
+                    $query->where('document_date', '<=', $old_until_date);
+                })
+                ->whereHas('itemstock', function ($query) use($old_from_date, $inventory, $med_id) {
+                    $query->where('inventory_id', $inventory->id);
+                    $query->where('item_id', $med_id);
+                })
+                ->with(['invoice' => function($query) use($old_until_date, $inventory) {
+                    $query->where('document_date', '<=', $old_until_date);
+                }
+                ])
+                ->with(['itemstock' => function($query) use($old_until_date, $inventory) {
+                    $query->where('inventory_id', $inventory->id);
+                    $query->where('item_id', $med_id);
+                }
+                ])
+                ->where('item_id', $med_id)
+                ->sum('quantity');
+
+                $transfer_items_final = TransferItem::whereHas('transfer', function ($query) use($old_until_date, $inventory) {
+                    $query->where('document_date', '<=', $old_until_date);
+                    $query->where('from_inventory_id', $inventory->id);
+                })
+                ->with(['transfer' => function($query) use($old_until_date, $inventory) {
+                    $query->where('document_date', '<=', $old_until_date);
+                    $query->where('from_inventory_id', $inventory->id);
+                }
+                ])
+                ->where('item_id', $med_id)
+                ->sum('quantity');
+
+                $returning_items_final = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $inventory) {
+                    $query->where('document_date', '<=', $old_until_date);
+                    $query->where('inventory_id', $inventory->id);
+                })
+                ->with(['returning' => function($query) use($old_until_date, $inventory) {
+                    $query->where('document_date', '<=', $old_until_date);
+                    $query->where('inventory_id', $inventory->id);
+                }
+                ])
+                ->where('item_id', $med_id)
+                ->sum('quantity');
+
+                $transfer_items_between = TransferItem::whereHas('transfer', function ($query) use($old_until_date, $inventory, $old_from_date) {
+                    $query->where('document_date', '<=', $old_until_date);
+                    $query->where('document_date', '>=', $old_from_date);
+                    $query->where('from_inventory_id', $inventory->id);
+                })
+                ->with(['transfer' => function($query) use($old_until_date, $inventory, $old_from_date) {
+                    $query->where('document_date', '<=', $old_until_date);
+                    $query->where('document_date', '>=', $old_from_date);
+                    $query->where('from_inventory_id', $inventory->id);
+                }
+                ])
+                ->where('item_id', $med_id)
+                ->sum('quantity');
+
+                $invoice_items_between = InvoiceItem::whereHas('invoice', function ($query) use($old_until_date, $inventory, $old_from_date) {
+                    $query->where('document_date', '<=', $old_until_date);
+                    $query->where('document_date', '>=', $old_from_date);
+                })
+                ->with(['invoice' => function($query) use($old_until_date, $inventory, $old_from_date) {
+                    $query->where('document_date', '<=', $old_until_date);
+                    $query->where('document_date', '>=', $old_from_date);
+                }
+                ])
+                ->where('item_id', $med_id)
+                ->sum('quantity');
+
+                $returning_items_between = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $inventory, $old_from_date) {
+                    $query->where('document_date', '<=', $old_until_date);
+                    $query->where('document_date', '>', $old_from_date);
+                })
+                ->with(['returning' => function($query) use($old_until_date, $inventory, $old_from_date) {
+                    $query->where('document_date', '<=', $old_until_date);
+                    $query->where('document_date', '>', $old_from_date);
+                }
+                ])
+                ->where('item_id', $med_id)
+                ->sum('quantity');
+
+                //dd($transfer_items_final);
+
+            // $ch_items = ChecklistItem::whereHas('checklist_pf', function ($query) use($old_until_date, $inventory) {
+            //     $query->where('checklist_date', '>', $old_until_date);
             //     $query->where('inventory_id', $inventory->id);
+            //     //$query->where('used', 0);
             // })
-            // ->with(['consumption' => function($query) use($old_until_date, $inventory) {
-            //     $query->where('document_date', '>=', $old_until_date);
+            // ->with(['checklist_pf' => function($query) use($old_until_date, $inventory) {
+            //     $query->where('checklist_date', '>', $old_until_date);
             //     $query->where('inventory_id', $inventory->id);
+            //     //$query->where('used', 0);
             // }
             // ])
             // ->where('item_id', $med_id)
             // ->sum('quantity');
 
-            $ch_items = ChecklistItem::whereHas('checklist_pf', function ($query) use($old_until_date, $inventory) {
-                $query->where('checklist_date', '>', $old_until_date);
-                $query->where('inventory_id', $inventory->id);
-                //$query->where('used', 0);
-            })
-            ->with(['checklist_pf' => function($query) use($old_until_date, $inventory) {
-                $query->where('checklist_date', '>', $old_until_date);
-                $query->where('inventory_id', $inventory->id);
-                //$query->where('used', 0);
-            }
-            ])
-            ->where('item_id', $med_id)
-            ->sum('quantity');
+            // $t_items = TransferItem::whereHas('transfer', function ($query) use($old_until_date, $inventory) {
+            //     $query->where('document_date', '>', $old_until_date);
+            //     $query->where('from_inventory_id', $inventory->id);
+            // })
+            // ->with(['transfer' => function($query) use($old_until_date, $inventory) {
+            //     $query->where('document_date', '>', $old_until_date);
+            //     $query->where('from_inventory_id', $inventory->id);
+            // }
+            // ])
+            // ->where('item_id', $med_id)
+            // ->sum('quantity');
 
-            $t_items = TransferItem::whereHas('transfer', function ($query) use($old_until_date, $inventory) {
-                $query->where('document_date', '>', $old_until_date);
-                $query->where('from_inventory_id', $inventory->id);
-            })
-            ->with(['transfer' => function($query) use($old_until_date, $inventory) {
-                $query->where('document_date', '>', $old_until_date);
-                $query->where('from_inventory_id', $inventory->id);
-            }
-            ])
-            ->where('item_id', $med_id)
-            ->sum('quantity');
-
-            $r_items = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $inventory) {
-                $query->where('document_date', '>', $old_until_date);
-                $query->where('inventory_id', $inventory->id);
-            })
-            ->with(['returning' => function($query) use($old_until_date, $inventory) {
-                $query->where('document_date', '>', $old_until_date);
-                $query->where('inventory_id', $inventory->id);
-            }
-            ])
-            ->where('item_id', $med_id)
-            ->sum('quantity');
+            // $r_items = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $inventory) {
+            //     $query->where('document_date', '>', $old_until_date);
+            //     $query->where('inventory_id', $inventory->id);
+            // })
+            // ->with(['returning' => function($query) use($old_until_date, $inventory) {
+            //     $query->where('document_date', '>', $old_until_date);
+            //     $query->where('inventory_id', $inventory->id);
+            // }
+            // ])
+            // ->where('item_id', $med_id)
+            // ->sum('quantity');
 
             // $rc_items = ReturningChecklistItem::whereHas('returning_checklist', function ($query) use($old_until_date, $inventory) {
             //     $query->where('document_date', '>=', $old_until_date);
@@ -361,58 +462,67 @@ class ProductFileController extends Controller
 
             $today = date('Y-m-d');
 
-            $ch_items_today = ChecklistItem::whereHas('checklist_pf', function ($query) use($today, $inventory, $old_from_date) {
-                $query->where('checklist_date', '<=', $today);
-                $query->where('checklist_date', '>', $old_from_date);
-                $query->where('inventory_id', $inventory->id);
-                //$query->where('used', 0);
-            })
-            ->with(['checklist_pf' => function($query) use($today, $inventory, $old_from_date) {
-                $query->where('checklist_date', '<=', $today);
-                $query->where('checklist_date', '>', $old_from_date);
-                $query->where('inventory_id', $inventory->id);
-                //$query->where('used', 0);
-            }
-            ])
-            ->where('item_id', $med_id)
-            ->sum('quantity');
+            // $ch_items_today = ChecklistItem::whereHas('checklist_pf', function ($query) use($today, $inventory, $old_from_date) {
+            //     $query->where('checklist_date', '<=', $today);
+            //     $query->where('checklist_date', '>', $old_from_date);
+            //     $query->where('inventory_id', $inventory->id);
+            //     //$query->where('used', 0);
+            // })
+            // ->with(['checklist_pf' => function($query) use($today, $inventory, $old_from_date) {
+            //     $query->where('checklist_date', '<=', $today);
+            //     $query->where('checklist_date', '>', $old_from_date);
+            //     $query->where('inventory_id', $inventory->id);
+            //     //$query->where('used', 0);
+            // }
+            // ])
+            // ->where('item_id', $med_id)
+            // ->sum('quantity');
 
-            $t_items_today = TransferItem::whereHas('transfer', function ($query) use($today, $inventory, $old_from_date) {
-                $query->where('document_date', '<=', $today);
-                $query->where('document_date', '>', $old_from_date);
-                $query->where('from_inventory_id', $inventory->id);
-            })
-            ->with(['transfer' => function($query) use($today, $inventory, $old_from_date) {
-                $query->where('document_date', '<=', $today);
-                $query->where('document_date', '>', $old_from_date);
-                $query->where('from_inventory_id', $inventory->id);
-            }
-            ])
-            ->where('item_id', $med_id)
-            ->sum('quantity');
+            // $t_items_today = TransferItem::whereHas('transfer', function ($query) use($today, $inventory, $old_from_date) {
+            //     $query->where('document_date', '<=', $today);
+            //     $query->where('document_date', '>', $old_from_date);
+            //     $query->where('from_inventory_id', $inventory->id);
+            // })
+            // ->with(['transfer' => function($query) use($today, $inventory, $old_from_date) {
+            //     $query->where('document_date', '<=', $today);
+            //     $query->where('document_date', '>', $old_from_date);
+            //     $query->where('from_inventory_id', $inventory->id);
+            // }
+            // ])
+            // ->where('item_id', $med_id)
+            // ->sum('quantity');
 
-            $r_items_today = ReturningItem::whereHas('returning', function ($query) use($today, $inventory, $old_from_date) {
-                $query->where('document_date', '<=', $today);
-                $query->where('document_date', '>', $old_from_date);
-                $query->where('inventory_id', $inventory->id);
-            })
-            ->with(['returning' => function($query) use($today, $inventory, $old_from_date) {
-                $query->where('document_date', '<=', $today);
-                $query->where('document_date', '>', $old_from_date);
-                $query->where('inventory_id', $inventory->id);
-            }
-            ])
-            ->where('item_id', $med_id)
-            ->sum('quantity');
+            // $r_items_today = ReturningItem::whereHas('returning', function ($query) use($today, $inventory, $old_from_date) {
+            //     $query->where('document_date', '<=', $today);
+            //     $query->where('document_date', '>', $old_from_date);
+            //     $query->where('inventory_id', $inventory->id);
+            // })
+            // ->with(['returning' => function($query) use($today, $inventory, $old_from_date) {
+            //     $query->where('document_date', '<=', $today);
+            //     $query->where('document_date', '>', $old_from_date);
+            //     $query->where('inventory_id', $inventory->id);
+            // }
+            // ])
+            // ->where('item_id', $med_id)
+            // ->sum('quantity');
+
+            // if($inventory->id == 3) {
+            //     //dd(($ch_items_today + $current) - $t_items_today);
+            //     //dd($t_items_today);
+            // }
+            //dd($current);
+
+            //dd($returning_items_initial);
+
+            $initial = $invoice_items_initial - $transfer_items_initial - $returning_items_initial;
+            //$total = $invoice_items_final - $transfer_items_final - $returning_items_final;
+            $total = $initial - $transfer_items_between - $returning_items_between + $invoice_items_between;
+            //dd($invoice_items_initial);
             
-            $total = $current + $ch_items + $t_items;
-            $initial = $current + $ch_items_today + $t_items_today + $r_items_today;
-            if($inventory->id == 2) {
-                //dd($r_items_today);
-            }
-            
-            $html .= '<span style="float: right;">Stoc final '. $inventory->name .': '. $total .' [/] Stoc initial '. $inventory->name .': '. $initial .'</span>
+            $html .= '<span style="float: right;">Stoc initial '. $inventory->name .': '. $initial .' [/] Stoc final '. $inventory->name .': '. $total .'</span>
             <br>';
+            }
+            
         }
 
         // foreach($inventories as $inventory) {
