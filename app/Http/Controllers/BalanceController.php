@@ -97,13 +97,13 @@ class BalanceController extends Controller
 
         if($inventory_id == 1) {
 
-            $in_items = ItemStock::whereHas('invoice_item.invoice', function ($query) use($old_until_date, $inventory_id, $old_from_date_interval, $subset) {
-                $query->where('document_date', '>=', $old_from_date_interval);
+            $in_items = ItemStock::whereHas('invoice_item.invoice', function ($query) use($old_from_date, $old_until_date, $inventory_id, $old_from_date_interval, $subset) {
+                $query->where('document_date', '>=', $old_from_date);
                 $query->where('document_date', '<=', $old_until_date);
                // $query->where('to_inventory_id', $inventory_id);
             })
-            ->with(['invoice_item.invoice' => function($query) use($old_until_date, $inventory_id, $old_from_date_interval, $subset) {
-                $query->where('document_date', '>=', $old_from_date_interval);
+            ->with(['invoice_item.invoice' => function($query) use($old_from_date, $old_until_date, $inventory_id, $old_from_date_interval, $subset) {
+                $query->where('document_date', '>=', $old_from_date);
                 $query->where('document_date', '<=', $old_until_date);
                 //$query->where('to_inventory_id', $inventory_id);
             }
@@ -119,13 +119,13 @@ class BalanceController extends Controller
             // , 'item_stocks.invoice_item_id')->groupBy('item_stock_id')
             ->get();
 
-            $no_action_items = ItemStock::whereDoesntHave('transfer_item.transfer', function ($query) use($old_until_date, $inventory_id, $old_from_date_interval, $subset) {
-                $query->where('document_date', '>=', $old_from_date_interval);
+            $no_action_items = ItemStock::whereDoesntHave('transfer_item.transfer', function ($query) use($old_from_date, $old_until_date, $inventory_id, $old_from_date_interval, $subset) {
+                $query->where('document_date', '>=', $old_from_date);
                 $query->where('document_date', '<=', $old_until_date);
                // $query->where('to_inventory_id', $inventory_id);
             })
-            ->whereDoesntHave('returning_item.returning', function ($query) use($old_until_date, $inventory_id, $old_from_date_interval, $subset) {
-                $query->where('document_date', '>=', $old_from_date_interval);
+            ->whereDoesntHave('returning_item.returning', function ($query) use($old_from_date, $old_until_date, $inventory_id, $old_from_date_interval, $subset) {
+                $query->where('document_date', '>=', $old_from_date);
                 $query->where('document_date', '<=', $old_until_date);
                // $query->where('to_inventory_id', $inventory_id);
             })
@@ -138,13 +138,13 @@ class BalanceController extends Controller
 
             //dd($in_items);
 
-            $out_items = TransferItem::whereHas('transfer', function ($query) use($old_until_date, $inventory_id, $old_from_date_interval, $subset) {
-                $query->where('document_date', '>=', $old_from_date_interval);
+            $out_items = TransferItem::whereHas('transfer', function ($query) use($old_from_date, $old_until_date, $inventory_id, $old_from_date_interval, $subset) {
+                $query->where('document_date', '>=', $old_from_date);
                 $query->where('document_date', '<=', $old_until_date);
                 $query->where('from_inventory_id', $inventory_id);
             })
-            ->with(['transfer' => function($query) use($old_until_date, $inventory_id, $old_from_date_interval) {
-                $query->where('document_date', '>=', $old_from_date_interval);
+            ->with(['transfer' => function($query) use($old_from_date, $old_until_date, $inventory_id, $old_from_date_interval) {
+                $query->where('document_date', '>=', $old_from_date);
                 $query->where('document_date', '<=', $old_until_date);
                 $query->where('from_inventory_id', $inventory_id);
             }
@@ -193,12 +193,14 @@ class BalanceController extends Controller
                 ->where('id', $item->id)
                 ->first();
 
-                $returned_quantity = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $old_from_date_interval, $inventory_id, $subset) {
+                $returned_quantity = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $old_from_date, $inventory_id, $subset) {
                     $query->where('document_date', '<=', $old_until_date);
+                    $query->where('document_date', '>=', $old_from_date);
                     $query->where('inventory_id', $inventory_id);
                 })
-                ->with(['returning' => function($query) use($old_until_date, $inventory_id, $old_from_date_interval) {
+                ->with(['returning' => function($query) use($old_until_date, $inventory_id, $old_from_date) {
                     $query->where('document_date', '<=', $old_until_date);
+                    $query->where('document_date', '>=', $old_from_date);
                     $query->where('inventory_id', $inventory_id);
                 }
                 ])
@@ -239,8 +241,7 @@ class BalanceController extends Controller
                         'ins' => $item->invoice_item->quantity,
                         'outs' => $transfered_to + $returned_quantity,
                         'final' => (0 + $item->invoice_item->quantity) - $transfered_to - $returned_quantity,
-                        'sold' => $item->invoice_item->price * ((0 + $item->invoice_item->quantity) - $transfered_to));
-                    
+                        'sold' => $item->invoice_item->price * ((0 + $item->invoice_item->quantity) - $transfered_to - $returned_quantity));
                 }
 
                 //dd($detailed_item->invoice_item);
@@ -248,13 +249,16 @@ class BalanceController extends Controller
                 $total_initial += 0 * $detailed_item->invoice_item->tva_price;
                 $total_ins += ($item->invoice_item->quantity * $detailed_item->invoice_item->tva_price);
                 $total_outs += (($transfered_to + $returned_quantity) * $detailed_item->invoice_item->tva_price);
-                $total_sold += ($item->invoice_item->tva_price * ((0 + $item->invoice_item->quantity) - $transfered_to));
+                $total_sold += ($item->invoice_item->tva_price * ((0 + $item->invoice_item->quantity) - $transfered_to - $returned_quantity));
                 //dd($details);
             }
 
             //dd($out_items);
 
             foreach($out_items as $item) {
+                // if($item->item_stock_id = 2351) {
+                //     dd($item);
+                // }
                 //store name, document_date, measure_unit, price, outs, (ins = 0)
                 $detailed_item = ItemStock::with('invoice_item', 'invoice_item.invoice', 'item', 'invoice_item.measure_unit')
                 ->where('id', $item->item_stock_id)
@@ -262,12 +266,14 @@ class BalanceController extends Controller
 
                 //dd($item);
 
-                $returned_quantity = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $old_from_date_interval, $inventory_id, $subset) {
+                $returned_quantity = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $old_from_date, $inventory_id, $subset) {
                     $query->where('document_date', '<=', $old_until_date);
+                    $query->where('document_date', '>=', $old_from_date);
                     $query->where('inventory_id', $inventory_id);
                 })
-                ->with(['returning' => function($query) use($old_until_date, $inventory_id, $old_from_date_interval) {
+                ->with(['returning' => function($query) use($old_until_date, $inventory_id, $old_from_date) {
                     $query->where('document_date', '<=', $old_until_date);
+                    $query->where('document_date', '>=', $old_from_date);
                     $query->where('inventory_id', $inventory_id);
                 }
                 ])
@@ -275,11 +281,11 @@ class BalanceController extends Controller
                 ->sum('quantity');
 
                 $returned_initial = ReturningItem::whereHas('returning', function ($query) use($old_until_date, $old_from_date_interval, $inventory_id, $subset, $old_from_date) {
-                    $query->where('document_date', '<=', $old_from_date_interval);
+                    $query->where('document_date', '<=', $old_from_date);
                     $query->where('inventory_id', $inventory_id);
                 })
                 ->with(['returning' => function($query) use($old_until_date, $inventory_id, $old_from_date_interval, $old_from_date) {
-                    $query->where('document_date', '<=', $old_from_date_interval);
+                    $query->where('document_date', '<=', $old_from_date);
                     $query->where('inventory_id', $inventory_id);
                 }
                 ])
@@ -308,12 +314,12 @@ class BalanceController extends Controller
                 //transfered_quantity
                 $transfered_quantity = TransferItem::whereHas('transfer', function($query) use($inventory_id, $old_from_date_interval, $invoice_item_quantity, $old_from_date) {
                     $query->where('from_inventory_id', $inventory_id);
-                    $query->whereBetween('document_date', [$invoice_item_quantity->invoice->document_date, date("Y-m-d", strtotime('-1 day', strtotime($old_from_date_interval)))]);
+                    $query->whereBetween('document_date', [$invoice_item_quantity->invoice->document_date, $old_from_date_interval]);
                 }
             )
                 ->with(['transfer' => function($query) use($inventory_id, $old_from_date_interval, $invoice_item_quantity, $old_from_date) {
                     $query->where('from_inventory_id', $inventory_id);
-                    $query->whereBetween('document_date', [$invoice_item_quantity->invoice->document_date, date("Y-m-d", strtotime('-1 day', strtotime($old_from_date_interval)))]);
+                    $query->whereBetween('document_date', [$invoice_item_quantity->invoice->document_date, $old_from_date_interval]);
                 }
             ])
             ->where('item_stock_id', $item->item_stock_id)
@@ -337,6 +343,10 @@ class BalanceController extends Controller
 
                 //sold is price * final
 
+                // if($item->item_stock_id == 2351) {
+                //     dd($transfered_quantity);
+                // }
+
                 if(!isset($details[$item->item_stock_id])) {
                     $details[$item->item_stock_id] = array(
                         'name' => $detailed_item->item->name,
@@ -347,14 +357,14 @@ class BalanceController extends Controller
                         'ins' => 0,
                         'outs' => $item->total_quantity + $returned_quantity,
                         'final' => ($invoice_item_quantity->quantity - $transfered_quantity + 0) - $item->total_quantity - $returned_quantity,
-                        'sold' => $detailed_item->invoice_item->price * (($invoice_item_quantity->quantity - $transfered_quantity + 0) - $item->total_quantity));
+                        'sold' => $detailed_item->invoice_item->price * (($invoice_item_quantity->quantity - $transfered_quantity - $returned_quantity + 0) - $item->total_quantity));
                     
                 }
 
                 $total_initial += (($invoice_item_quantity->quantity - $transfered_quantity - $returned_initial) * $detailed_item->invoice_item->tva_price);
                 $total_ins += 0 * $detailed_item->invoice_item->tva_price;
                 $total_outs += (($item->total_quantity + $returned_quantity) * $detailed_item->invoice_item->tva_price);
-                $total_sold += ($detailed_item->invoice_item->tva_price * (($invoice_item_quantity->quantity - $transfered_quantity + 0) - $item->total_quantity));
+                $total_sold += ($detailed_item->invoice_item->tva_price * (($invoice_item_quantity->quantity - $transfered_quantity - $returned_quantity + 0) - $item->total_quantity));
                 //dd($total_sold);
                 // if($item->item_stock_id == 2339) {
                 //     dd($detailed_item->invoice_item->price * (($invoice_item_quantity->quantity - $transfered_quantity + 0) - $item->total_quantity));
