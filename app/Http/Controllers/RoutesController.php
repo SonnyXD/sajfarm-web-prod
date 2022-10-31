@@ -525,10 +525,23 @@ class RoutesController extends Controller
         //$html = \View::make('documente.facturi', $data);
         $html = \View::make('pdf-generation.returning', $data);
         $html_content = $html->render();
+
+        PDF::setFooterCallback(function($pdf) {
+
+            // Position at 15 mm from bottom
+            $pdf->SetY(-15);
+            // Set font
+            $pdf->SetFont('helvetica', 'I', 10);
+            // Page number
+            $pdf->Cell(0, 10, 'Pagina '.$pdf->getAliasNumPage().'/'.$pdf->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    
+    });
         
         PDF::SetTitle('Retur');
         PDF::AddPage();
         PDF::writeHTML($html_content, true, false, true, false, '');
+
+        
 
         PDF::Output('retur.pdf');
     }
