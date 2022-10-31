@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\Inventory;
 use \App\Models\ReturningItem;
+use \App\Models\ItemStock;
 
 class Returning extends Model
 {
@@ -22,6 +23,10 @@ class Returning extends Model
 
     public function inventory() {
         return $this->belongsTo( Inventory::class );
+    }
+
+    public function item_stock() {
+        return $this->belongsTo( ItemStock::class );
     }
 
     public function returning_item() {

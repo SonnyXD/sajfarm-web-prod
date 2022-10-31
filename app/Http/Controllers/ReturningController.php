@@ -144,7 +144,6 @@ class ReturningController extends Controller
         <th style="font-weight: bold; text-align: center;">TVA</th>
         <th style="font-weight: bold; text-align: center;">Valoare</th>
         <th style="font-weight: bold; text-align: center;">Lot</th>
-        <th style="font-weight: bold; text-align: center;">Data expirare</th>
         <th style="font-weight: bold; text-align: center;">Motiv</th>
         <th style="font-weight: bold; text-align: center;">Gestiune de iesire</th>
         </tr>
@@ -183,7 +182,6 @@ class ReturningController extends Controller
                         <td style="text-align: center;">'. $detailedItem->invoice_item->tva .'</td>
                         <td style="text-align: center;">'. $detailedItem->invoice_item->tva_price * $item->quantity .'</td>
                         <td style="text-align: center;">'. $detailedItem->invoice_item->lot .'</td>
-                        <td style="text-align: center;">'. date("d-m-Y", strtotime($detailedItem->invoice_item->exp_date)).'</td>
                         <td style="text-align: center;">'. $item->reason .'</td>
                         <td style="text-align: center;">'. $from .'</td>
                     </tr>';

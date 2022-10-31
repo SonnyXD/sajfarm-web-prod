@@ -111,7 +111,7 @@
         @foreach($returnings as $returning)
         <tr>
             <td>{{$returning->id}}</td>
-        <td><a target="_blank" href="/pdfs/{{$returning->uid}}.pdf">Retur {{$returning->id}}</a></td>
+        <td><a target="_blank" href="/pdfs/retururi/{{$returning->uid}}">Retur {{$returning->id}}</a></td>
             <td>{{$returning->inventory->name}}</td>
             <td>{{date("d-m-Y", strtotime($returning->document_date))}}</td>
         </tr>

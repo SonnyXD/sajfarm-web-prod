@@ -474,4 +474,63 @@ class RoutesController extends Controller
         PDF::Output('nir.pdf');
     }
 
+    public function pdfs_retururi($uid = null) 
+    {
+    $returning = Returning::with('returning_item', 'returning_item.item_stock', 'returning_item.item_stock.invoice_item',
+    'returning_item.item_stock.invoice_item.invoice', 'returning_item.item_stock.invoice_item.invoice.provider')
+        ->where('uid', $uid)
+        ->first();
+
+        $exploded = explode('-', $returning->document_date);
+
+        $first_date = '01-'.$exploded[1].'-'.$exploded[0];
+
+        $items = ReturningItem::with('item_stock', 'item_stock.invoice_item', 'item_stock.invoice_item.item', 'item_stock.invoice_item.measure_unit')
+        ->where('returning_id', $returning->id)    
+        ->get();
+
+        $categories = Category::all();
+
+        $total_values = [];
+
+        foreach($categories as $category) {
+            $total = 0;
+            foreach($items as $item) {
+                if($category->id == $item->item_stock->invoice_item->item->category_id) {
+                    $total += ($item->item_stock->invoice_item->tva_price * $item->quantity);
+                    
+                }
+            }
+            $total_values[] = $total;
+        }
+
+        $data = [
+            'returning' => $returning,
+            'user' => Auth::user(),
+            'institution' => Institution::first(),
+            //'provider' => Provider::where('id', $returning->returning_item->first()->item_stock->invoice_item->invoice->provider_id)->first(),
+            'items' => ReturningItem::with('item_stock', 'item_stock.invoice_item', 'item_stock.invoice_item.item', 'item_stock.invoice_item.measure_unit')
+            ->where('returning_id', $returning->id)->get(),
+            'new_date' => date("d-m-Y", strtotime($returning->document_date)),
+            'first_date' => date("d-m-Y", strtotime($first_date)),
+            'inventory' => Inventory::where('id', $returning->inventory_id)->first()->name,
+            'categories' => Category::all(),
+            'total_values' => $total_values
+        ];
+
+
+
+        //dd($data);
+
+        //$html = \View::make('documente.facturi', $data);
+        $html = \View::make('pdf-generation.returning', $data);
+        $html_content = $html->render();
+        
+        PDF::SetTitle('Retur');
+        PDF::AddPage();
+        PDF::writeHTML($html_content, true, false, true, false, '');
+
+        PDF::Output('retur.pdf');
+    }
+
 }
