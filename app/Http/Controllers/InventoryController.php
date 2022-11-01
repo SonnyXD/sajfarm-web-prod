@@ -210,7 +210,7 @@ class InventoryController extends Controller
             <tr nobr="true">
             <td style="text-align: center;"></td>
             <td style="text-align: center;"></td>
-            <td style="text-align: center;">As. Sef '. $institution[0]->assistent .'</td>
+            <td style="text-align: center;">As. Farm '. $institution[0]->assistent .'</td>
             <td style="text-align: center;"></td>
             </tr>
             <tr nobr="true">
