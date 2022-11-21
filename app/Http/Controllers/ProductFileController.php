@@ -103,12 +103,25 @@ class ProductFileController extends Controller
 
         $inventories = Inventory::get();
 
+        //dd($inventories);
+
         $invoices = Invoice::with(['invoice_item' => function($query) use($med_id) {
             $query->where('item_id', $med_id);
         }
-        ])
+    ])
+    ->whereHas('invoice_item', function ($query) use($med_id) {
+        $query->where('item_id', $med_id);
+        
+        // $query->where('item_id', $med_id);
+    })
+        // ->whereHas('invoice_item.itemstock' => function($query) use($inventories) {
+        //     $query->where('inventory_id', 1);
+            
+        // })
         ->whereBetween('document_date', [$old_from_date, $old_until_date])
         ->get();
+
+        //dd($invoices->first());
 
         $transfers = Transfer::with(['transfer_item' => function($query) use($med_id) {
             $query->where('item_id', $med_id);
@@ -339,6 +352,8 @@ class ProductFileController extends Controller
                 ->where('item_id', $med_id)
                 ->sum('quantity');
 
+                //dd($invoice_items_final);
+
                 $transfer_items_final = TransferItem::whereHas('transfer', function ($query) use($old_until_date, $inventory) {
                     $query->where('document_date', '<=', $old_until_date);
                     $query->where('from_inventory_id', $inventory->id);
@@ -380,6 +395,9 @@ class ProductFileController extends Controller
                 $invoice_items_between = InvoiceItem::whereHas('invoice', function ($query) use($old_until_date, $inventory, $old_from_date) {
                     $query->where('document_date', '<=', $old_until_date);
                     $query->where('document_date', '>=', $old_from_date);
+                })
+                ->whereHas('itemstock', function ($query) use($old_until_date, $inventory, $old_from_date) {
+                    $query->where('inventory_id', $inventory->id);
                 })
                 ->with(['invoice' => function($query) use($old_until_date, $inventory, $old_from_date) {
                     $query->where('document_date', '<=', $old_until_date);
@@ -515,10 +533,28 @@ class ProductFileController extends Controller
             //dd($current);
 
             //dd($returning_items_initial);
+            
 
             $initial = $invoice_items_initial - $transfer_items_initial - $returning_items_initial;
+            //dd($transfer_items_between);
             //$total = $invoice_items_final - $transfer_items_final - $returning_items_final;
+            //dd($invoice_items_between);
             $total = $initial - $transfer_items_between - $returning_items_between + $invoice_items_between;
+            foreach($invoices as $invoice) {
+                if($invoice->document_date == $old_from_date) {
+                    //dd($invoice_items_initial);
+                    $inv_quantity = InvoiceItem::where('invoice_id', $invoice->id)
+                    ->whereHas('itemstock', function ($query) use($old_until_date, $inventory, $old_from_date) {
+                        $query->where('inventory_id', 1);
+                    })
+                    ->where('item_id', $med_id)
+                    ->sum('quantity');
+                    //dd($inv_quantity);
+                    $total = $initial - $transfer_items_between - $returning_items_between + $invoice_items_between - $inv_quantity;
+                    break;
+                }
+            }
+            //$total = $initial - $transfer_items_between - $returning_items_between + $invoice_items_between;
             //dd($invoice_items_initial);
             
             $html .= '<span style="float: right;">Stoc initial '. $inventory->name .': '. $initial .' [/] Stoc final '. $inventory->name .': '. $total .'</span>
