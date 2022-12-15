@@ -67,11 +67,23 @@ class InventoryController extends Controller
         ->select(ItemStock::raw('SUM(item_stocks.quantity) as current_quantity'), 'items.name as item_name', 'measure_units.name as um',
         'invoice_items.lot as lot', 'invoice_items.price as price', 'invoice_items.tva as tva',
         'invoice_items.tva_price as tva_price', 'invoice_items.exp_date as exp_date', 'items.category_id as category_id')
-        ->groupBy('item_stocks.item_id')
+        // ->groupBy('item_stocks.item_id')
+        ->groupBy('item_stocks.invoice_item_id')
         ->groupBy('invoice_items.measure_unit_id')
         ->get();
 
-        $items = collect($items)->sortBy('item_name');
+        // $items = collect($items)->sortBy('item_name');
+        //$items = collect($items);
+
+        // $test = [];
+
+        // foreach($items as $item) {
+        //     if($item->category_id == 4) {
+        //         $test[] = $item;
+        //     }
+        // }
+
+        // dd($test);
 
         $html = '<html>
                 <head>
@@ -125,7 +137,7 @@ class InventoryController extends Controller
                 $total = 0;
                 foreach($items as $item) {
                     if($item['category_id'] == $category->id) {
-                        $total += ($item['price'] * $item['current_quantity']);
+                        $total += ($item['tva_price'] * $item['current_quantity']);
                         $html .= '<tr nobr="true">
                                         <td style="text-align: center;">'. $item['item_name'] .'</td>
                                         <td style="text-align: center;">'. $item['um'] .'</td>
