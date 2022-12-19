@@ -254,10 +254,80 @@ class BalanceController extends Controller
 
                 //dd($detailed_item->invoice_item);
 
-                $total_initial += 0 * $detailed_item->invoice_item->tva_price;
+                // $invoices_date = Invoice::whereHas('invoice_item', function ($query) use($old_until_date, $old_from_date_interval, $inventory_id, $subset, $old_from_date) {
+
+                // })
+                // ->with(['invoice_item' => function($query) use($old_until_date, $inventory_id, $old_from_date_interval, $old_from_date) {
+                    
+                // }
+                // ])
+                // ->where('document_date', '<=', $old_from_date)
+                // ->select('document_date')
+                // ->first();
+
+                // //dd($out_items);
+
+                // $the_date = InvoiceItem::with('invoice')
+                // ->where('id', $item->invoice_item_id)
+                // ->first();
+                
+                // if($invoices_date->document_date <= $the_date->invoice->document_date) {
+                //     //$total_initial += 0 * $detailed_item->invoice_item->tva_price;
+                // }
+
+                if($old_from_date == '2022-05-23') {
+                    $total_initial = InvoiceItem::whereHas('invoice', function ($query) use($old_until_date, $old_from_date, $inventory_id, $subset) {
+                        $query->where('document_date', '=', $old_from_date);
+                    })
+                    ->whereHas('item', function ($query) use($old_until_date, $old_from_date, $category_id, $subset) {
+                        $query->where('category_id', '=', $category_id);
+                    })
+                    ->whereHas('itemstock', function ($query) use($old_until_date, $old_from_date, $inventory_id, $subset) {
+                        $query->where('inventory_id', '=', $inventory_id);
+                    })
+                    ->sum('value');
+                    
+                } else {
+                    $total_initial += 0 * $detailed_item->invoice_item->tva_price;
+                }
+
                 $total_ins += ($item->invoice_item->quantity * $detailed_item->invoice_item->tva_price);
                 $total_outs += (($transfered_to + $returned_quantity) * $detailed_item->invoice_item->tva_price);
-                $total_sold += ($item->invoice_item->tva_price * ((0 + $item->invoice_item->quantity) - $transfered_to - $returned_quantity));
+
+                if($old_until_date >= '2022-12-15') {
+                    $the_items = ItemStock::leftjoin('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
+                    ->leftjoin('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
+                    ->leftjoin('measure_units', 'measure_units.id', '=', 'invoice_items.measure_unit_id')
+                    ->leftjoin('items', 'items.id', '=', 'invoice_items.item_id')
+                    ->where('item_stocks.inventory_id', $inventory_id)
+                    ->where('item_stocks.quantity', '!=', 0)
+                    ->select(ItemStock::raw('SUM(item_stocks.quantity) as current_quantity'), 'items.name as item_name', 'measure_units.name as um',
+                    'invoice_items.lot as lot', 'invoice_items.price as price', 'invoice_items.tva as tva',
+                    'invoice_items.tva_price as tva_price', 'invoice_items.exp_date as exp_date', 'items.category_id as category_id')
+                    // ->groupBy('item_stocks.item_id')
+                    ->groupBy('item_stocks.invoice_item_id')
+                    ->groupBy('invoice_items.measure_unit_id')
+                    ->where('items.category_id', $category_id)
+                    ->get();
+
+                    $categories = Category::all();
+
+                    foreach($categories as $category) {
+                        $total = 0;
+                        foreach($the_items as $item) {
+                            if($item['category_id'] == $category->id) {
+                                $total += ($item['tva_price'] * $item['current_quantity']);
+                            }
+                        }
+                        $total_values[] = $total;
+                    }
+                    
+                    $total_sold = $total_values[$category_id-1];
+                } else {
+                    $total_sold += $item->invoice_item->tva_price * ((0 + $item->invoice_item->quantity) - $transfered_to - $returned_quantity);
+                }
+
+                
                 //dd($details);
             }
 
@@ -404,14 +474,49 @@ class BalanceController extends Controller
 
                 //dd($out_items);
 
-                
-                if($invoices_date->document_date >= $item->invoice_date) {
+                if($old_from_date == '2022-05-23') {
+                    $total_initial = $total_initial;
+                } else if($invoices_date->document_date >= $item->invoice_date) {
                     $total_initial += (($invoice_item_quantity->quantity - $transfered_quantity - $returned_initial) * $detailed_item->invoice_item->tva_price);
                 }
                 
                 $total_ins += 0 * $detailed_item->invoice_item->tva_price;
                 $total_outs += (($item->total_quantity + $returned_quantity) * $detailed_item->invoice_item->tva_price);
-                $total_sold += ($detailed_item->invoice_item->tva_price * (($invoice_item_quantity->quantity - $transfered_quantity - $returned_quantity + 0) - $item->total_quantity));
+
+                if($old_until_date >= '2022-12-15') {
+                    $the_items = ItemStock::leftjoin('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
+                    ->leftjoin('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
+                    ->leftjoin('measure_units', 'measure_units.id', '=', 'invoice_items.measure_unit_id')
+                    ->leftjoin('items', 'items.id', '=', 'invoice_items.item_id')
+                    ->where('item_stocks.inventory_id', $inventory_id)
+                    ->where('item_stocks.quantity', '!=', 0)
+                    ->select(ItemStock::raw('SUM(item_stocks.quantity) as current_quantity'), 'items.name as item_name', 'measure_units.name as um',
+                    'invoice_items.lot as lot', 'invoice_items.price as price', 'invoice_items.tva as tva',
+                    'invoice_items.tva_price as tva_price', 'invoice_items.exp_date as exp_date', 'items.category_id as category_id')
+                    // ->groupBy('item_stocks.item_id')
+                    ->groupBy('item_stocks.invoice_item_id')
+                    ->groupBy('invoice_items.measure_unit_id')
+                    ->where('items.category_id', $category_id)
+                    ->get();
+
+                    $categories = Category::all();
+
+                    foreach($categories as $category) {
+                        $total = 0;
+                        foreach($the_items as $item) {
+                            if($item['category_id'] == $category->id) {
+                                $total += ($item['tva_price'] * $item['current_quantity']);
+                            }
+                        }
+                        $total_values[] = $total;
+                    }
+                    
+                    $total_sold = $total_values[$category_id-1];
+                } else {
+                    $total_sold += $detailed_item->invoice_item->tva_price * (($invoice_item_quantity->quantity - $transfered_quantity - $returned_quantity + 0) - $item->total_quantity);
+                }
+
+                // $total_sold += $detailed_item->invoice_item->tva_price * (($invoice_item_quantity->quantity - $transfered_quantity - $returned_quantity + 0) - $item->total_quantity);
                 //dd($total_sold);
                 // if($item->item_stock_id == 2339) {
                 //     dd($detailed_item->invoice_item->price * (($invoice_item_quantity->quantity - $transfered_quantity + 0) - $item->total_quantity));
