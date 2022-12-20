@@ -298,7 +298,13 @@ class BalanceController extends Controller
                         $total_initial = 235708.21;
                     } else if($category_id == 4) {
                         $total_initial = 60462.93;
-                    } 
+                    } else if($category_id == 3) {
+                        $total_initial = 50191.26;
+                    } else if($category_id == 5) {
+                        $total_initial = 20761.46;
+                    } else if($category_id == 6) {
+                        $total_initial = 1832.96;
+                    }
                 } else {
                     $total_initial += 0 * $detailed_item->invoice_item->tva_price;
                 }
