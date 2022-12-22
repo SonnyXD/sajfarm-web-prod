@@ -312,7 +312,7 @@ class BalanceController extends Controller
                 $total_ins += ($item->invoice_item->quantity * $detailed_item->invoice_item->tva_price);
                 $total_outs += (($transfered_to + $returned_quantity) * $detailed_item->invoice_item->tva_price);
 
-                if($old_until_date >= '2022-12-15') {
+                if($old_until_date >= '2022-12-05') {
                     $the_items = ItemStock::leftjoin('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
                     ->leftjoin('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
                     ->leftjoin('measure_units', 'measure_units.id', '=', 'invoice_items.measure_unit_id')
@@ -513,7 +513,7 @@ class BalanceController extends Controller
                 $total_ins += 0 * $detailed_item->invoice_item->tva_price;
                 $total_outs += (($item->total_quantity + $returned_quantity) * $detailed_item->invoice_item->tva_price);
 
-                if($old_until_date >= '2022-12-15') {
+                if($old_until_date >= '2022-12-05') {
                     $the_items = ItemStock::leftjoin('invoice_items', 'invoice_items.id', '=', 'item_stocks.invoice_item_id')
                     ->leftjoin('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
                     ->leftjoin('measure_units', 'measure_units.id', '=', 'invoice_items.measure_unit_id')
