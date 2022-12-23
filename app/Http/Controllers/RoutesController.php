@@ -546,4 +546,17 @@ class RoutesController extends Controller
         PDF::Output('retur.pdf');
     }
 
+    public function centralizator_consumuri() 
+    {
+        $providers = Provider::all();
+        $items = Item::all();
+        $units = MeasureUnit::all();
+        $invoices = Invoice::all();
+        $inventories = Inventory::all();
+
+        $title = 'Centralizator Consumuri';
+
+        return view('documente.centralizator-consumuri', ['providers' => $providers, 'items' => $items, 'units' => $units, 'invoices' => $invoices, 'title' => $title, 'inventories' => $inventories]);
+    }
+
 }

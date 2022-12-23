@@ -266,6 +266,8 @@ Route::get('/operatiuni/checklist-medici', array('uses' => 'App\Http\Controllers
 
 Route::get('/operatiuni/bon-transfer', array('uses' => 'App\Http\Controllers\RoutesController@bon_transfer'));
 
+Route::get('/documente/centralizator-consumuri', array('uses' => 'App\Http\Controllers\RoutesController@centralizator_consumuri'));
+
 //Route::get('/pdfs/facturi/{uid}', ['as'=>'facturi','uses'=>'App\Http\Controllers\RoutesController@pdfs_facturi']);
 
 Route::get('/pdfs/facturi/{uid}', array('uses' => 'App\Http\Controllers\RoutesController@pdfs_facturi'));
@@ -351,6 +353,8 @@ Route::get('rapoarte', 'App\Http\Controllers\ReportController@store')->name('rep
 Route::get('expira-in-6-luni', 'App\Http\Controllers\ExpirareController@store')->name('expirare.store');
 
 Route::get('inventar', 'App\Http\Controllers\InventoryController@store')->name('inventory.store');
+
+Route::get('centralizator-consum', array('uses' => 'App\Http\Controllers\CentralizatorConsumptionController@store'))->name('centralizator-consum.store');
 
 
 //Route::post('intrare-factura', 'App\Http\Controllers\InvoiceItemController@store')->name('invoiceitems.store');

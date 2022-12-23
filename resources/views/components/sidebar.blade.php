@@ -106,6 +106,12 @@
             <span class="menu-title">Documente Generate</span>
         </a>
         </li>
+        <li class="nav-item">
+        <a class="nav-link" href="/documente/centralizator-consumuri">
+            <i class="menu-icon mdi mdi-file-document-box-search-outline"></i>
+            <span class="menu-title">Centralizator consumuri</span>
+        </a>
+        </li>
         <li class="nav-item nav-category">Diverse</li>
         <li class="nav-item">
             <a class="nav-link keychainify-checked" href="/diverse/documentatie">
