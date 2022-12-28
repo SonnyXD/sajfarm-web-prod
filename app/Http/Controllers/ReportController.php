@@ -53,8 +53,8 @@ class ReportController extends Controller
     {
         $this->validate($request, array(
             'report-type' => 'required',
-            'substation-select' => 'required',
-            'ambulance-select' => 'required',
+            'substation-select' => 'nullable',
+            'ambulance-select' => 'nullable',
             'from-date' => 'required',
             'until-date' => 'required'
         ));
@@ -128,7 +128,7 @@ class ReportController extends Controller
             ->with('consumptions', 'consumptions.consumption_items_grouped', 'consumptions.consumption_items_grouped.item')
             ->get();
 
-            if($ambulances->isEmpty()) {
+            if($ambulances->isEmpty() && $report_type == 1) {
                 Session::flash('error');
                 return redirect('/documente/rapoarte');
             }
