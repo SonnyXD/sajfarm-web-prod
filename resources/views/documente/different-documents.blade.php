@@ -28,7 +28,7 @@
         @foreach($transfers as $index => $value)
         <tr>
             <td>{{$transfers[$index]->id}}</td>
-        <td><a target="_blank" href="/pdfs/{{$transfers[$index]->uid}}.pdf">Transfer {{$transfers[$index]->id}}</a></td>
+        <td><a target="_blank" href="/pdfs/transferuri/{{$transfers[$index]->uid}}">Transfer {{$transfers[$index]->id}}</a></td>
             <td>{{$transfers[$index]->inventory_from->name}}</td>
             <td>{{$transfers[$index]->inventory_to->name}}</td>
             <td>{{date("d-m-Y", strtotime($transfers[$index]->document_date))}}</td>
@@ -57,7 +57,7 @@
         @foreach($consumptions as $consumption)
         <tr>
             <td>{{$consumption->id}}</td>
-        <td><a target="_blank" href="/pdfs/{{$consumption->uid}}.pdf">Consum {{$consumption->id}}</a></td>
+        <td><a target="_blank" href="/pdfs/consumuri/{{$consumption->uid}}">Consum {{$consumption->id}}</a></td>
             <td>{{$consumption->inventory->name}}</td>
             <td>{{$consumption->ambulance->license_plate}} / {{$consumption->medic->name ?? ''}}</td>
             <td>{{date("d-m-Y", strtotime($consumption->document_date))}}</td>

@@ -274,6 +274,10 @@ Route::get('/pdfs/facturi/{uid}', array('uses' => 'App\Http\Controllers\RoutesCo
 
 Route::get('/pdfs/retururi/{uid}', array('uses' => 'App\Http\Controllers\RoutesController@pdfs_retururi'));
 
+Route::get('/pdfs/transferuri/{uid}', array('uses' => 'App\Http\Controllers\RoutesController@pdfs_transferuri'));
+
+Route::get('/pdfs/consumuri/{uid}', array('uses' => 'App\Http\Controllers\RoutesController@pdfs_consumuri'));
+
 Route::get('/operatiuni/bon-consum-ambulante', array('uses' => 'App\Http\Controllers\RoutesController@bon_consum_ambulante'));
 
 Route::get('/operatiuni/bon-consum-medici', array('uses' => 'App\Http\Controllers\RoutesController@bon_consum_medici'));

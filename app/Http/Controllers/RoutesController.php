@@ -474,6 +474,83 @@ class RoutesController extends Controller
         PDF::Output('nir.pdf');
     }
 
+    public function pdfs_transferuri($uid = null) 
+    {
+        $transfer = Transfer::where('uid', $uid)->with('inventory_from', 'inventory_to')
+        ->first();
+
+        $new_date = date("d-m-Y", strtotime($transfer->document_date));
+
+        $items = TransferItem::with('item_stock', 'item_stock.invoice_item', 'item_stock.invoice_item.item', 'item_stock.invoice_item.measure_unit')
+        ->where('transfer_id', $transfer->id)    
+        ->get();
+
+        $total = 0;
+
+        foreach($items as $item) {
+            $total += ($item->item_stock->invoice_item->tva_price * $item->quantity);
+        }
+
+        $data = [
+            'transfer' => $transfer,
+            'user' => Auth::user(),
+            'institution' => Institution::first(),
+            'items' => TransferItem::where('transfer_id', $transfer->id)->get(),
+            'new_date' => $new_date,
+            'total' => $total
+        ];
+
+        $html = \View::make('pdf-generation.transfer', $data);
+        $html_content = $html->render();
+        
+        PDF::SetTitle('transfer');
+        PDF::AddPage();
+        PDF::writeHTML($html_content, true, false, true, false, '');
+
+        PDF::Output('transfer.pdf');
+    }
+
+    public function pdfs_consumuri($uid = null) 
+    {
+        $consumption = Consumption::where('uid', $uid)
+        ->first();
+
+        $new_date = date("d-m-Y", strtotime($consumption->document_date));
+
+        $items = ConsumptionItem::with('item_stock', 'item_stock.invoice_item', 'item_stock.invoice_item.item', 'item_stock.invoice_item.measure_unit')
+        ->where('consumption_id', $consumption->id)    
+        ->get();
+
+        $exploded = explode('-', $consumption->document_date);
+
+        $from = '01-'.$exploded[1].'-'.$exploded[0];
+
+        $total = 0;
+
+        foreach($items as $item) {
+            $total += ($item->item_stock->invoice_item->tva_price * $item->quantity);
+        }
+
+        $data = [
+            'consumption' => $consumption,
+            'user' => Auth::user(),
+            'institution' => Institution::first(),
+            'items' => ConsumptionItem::where('consumption_id', $consumption->id)->get(),
+            'new_date' => $new_date,
+            'total' => $total,
+            'from' => $from
+        ];
+
+        $html = \View::make('pdf-generation.consum', $data);
+        $html_content = $html->render();
+        
+        PDF::SetTitle('consum');
+        PDF::AddPage();
+        PDF::writeHTML($html_content, true, false, true, false, '');
+
+        PDF::Output('consum.pdf');
+    }
+
     public function pdfs_retururi($uid = null) 
     {
     $returning = Returning::with('returning_item', 'returning_item.item_stock', 'returning_item.item_stock.invoice_item',
@@ -561,7 +638,7 @@ class RoutesController extends Controller
 
     public function testing() 
     {
-        $items = TransferItem::where('transfer_id', 20)
+        $items = TransferItem::where('transfer_id', 5)
         ->get();
 
         $tva = 0;
