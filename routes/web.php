@@ -354,6 +354,10 @@ Route::get('expira-in-6-luni', 'App\Http\Controllers\ExpirareController@store')-
 
 Route::get('inventar', 'App\Http\Controllers\InventoryController@store')->name('inventory.store');
 
+Route::get('/testing', 'App\Http\Controllers\RoutesController@testing');
+
+Route::get('/documente/diferente-documente', 'App\Http\Controllers\RoutesController@different_documents');
+
 Route::get('centralizator-consum', array('uses' => 'App\Http\Controllers\CentralizatorConsumptionController@store'))->name('centralizator-consum.store');
 
 

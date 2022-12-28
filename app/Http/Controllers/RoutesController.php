@@ -559,4 +559,38 @@ class RoutesController extends Controller
         return view('documente.centralizator-consumuri', ['providers' => $providers, 'items' => $items, 'units' => $units, 'invoices' => $invoices, 'title' => $title, 'inventories' => $inventories]);
     }
 
+    public function testing() 
+    {
+        $items = TransferItem::where('transfer_id', 20)
+        ->get();
+
+        $tva = 0;
+        $no = 0;
+
+        foreach($items as $item) {
+            $stock = ItemStock::where('id', $item->item_stock_id)->first();
+
+            $med = InvoiceItem::where('id', $stock->invoice_item_id)->first();
+
+            $tva += $item->quantity * $med->tva_price;
+
+            $no += $item->quantity * $med->price;
+        }
+
+        return view('documente.testing', ['tva' => $tva, 'no' => $no]);
+    }
+
+    public function different_documents() 
+    {
+        $c_array = [15, 16, 17, 18, 19, 27, 30, 35, 36, 38, 39, 40, 46, 47, 48, 50, 52, 53, 54, 56, 57, 58, 59, 60, 61, 67, 69, 71, 72, 73, 74, 77, 87];
+
+        $consumptions = Consumption::whereIn('id', $c_array)->get();
+       
+        $t_array = [5, 6, 7, 8, 9, 13, 15, 18];
+
+        $transfers = Transfer::whereIn('id', $t_array)->get();
+
+        return view('documente.different-documents', ['consumptions' => $consumptions, 'transfers' => $transfers]);
+    }
+
 }

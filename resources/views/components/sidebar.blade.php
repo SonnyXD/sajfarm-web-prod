@@ -106,10 +106,16 @@
             <span class="menu-title">Documente Generate</span>
         </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
         <a class="nav-link" href="/documente/centralizator-consumuri">
             <i class="menu-icon mdi mdi-file-document-box-search-outline"></i>
             <span class="menu-title">Centralizator consumuri</span>
+        </a>
+        </li> -->
+        <li class="nav-item">
+        <a class="nav-link" href="/documente/diferente-documente">
+            <i class="menu-icon mdi mdi-file-document-box-search-outline"></i>
+            <span class="menu-title">Diferente Documente</span>
         </a>
         </li>
         <li class="nav-item nav-category">Diverse</li>
